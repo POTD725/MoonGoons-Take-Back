@@ -1,0 +1,132 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "schema_version": "1.0.0",
+  "factions": {
+    "lunar_peacekeepers": {
+      "unique_mechanics": [
+        "Security Zones from production structures grant friendly units +10% armor and passive regeneration.",
+        "Arrest & Interrogate can convert defeated human Syndicate units into ongoing Intel and Evidence value."
+      ],
+      "tier_2": [
+        {
+          "id": "pk_riot_vanguard",
+          "name": "Riot Vanguard",
+          "role": "Frontline tank and disruption",
+          "weapon": "Kinetic shotgun and heavy ballistic shield",
+          "abilities": ["Shield Wall: blocks 75% of frontal projectile damage while stationary.", "Flashbang: blinds and silences nearby units for 3 seconds."],
+          "tactical_use": "Absorb ambush damage and protect the line during hard pushes."
+        },
+        {
+          "id": "pk_k9_drone_operator",
+          "name": "K-9 Drone Operator",
+          "role": "Recon and tracker specialist",
+          "weapon": "Submachine gun",
+          "abilities": ["Release the Hounds: deploy Cyber-Canines that hunt stealthed infiltrators.", "Proximity Sensor: reveal a small fog-of-war area and cloaked units."],
+          "tactical_use": "Counter stealth from behind the Vanguard line."
+        }
+      ],
+      "tier_3": [
+        {
+          "id": "pk_enforcer_vehicle",
+          "name": "Enforcer Armored Patrol Vehicle",
+          "role": "Mobile fire support and transport",
+          "weapon": "Twin laser cannon",
+          "abilities": ["Riot Cleaver: ram through light barriers and ignore slows.", "Garrison: carry two infantry squads safely across hazardous terrain."],
+          "tactical_use": "Rapid response and perimeter breach support."
+        },
+        {
+          "id": "pk_elite_magistrate",
+          "name": "Elite Magistrate",
+          "role": "Commander and force multiplier",
+          "weapon": "High-impact rail rifle",
+          "abilities": ["Tactical Focus: aura grants allies +1 attack range.", "Judicial Strike: calls an orbital pinpoint laser from the Watchtower."],
+          "tactical_use": "Late-game army anchor; protect this hero carefully."
+        }
+      ]
+    },
+    "the_syndicate": {
+      "unique_mechanics": [
+        "Underground Network lets structures hide in fog of war until they attack or are detected.",
+        "Siphon lets mobile units steal Credits or Alloy from resource nodes without an extraction building."
+      ],
+      "tier_2": [
+        {
+          "id": "syn_shadow_stalker",
+          "name": "Shadow-Stalker Infiltrator",
+          "role": "Stealth assassin",
+          "weapon": "Monomolecular vibro-blades that bypass 50% armor",
+          "abilities": ["Active Cloaking: invisible while moving until detected or attacking.", "Sabotage Charge: structural explosive detonates after 8 seconds."],
+          "tactical_use": "Slip into a base and destroy priority infrastructure."
+        },
+        {
+          "id": "syn_smuggler_bruiser",
+          "name": "Smuggler Bruiser",
+          "role": "Heavy frontline brawler",
+          "weapon": "Modified mining laser that ramps damage on a sustained target",
+          "abilities": ["Adrenaline Surge: restore 25% health and resist crowd control for 4 seconds.", "Scavenge: defeating a vehicle grants 50 Lunar Alloy."],
+          "tactical_use": "Break heavy Peacekeeper lines and punish armored units."
+        }
+      ],
+      "tier_3": [
+        {
+          "id": "syn_widowmaker_sky_skiff",
+          "name": "Widowmaker Sky-Skiff",
+          "role": "Fast aerial transport and suppression",
+          "weapon": "Underside minigun",
+          "abilities": ["Air Drop: deploy two infantry anywhere, ignoring ground obstacles.", "Chaff Flare: break missile locks and orbital tracking."],
+          "tactical_use": "Insert raiders behind defensive walls."
+        },
+        {
+          "id": "syn_fixer",
+          "name": "The Fixer",
+          "role": "Tactical commander and disruption hero",
+          "weapon": "Customized snub-nose railgun",
+          "abilities": ["Bribery Aura: nearby enemy Tier 1 units deal 20% less damage.", "Blackout: darkens enemy mini-map and communications for 10 seconds."],
+          "tactical_use": "Blind a defender immediately before a decisive push."
+        }
+      ]
+    },
+    "the_nullborn": {
+      "unique_mechanics": [
+        "Corruption Grid spreads from structures, slows enemy units by 15%, and reduces basic radar visibility.",
+        "Bio-Mechanical Evolution spends Evidence and Lunar Alloy to permanently mutate weapons, armor, or abilities."
+      ],
+      "tier_2": [
+        {
+          "id": "nb_abyssal_defiler",
+          "name": "Abyssal Defiler",
+          "role": "Frontline bruiser and line breaker",
+          "weapon": "Bio-mechanical claws",
+          "abilities": ["Subterranean Burrow: hide underground and stun targets on emergence.", "Corrosive Vomit: shred 30% of armor for 6 seconds."],
+          "tactical_use": "Bypass Shield Walls and crack armored formations."
+        },
+        {
+          "id": "nb_nullborn_siphon",
+          "name": "Nullborn Siphon",
+          "role": "Utility and infiltration counter",
+          "weapon": "Leeching beam",
+          "abilities": ["Infect Node: lock down enemy extraction and redirect half the income.", "Neural Disruption: temporarily turn an enemy mechanical unit."],
+          "tactical_use": "Hijack enemy infrastructure and counter drone-heavy forces."
+        }
+      ],
+      "tier_3": [
+        {
+          "id": "nb_goliath_flesh_titan",
+          "name": "Goliath Flesh-Titan",
+          "role": "Siege engine and tank",
+          "weapon": "Twin plasma spore mortars",
+          "abilities": ["Grave Spores: temporarily revive fallen infantry as Scavengers.", "Bio-Mass Shield: consume a friendly Tier 1 unit for a large shield."],
+          "tactical_use": "Slow, relentless late-game push engine."
+        },
+        {
+          "id": "nb_singularity",
+          "name": "The Singularity",
+          "role": "Ultimate force multiplier and disruption hero",
+          "weapon": "Void Rift",
+          "abilities": ["Eldritch Growth: spreads Corrupted Ground around itself.", "Reality Tear: pull and freeze enemy units for 4 seconds."],
+          "tactical_use": "Group enemies for catastrophic follow-up damage."
+        }
+      ]
+    }
+  }
+}
