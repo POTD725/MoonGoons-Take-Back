@@ -1,0 +1,292 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "factions": {
+    "lunar_peacekeepers": {
+      "units": [
+        {
+          "id": "pk_patrol_deputy",
+          "name": "Patrol Deputy",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 100,
+            "lunar_alloy": 0,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 150,
+            "armor": 2,
+            "movement_speed": 4.5,
+            "vision_range": 12.0
+          },
+          "weapon": {
+            "name": "Pulse Carbine",
+            "type": "kinetic",
+            "damage": 12,
+            "attack_range": 8.0,
+            "fire_rate_seconds": 0.8
+          },
+          "abilities": [
+            {
+              "id": "suppressive_fire",
+              "name": "Suppressive Fire",
+              "cooldown": 15.0,
+              "duration": 5.0,
+              "effects": {
+                "target_speed_multiplier": 0.7,
+                "target_accuracy_multiplier": 0.6
+              }
+            },
+            {
+              "id": "detain",
+              "name": "Detain",
+              "cooldown": 5.0,
+              "target_condition": "organic_low_health",
+              "effects": {
+                "convert_to_resource": "evidence",
+                "resource_value": 25
+              }
+            }
+          ]
+        },
+        {
+          "id": "pk_combat_medic",
+          "name": "Combat Medic",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 125,
+            "lunar_alloy": 15,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 120,
+            "armor": 1,
+            "movement_speed": 4.8,
+            "vision_range": 10.0
+          },
+          "weapon": {
+            "name": "Non-Lethal Stun Pistol",
+            "type": "kinetic",
+            "damage": 4,
+            "attack_range": 4.0,
+            "fire_rate_seconds": 1.2
+          },
+          "abilities": [
+            {
+              "id": "nano_med_injection",
+              "name": "Nano-Med Injection",
+              "cooldown": 8.0,
+              "target_type": "friendly_biological",
+              "effects": {
+                "heal_amount_pct": 0.4,
+                "heal_duration_seconds": 4.0
+              }
+            },
+            {
+              "id": "stim_drone_deploy",
+              "name": "Stim Drone Deploy",
+              "cooldown": 20.0,
+              "effects": {
+                "target_fire_rate_multiplier": 1.15,
+                "duration": 6.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "the_syndicate": {
+      "units": [
+        {
+          "id": "syn_black_market_runner",
+          "name": "Black-Market Runner",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 85,
+            "lunar_alloy": 0,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 110,
+            "armor": 0,
+            "movement_speed": 5.5,
+            "vision_range": 14.0
+          },
+          "weapon": {
+            "name": "Dual Automatic Pistols",
+            "type": "kinetic",
+            "damage": 18,
+            "attack_range": 5.0,
+            "fire_rate_seconds": 0.4
+          },
+          "abilities": [
+            {
+              "id": "sprint",
+              "name": "Sprint",
+              "cooldown": 12.0,
+              "duration": 6.0,
+              "effects": {
+                "self_speed_multiplier": 1.4,
+                "self_armor_modifier": -10
+              }
+            },
+            {
+              "id": "siphon",
+              "name": "Siphon",
+              "cooldown": 0.0,
+              "is_passive": true,
+              "target_type": "resource_node",
+              "effects": {
+                "credits_per_second": 2
+              }
+            }
+          ]
+        },
+        {
+          "id": "syn_wire_tapper",
+          "name": "Syndicate Wire-Tapper",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 110,
+            "lunar_alloy": 20,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 100,
+            "armor": 1,
+            "movement_speed": 5.0,
+            "vision_range": 12.0
+          },
+          "weapon": {
+            "name": "Silenced Pistol",
+            "type": "kinetic",
+            "damage": 8,
+            "attack_range": 6.0,
+            "fire_rate_seconds": 0.9,
+            "breaks_stealth": false
+          },
+          "abilities": [
+            {
+              "id": "grid_hack",
+              "name": "Grid Hack",
+              "cooldown": 18.0,
+              "target_type": "enemy_mechanical",
+              "effects": {
+                "stun_duration_seconds": 5.0
+              }
+            },
+            {
+              "id": "intel_smoke",
+              "name": "Intel Smoke",
+              "cooldown": 25.0,
+              "effects": {
+                "radius": 4.0,
+                "friendly_evasion_pct": 0.5,
+                "duration_seconds": 6.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "the_nullborn": {
+      "units": [
+        {
+          "id": "nb_corrupted_scavenger",
+          "name": "Corrupted Scavenger",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 60,
+            "lunar_alloy": 0,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 80,
+            "armor": 0,
+            "movement_speed": 4.2,
+            "vision_range": 9.0
+          },
+          "weapon": {
+            "name": "Bio-Energy Cutter",
+            "type": "bio_acid",
+            "damage": 10,
+            "attack_range": 1.5,
+            "fire_rate_seconds": 0.7
+          },
+          "abilities": [
+            {
+              "id": "self_detonate",
+              "name": "Self-Detonate",
+              "cooldown": 0.0,
+              "effects": {
+                "aoe_damage": 40,
+                "aoe_radius": 2.5,
+                "leaves_corrupted_ground": true
+              }
+            },
+            {
+              "id": "consume_system",
+              "name": "Consume System",
+              "cooldown": 10.0,
+              "target_type": "neutral_debris_or_disabled_structure",
+              "effects": {
+                "instant_credit_grant": 75
+              }
+            }
+          ]
+        },
+        {
+          "id": "nb_shard_drone",
+          "name": "Shard Drone",
+          "tier": 1,
+          "class": "light_infantry",
+          "cost": {
+            "credits": 95,
+            "lunar_alloy": 10,
+            "command_capacity": 1
+          },
+          "stats": {
+            "max_hp": 90,
+            "armor": 1,
+            "movement_speed": 6.0,
+            "vision_range": 11.0
+          },
+          "weapon": {
+            "name": "Unstable Energy Needle",
+            "type": "energy",
+            "damage": 5,
+            "attack_range": 7.0,
+            "fire_rate_seconds": 0.3
+          },
+          "abilities": [
+            {
+              "id": "phase_shift",
+              "name": "Phase Shift",
+              "cooldown": 14.0,
+              "effects": {
+                "invulnerable": true,
+                "disallow_attacks": true,
+                "duration_seconds": 3.0
+              }
+            },
+            {
+              "id": "overload",
+              "name": "Overload",
+              "cooldown": 20.0,
+              "effects": {
+                "fire_rate_multiplier": 1.5,
+                "hp_loss_per_second_pct": 0.05,
+                "duration_seconds": 5.0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
