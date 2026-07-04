@@ -1,0 +1,219 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "schema_version": "1.0.0",
+  "factions": {
+    "lunar_peacekeepers": {
+      "playstyle": "Defensive, adaptive law enforcement built around Security Zones, repair, arrest, and investigation.",
+      "progression": ["pk_command_nexus", "pk_tactical_armory", "pk_drone_bay", "pk_communications_relay", "pk_field_medbay", "pk_evidence_vault", "pk_orbital_watchtower"],
+      "buildings": [
+        {
+          "id": "pk_command_nexus",
+          "name": "Command Nexus",
+          "tier": 1,
+          "cost": {"credits": 500, "lunar_alloy": 0},
+          "command_capacity": 20,
+          "prerequisites": [],
+          "functions": ["Processes economy collections", "Trains standard workers and drones"],
+          "passive": {"id": "security_grid", "radius_m": 30, "friendly_armor_multiplier": 1.1, "friendly_health_regen": true},
+          "upgrade": {"id": "sector_lockdown", "cost": {"credits": 200, "lunar_alloy": 50}, "effect": "Fortifies the Nexus with defensive kinetic turrets."}
+        },
+        {
+          "id": "pk_tactical_armory",
+          "name": "Tactical Armory",
+          "tier": 1,
+          "cost": {"credits": 150, "lunar_alloy": 25},
+          "prerequisites": ["pk_command_nexus"],
+          "functions": ["Recruit Patrol Deputies", "Research armor plating and weapon calibrations"],
+          "upgrade": {"id": "calibration", "max_tiers": 3, "effect": "+10% weapon damage and armor per tier."}
+        },
+        {
+          "id": "pk_drone_bay",
+          "name": "Drone Bay",
+          "tier": 1,
+          "cost": {"credits": 175, "lunar_alloy": 40},
+          "prerequisites": ["pk_command_nexus"],
+          "functions": ["Build logistics drones and defensive support assets", "Repair mechanical units in local radius"]
+        },
+        {
+          "id": "pk_communications_relay",
+          "name": "Communications Relay",
+          "tier": 2,
+          "cost": {"credits": 250, "lunar_alloy": 75},
+          "prerequisites_any": ["pk_tactical_armory", "pk_drone_bay"],
+          "functions": ["Unlock Tier 2", "Extend radar coverage"],
+          "passive": {"id": "intel_uplink", "intel_per_second": 1}
+        },
+        {
+          "id": "pk_field_medbay",
+          "name": "Field Medbay",
+          "tier": 2,
+          "cost": {"credits": 200, "lunar_alloy": 50},
+          "prerequisites": ["pk_communications_relay"],
+          "functions": ["Recruit Combat Medics and heavy response teams", "Heal nearby organic units outside combat"]
+        },
+        {
+          "id": "pk_evidence_vault",
+          "name": "Evidence Vault & Holding Cells",
+          "tier": 2,
+          "cost": {"credits": 220, "lunar_alloy": 60},
+          "prerequisites": ["pk_communications_relay"],
+          "functions": ["Unlock Arrest & Interrogate", "Convert detained enemies into Evidence and Intel"]
+        },
+        {
+          "id": "pk_orbital_watchtower",
+          "name": "Orbital Watchtower",
+          "tier": 3,
+          "cost": {"credits": 400, "lunar_alloy": 150},
+          "prerequisites": ["pk_evidence_vault", "pk_field_medbay"],
+          "functions": ["Unlock Tier 3", "Authorize Elite Magistrates and armored vehicle groups"],
+          "commander_abilities": [
+            {"id": "sat_scan", "intel_cost": 40, "duration_seconds": 10, "effect": "Reveal a target area through fog of war."},
+            {"id": "judicial_ray", "intel_cost": 150, "cooldown_seconds": 45, "effect": "Precision orbital strike against a heavy unit or enemy hub."}
+          ]
+        }
+      ]
+    },
+    "the_syndicate": {
+      "playstyle": "Fast, hidden, and economically disruptive raiders built around stealth, sabotage, siphoning, and rapid extraction.",
+      "progression": ["syn_hideout_core", "syn_scrap_workshop", "syn_signal_jammer", "syn_smuggling_hub", "syn_safehouse_network", "syn_chop_shop", "syn_council"],
+      "buildings": [
+        {
+          "id": "syn_hideout_core",
+          "name": "Hideout Core",
+          "tier": 1,
+          "cost": {"credits": 450, "lunar_alloy": 0},
+          "command_capacity": 15,
+          "prerequisites": [],
+          "functions": ["Processes stolen, siphoned, and scavenged currency", "Produces basic runners and drone scavengers"],
+          "passive": {"id": "underground_network", "effect": "Hidden from enemy mini-map until it attacks or is specially scanned."}
+        },
+        {
+          "id": "syn_scrap_workshop",
+          "name": "Scrap Workshop",
+          "tier": 1,
+          "cost": {"credits": 130, "lunar_alloy": 20},
+          "prerequisites": ["syn_hideout_core"],
+          "functions": ["Recruit Black-Market Runners", "Research rate-of-fire and speed enhancements"],
+          "upgrade": {"id": "speed_enhancements", "max_tiers": 3, "effect": "+12% movement speed per tier."}
+        },
+        {
+          "id": "syn_signal_jammer",
+          "name": "Signal Jammer",
+          "tier": 1,
+          "cost": {"credits": 160, "lunar_alloy": 35},
+          "prerequisites": ["syn_hideout_core"],
+          "functions": ["Shroud friendly units and structures from standard radar"],
+          "passive": {"id": "fog_shroud", "radius_m": 40}
+        },
+        {
+          "id": "syn_smuggling_hub",
+          "name": "Smuggling Hub",
+          "tier": 2,
+          "cost": {"credits": 225, "lunar_alloy": 65},
+          "prerequisites_any": ["syn_scrap_workshop", "syn_signal_jammer"],
+          "functions": ["Unlock Tier 2"],
+          "passive": {"id": "fast_turnaround", "infantry_build_time_multiplier": 0.85}
+        },
+        {
+          "id": "syn_safehouse_network",
+          "name": "Safehouse Network",
+          "tier": 2,
+          "cost": {"credits": 180, "lunar_alloy": 45},
+          "prerequisites": ["syn_smuggling_hub"],
+          "functions": ["Recruit Wire-Tappers and Shadow-Stalker Infiltrators", "Place invisible extraction points near neutral districts"]
+        },
+        {
+          "id": "syn_chop_shop",
+          "name": "Chop Shop",
+          "tier": 2,
+          "cost": {"credits": 210, "lunar_alloy": 55},
+          "prerequisites": ["syn_smuggling_hub"],
+          "functions": ["Unlock vehicles", "Convert salvaged mechanical wreckage into Lunar Alloy"]
+        },
+        {
+          "id": "syn_council",
+          "name": "Syndicate Council",
+          "tier": 3,
+          "cost": {"credits": 375, "lunar_alloy": 130},
+          "prerequisites": ["syn_safehouse_network", "syn_chop_shop"],
+          "functions": ["Unlock Tier 3", "Authorize The Fixer and Widowmaker Sky-Skiffs"],
+          "commander_abilities": [
+            {"id": "siphon_hack", "intel_cost": 50, "effect": "Drain 150 Credits from a targeted enemy resource repository."},
+            {"id": "blackout_pulse", "intel_cost": 120, "cooldown_seconds": 60, "effect": "Disrupt enemy mini-map and control groups for 12 seconds."}
+          ]
+        }
+      ]
+    },
+    "the_nullborn": {
+      "playstyle": "Organic assimilation that mutates units, consumes resource sites, infects infrastructure, and turns terrain into a weapon.",
+      "progression": ["nb_spore_heart", "nb_biomass_vent", "nb_shard_nest", "nb_infestation_pod", "nb_mutation_chamber", "nb_neural_node", "nb_apex_singularity"],
+      "buildings": [
+        {
+          "id": "nb_spore_heart",
+          "name": "Spore Heart",
+          "tier": 1,
+          "cost": {"credits": 400, "lunar_alloy": 20},
+          "command_capacity": 15,
+          "prerequisites": [],
+          "functions": ["Process raw matter into bio-energy", "Spawn Corrupted Scavengers"],
+          "passive": {"id": "corruption_grid", "radius_m": 35, "enemy_speed_multiplier": 0.85, "minor_damage_over_time": true}
+        },
+        {
+          "id": "nb_biomass_vent",
+          "name": "Biomass Vent",
+          "tier": 1,
+          "cost": {"credits": 120, "lunar_alloy": 15},
+          "prerequisites": ["nb_spore_heart"],
+          "placement_rule": "Must be placed directly on a resource node.",
+          "functions": ["Digest deposits into raw materials", "Permanently deny the consumed node to other factions"]
+        },
+        {
+          "id": "nb_shard_nest",
+          "name": "Shard Nest",
+          "tier": 1,
+          "cost": {"credits": 140, "lunar_alloy": 25},
+          "prerequisites": ["nb_spore_heart"],
+          "functions": ["Breed Shard Drones", "Research shell armor thickeners"],
+          "upgrade": {"id": "shell_thickener", "max_tiers": 3, "effect": "+15% unit HP per evolution tier."}
+        },
+        {
+          "id": "nb_infestation_pod",
+          "name": "Infestation Pod",
+          "tier": 2,
+          "cost": {"credits": 230, "lunar_alloy": 60},
+          "prerequisites_any": ["nb_biomass_vent", "nb_shard_nest"],
+          "functions": ["Unlock Tier 2", "Act as a secondary spawn node", "Grow spore turrets along Corrupted Ground"]
+        },
+        {
+          "id": "nb_mutation_chamber",
+          "name": "Mutation Chamber",
+          "tier": 2,
+          "cost": {"credits": 190, "lunar_alloy": 50},
+          "prerequisites": ["nb_infestation_pod"],
+          "functions": ["Recruit Abyssal Defilers", "Unlock permanent on-field weapon and carapace mutations"]
+        },
+        {
+          "id": "nb_neural_node",
+          "name": "Neural Node",
+          "tier": 2,
+          "cost": {"credits": 200, "lunar_alloy": 55},
+          "prerequisites": ["nb_infestation_pod"],
+          "functions": ["Recruit Nullborn Siphons"],
+          "passive": {"id": "corruption_acceleration", "nearby_building_spread_multiplier": 1.5}
+        },
+        {
+          "id": "nb_apex_singularity",
+          "name": "Apex Singularity",
+          "tier": 3,
+          "cost": {"credits": 420, "lunar_alloy": 140},
+          "prerequisites": ["nb_mutation_chamber", "nb_neural_node"],
+          "functions": ["Unlock Tier 3", "Authorize Goliath Flesh-Titans and The Singularity"],
+          "commander_abilities": [
+            {"id": "bio_infect", "intel_cost": 60, "effect": "Disable an enemy mining/base structure and siphon 50% of its yield."},
+            {"id": "marrow_burst", "intel_cost": 140, "cooldown_seconds": 50, "effect": "Shockwave that reduces vehicle armor and leaves Corrupted Ground."}
+          ]
+        }
+      ]
+    }
+  }
+}
