@@ -1,0 +1,119 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "schema_version": "1.0.0",
+  "resources": {
+    "credits": {
+      "class": "macro",
+      "purpose": "Construct buildings, recruit baseline infantry, and purchase standard upgrades.",
+      "sources": ["Helium-3 vents", "civilian tax zones", "black-market trade depots"],
+      "cap": "Soft-capped by active Storage Vaults."
+    },
+    "lunar_alloy": {
+      "class": "macro",
+      "purpose": "Build advanced structures, heavy vehicles, armor upgrades, and mutations.",
+      "sources": ["strip-mined craters", "mechanical debris salvage", "hijacked supply trucks"],
+      "cap": "Unlimited; requires dedicated processing facilities."
+    },
+    "intel": {
+      "class": "tactical",
+      "purpose": "Spend on commander abilities, scans, and support call-downs.",
+      "sources": ["communications relays", "hacked terminals", "interrogated prisoners"],
+      "cap": 200
+    },
+    "evidence": {
+      "class": "tactical",
+      "purpose": "Unlock Tier 3 technology, heroes, and high-value mission outcomes.",
+      "sources": ["crime scenes", "mid-match objectives", "battlefield arrests"],
+      "cap": "Uncapped, but intentionally slow."
+    },
+    "command_capacity": {
+      "class": "force_limit",
+      "purpose": "Limits active units; grows through headquarters, relays, research, and districts."
+    }
+  },
+  "harvesting": {
+    "lunar_peacekeepers": "Build Extraction Depots and use protected automated drones inside Security Grids.",
+    "the_syndicate": "Use mobile runners and scavenger crews to Siphon nodes directly for reduced but flexible yield.",
+    "the_nullborn": "Spread Corrupted Ground and morph a worker into a Bio-Vent; the resource is consumed and denied permanently."
+  },
+  "district_bonuses": [
+    {"district": "black_market_spaceport", "effect": "Tier 1 and Tier 2 unit Credit costs reduced by 10%."},
+    {"district": "abandoned_mining_site", "effect": "+2 Lunar Alloy per second."},
+    {"district": "communications_relay", "effect": "+1 Intel per second and reveal adjacent sectors."},
+    {"district": "crater_settlement", "effect": "+10 Command Capacity."}
+  ],
+  "damage_modifiers": {
+    "kinetic": {"light_infantry": 1.0, "heavy_infantry": 0.75, "heavy_mechanical": 0.5},
+    "energy": {"light_infantry": 0.75, "heavy_infantry": 1.25, "heavy_mechanical": 1.0},
+    "bio_acid": {"light_infantry": 1.25, "heavy_infantry": 0.5, "heavy_mechanical": 1.5}
+  },
+  "macro_matchups": [
+    {"advantage": "lunar_peacekeepers", "against": "the_syndicate", "reason": "Security Zones, sensors, and fortified lockdown tools resist stealth raids."},
+    {"advantage": "the_syndicate", "against": "the_nullborn", "reason": "Mobility and economic harassment pressure slow corruption growth."},
+    {"advantage": "the_nullborn", "against": "lunar_peacekeepers", "reason": "Bio-acid, armor corrosion, and terrain corruption break static defensive lines."}
+  ],
+  "controls": {
+    "selection": {
+      "left_click": "Select a unit or structure.",
+      "drag_select": "Box select friendly mobile combat units; ignore workers when mixed with combat units.",
+      "right_click": {"terrain": "Move", "enemy": "Attack", "resource_node": "Harvest or Siphon"}
+    },
+    "camera": {"edge_scroll": true, "middle_mouse_pan": true, "mouse_wheel_zoom": true},
+    "global_hotkeys": {
+      "space": "Center camera on latest alert.",
+      "ctrl_0_9": "Assign control group.",
+      "0_9": "Recall control group; double-tap centers camera.",
+      "f1": "Select all idle workers.",
+      "f2": "Select all active combat units.",
+      "shift_right_click": "Queue commands."
+    },
+    "grid": {
+      "Q": "Primary ability or production", "W": "Secondary ability or production", "E": "Tertiary ability or production", "R": "Fourth ability or production",
+      "A": "Secondary-row ability or production", "S": "Secondary-row ability or production", "D": "Secondary-row ability or production", "F": "Secondary-row ability or production",
+      "Z": "Attack-move", "X": "Stop", "C": "Hold Ground", "V": "Patrol"
+    }
+  },
+  "map_design": {
+    "competitive_rules": {
+      "minimum_choke_clearance_heavy_vehicle_widths": 1.5,
+      "sector_capture": "Every sector has a Capture Terminal that grants vision and a district bonus.",
+      "one_v_one_symmetry": "Point- or line-symmetric around map center."
+    },
+    "standard_1v1_sectors": ["player_1_safe_sector", "player_1_natural_expansion", "player_1_flank_sector", "lunar_center", "player_2_flank_sector", "player_2_natural_expansion", "player_2_safe_sector"],
+    "hazards": [
+      {"id": "corrosive_gas_vent", "duration_seconds": 12, "effect": "Armor becomes 0 and units take hull damage over time."},
+      {"id": "neutral_syndicate_raid_outpost", "effect": "AI guards high-value sectors; defeat awards Intel and Evidence caches."},
+      {"id": "low_gravity_pocket", "effect": "+25% movement speed and +2 attack range, but -20% armor."}
+    ]
+  },
+  "campaign": {
+    "persistent_rules": [
+      "Mission objectives grant technology tokens for between-mission loadouts.",
+      "Heroes retain experience and unlock persistent passive traits.",
+      "After Act I, branching investigation routes provide different unlocks."
+    ],
+    "acts": [
+      {
+        "id": "act_1", "title": "The Broken Peace", "theme": "Routine inspection reveals coordinated Syndicate sabotage and a mysterious system failure.",
+        "missions": [
+          {"id": "1.01", "title": "First Response", "map": "Damaged Outpost / Crater Slum Sector", "primary": "Secure the Command Nexus and repair 3 automated defenses.", "secondary": "Arrest the fleeing Syndicate ringleader.", "unlocks": ["Patrol Deputy", "Command Nexus Base Kit"]},
+          {"id": "1.02", "title": "The Breach", "map": "Abandoned Mining Colony", "primary": "Escort a resource convoy to the Communications Relay.", "secondary": "Scavenge 3 hidden Lunar Alloy caches.", "unlocks": ["Tactical Armory", "Combat Medic"]}
+        ]
+      },
+      {
+        "id": "act_2", "title": "Underworld Crackdown", "theme": "The crackdown uncovers digital corruption and organic anomalies in deep tunnels.",
+        "missions": [
+          {"id": "2.01", "title": "Smuggler's Run", "choice": "A", "map": "Black-Market Spaceport / Orbital Docks", "primary": "Plant trackers on 4 Syndicate cargo ships before launch.", "secondary": "Hack terminal to siphon 1,000 Credits.", "unlocks": ["Drone Bay", "K-9 Drone Operator"]},
+          {"id": "2.02", "title": "Cold Storage", "choice": "B", "map": "Frozen Lunar Valley / Sealed Research Facility", "primary": "Secure 5 high-value Evidence canisters.", "secondary": "Neutralize automated defenses without losing heavy vehicles.", "unlocks": ["Field Medbay", "Riot Vanguard"]}
+        ]
+      },
+      {
+        "id": "act_3", "title": "The Null Protocols", "theme": "The Nullborn consume both Syndicate and Peacekeeper infrastructure, forcing fragile alliances.",
+        "missions": [
+          {"id": "3.01", "title": "Containment Failure", "map": "Underground Tunnels / Corrupted Precinct Hub", "primary": "Hold for 15 minutes while civilian transports prepare.", "secondary": "Destroy infected resource nodes to slow the swarm.", "unlocks": ["Orbital Watchtower", "Elite Magistrate"]},
+          {"id": "3.02", "title": "The Singularity Event", "map": "Ruined Research Core / Map Center", "primary": "Protect the core array and destroy 3 regional Apex Singularity nests.", "secondary": "Rescue a trapped Syndicate boss for fire support.", "unlocks": ["Full Custom Skirmish Sandbox Suite"]}
+        ]
+      }
+    ]
+  }
+}
