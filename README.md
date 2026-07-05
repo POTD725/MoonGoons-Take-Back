@@ -1,23 +1,23 @@
 # MoonGoons Take Back 🌙
 
-**MoonGoons Take Back** is a Godot 4 real-time strategy prototype and the growing foundation for the wider **MoonGoons** universe. Build a lunar precinct economy, control territory, command squads, and dismantle the Syndicate before the Nullborn crisis consumes the Moon.
+**MoonGoons Take Back** is a Godot 4 real-time strategy prototype and the growing foundation for the wider **MoonGoons** universe. Build a lunar precinct economy, control territory, command squads, establish forward operations, and dismantle the Syndicate before the Nullborn crisis consumes the Moon.
 
-## Playable RTS prototype: Phase Two
+## Playable RTS prototype: Phase Three
 
-`scenes/Main.tscn` now launches a code-drawn **Peacekeeper versus Syndicate RTS skirmish** with the first command-and-production upgrade layer.
+`scenes/Main.tscn` launches a code-drawn **Peacekeeper versus Syndicate RTS skirmish** with economy, production, command, and territorial expansion systems.
 
-- Select individual units with left-click or drag a selection box around a squad.
+- Select units with left-click or a drag-selection box.
 - Send **Survey Drones** to Credits or Lunar Alloy nodes with right-click.
 - Drones harvest, return cargo to the Command Nexus, and fund your build order.
-- Train more Drones and Patrol Deputies from the Command Nexus.
 - Build Communications Relays, Tactical Armories, and Security Turrets with selected Drones.
 - Communications Relays increase **Command Capacity**, MoonGoons Take Back’s supply limit.
 - Tactical Armories unlock Riot Vanguards.
-- Patrol Deputy and Riot Vanguard costs now resolve from the live Peacekeeper unit catalog.
-- Set rally points with **Shift + right-click**.
-- Assign or recall five control groups with **Shift + 1–5** and **1–5**.
+- Patrol Deputy and Riot Vanguard costs resolve from the Peacekeeper unit catalog.
+- Set rally points with **Shift + right-click** and assign up to five control groups.
 - Hold combat lines with `H`, attack-move with `A`, and activate Riot Vanguard Shield Wall with `S`.
-- Destroy the Syndicate Hideout before its Runner and Bruiser waves destroy your Command Nexus.
+- Capture **Aurora Exchange**, **Gravity Foundry**, and **Eclipse Signal Tower** with combat units.
+- Build a completed Communications Relay within a secured sector to create a **Forward Relay** that doubles that sector’s income.
+- Destroy the Syndicate Hideout before its escalating waves destroy your Command Nexus.
 
 The live scene remains an early skirmish slice, not a complete commercial RTS. It uses code-drawn visuals and has no external texture or font dependency.
 
@@ -62,12 +62,12 @@ See [`INSTALL.md`](INSTALL.md) for Windows, macOS, Linux, Godot path, testing, a
 - A 20-mission campaign catalog: Mission 1.01 through the Mission 1.20 finale.
 - Fixed-point simulation helpers, seeded RNG, lockstep turn buffering, state hashing, Resource Bank, combat/arrest resolution, and ability cooldowns.
 - Data-driven campaign trigger runner, local checksummed profile/snapshot saves, and GitHub Actions smoke-test automation.
-- A playable RTS economy with two resources, workers, capacity, production, structures, defense, attack-move, enemy waves, data-driven Peacekeeper production, control groups, rally points, auto-harvest, adaptive enemy response, and Shield Wall.
+- A playable RTS economy with workers, Credits, Lunar Alloy, Command Capacity, production, structures, defensive units, attack-move, enemy waves, data-driven Peacekeeper production, control groups, rally points, auto-harvest, adaptive enemy response, Shield Wall, territorial capture, sector income, and Forward Relay bonuses.
 
 ## Three-faction destination
 
-- **Lunar Peacekeepers:** combined arms, defensive grids, lawful territory control, capacity-based expansion, and tactical defensive abilities.
-- **The Syndicate:** mobility, stealth, air-drop raiding, and mobile Credit Siphons.
+- **Lunar Peacekeepers:** combined arms, defensive grids, lawful territory reclamation, capacity-based expansion, and tactical defensive abilities.
+- **The Syndicate:** mobility, stealth, air-drop raiding, mobile Credit Siphons, and economic sabotage.
 - **The Nullborn:** Corrupted Ground, Biomass Vents, swarm pressure, and territorial attrition.
 
 The current playable skirmish is Peacekeeper versus Syndicate. Playable Syndicate and Nullborn economies, obstacle-aware pathfinding, worker repair, full build trees, fog of war, deeper abilities, map variety, boss fights, campaign scenes, original art/audio, Android controls, and online network transport remain future development work.
@@ -75,25 +75,28 @@ The current playable skirmish is Peacekeeper versus Syndicate. Playable Syndicat
 ## Project map
 
 ```text
-LICENSE                                  MIT license for repository code and documentation
-INSTALL.md                               Godot installation and testing guide
-compile_and_test.sh                      Local headless verification
-.github/workflows/godot-ci.yml           GitHub Actions verification
+LICENSE                                      MIT license for repository code and documentation
+INSTALL.md                                   Godot installation and testing guide
+compile_and_test.sh                          Local headless verification
+.github/workflows/godot-ci.yml               GitHub Actions verification
 
-scenes/Main.tscn                         Current Phase Two RTS skirmish scene
-scripts/moongoons_rts_match.gd           Economy, construction, combat, and enemy loop
-scripts/moongoons_rts_match_launch.gd    Basic RTS launch adapter
-scripts/moongoons_rts_phase_two.gd       Data-driven production and command layer
-scripts/mission_controller.gd            Multi-catalog campaign trigger runner
-scripts/simulation/                      Fixed-point, combat, resource, and lockstep systems
+scenes/Main.tscn                             Current Phase Three RTS skirmish scene
+scripts/moongoons_rts_match.gd               Economy, construction, combat, and enemy loop
+scripts/moongoons_rts_match_launch.gd        Basic RTS launch adapter
+scripts/moongoons_rts_phase_two.gd           Data-driven production and command layer
+scripts/moongoons_rts_phase_three.gd         Territory capture and forward-operations layer
+scripts/mission_controller.gd                Multi-catalog campaign trigger runner
+scripts/simulation/                          Fixed-point, combat, resource, and lockstep systems
 
-data/rts_skirmish_rules.json             RTS loop and faction direction
-data/rts_phase_two_rules.json            Control, rally, ability, and escalation rules
-data/campaign_missions.json              Missions 1.01–1.02
-data/campaign_missions_act_2_to_4.json   Missions 1.03–1.20
+data/rts_skirmish_rules.json                 RTS loop and faction direction
+data/rts_phase_two_rules.json                Control, rally, ability, and escalation rules
+data/rts_phase_three_territories.json        Territory capture and Forward Relay rules
+data/campaign_missions.json                  Missions 1.01–1.02
+data/campaign_missions_act_2_to_4.json       Missions 1.03–1.20
 
-docs/RTS_SKIRMISH.md                     Full RTS control and scope guide
-tests/rts_phase_two_smoke_test.gd        Phase Two rules/controller smoke test
+docs/RTS_SKIRMISH.md                         Full RTS control and scope guide
+tests/rts_phase_two_smoke_test.gd            Phase Two rules/controller smoke test
+tests/rts_phase_three_smoke_test.gd          Phase Three territory smoke test
 ```
 
 ## Licensing
