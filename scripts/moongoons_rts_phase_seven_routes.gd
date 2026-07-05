@@ -14,6 +14,18 @@ func _draw_world() -> void:
 	super._draw_world()
 	_draw_queued_routes()
 
+func _command_selected_combat(destination: Vector2, target_enemy_id: String, is_attack_move: bool) -> void:
+	for unit: Variant in combat_units:
+		if bool(unit.selected):
+			route_queues.erase(String(unit.id))
+	super._command_selected_combat(destination, target_enemy_id, is_attack_move)
+
+func _command_selected_workers_move(destination: Vector2) -> void:
+	for worker: Variant in workers:
+		if bool(worker.selected):
+			route_queues.erase(String(worker.id))
+	super._command_selected_workers_move(destination)
+
 func _move_worker(worker: Variant, destination: Vector2, delta: float) -> void:
 	super._move_worker(worker, destination, delta)
 	_advance_route_if_arrived(String(worker.id), worker)
