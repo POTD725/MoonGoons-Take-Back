@@ -1,0 +1,71 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "data_type": "unit_profiles_tier_3",
+  "factions": {
+    "lunar_peacekeepers": {
+      "units": [
+        {
+          "id": "pk_heavy_enforcer",
+          "name": "Enforcer Armored Patrol Vehicle",
+          "tier": 3,
+          "class": "mechanical_vehicle",
+          "cost": {"credits": 300, "lunar_alloy": 90, "command_capacity": 4},
+          "stats": {"max_hp": 650, "armor": 8, "movement_speed": 4.8, "vision_range": 13.0},
+          "weapon": {"name": "Twin Laser Cannon", "type": "energy", "damage": 45, "attack_range": 9.0, "fire_rate_seconds": 1.1},
+          "abilities": [
+            {"id": "riot_cleaver", "name": "Riot Cleaver", "cooldown": 18.0, "duration": 5.0, "effects": {"cc_immunity": true, "ram_damage_infantry": 80, "speed_multiplier": 1.25}},
+            {"id": "garrison_transport", "name": "Garrison", "cooldown": 0.0, "is_passive": true, "effects": {"max_transport_slots": 2, "protects_passengers_from_hazards": true}}
+          ]
+        },
+        {
+          "id": "pk_hero_magistrate",
+          "name": "Elite Magistrate",
+          "tier": 3,
+          "class": "hero_officer",
+          "cost": {"credits": 450, "lunar_alloy": 120, "evidence": 50, "command_capacity": 5},
+          "stats": {"max_hp": 500, "armor": 5, "movement_speed": 4.2, "vision_range": 15.0},
+          "weapon": {"name": "High-Impact Rail Rifle", "type": "energy", "damage": 110, "attack_range": 12.0, "fire_rate_seconds": 2.2},
+          "abilities": [
+            {"id": "tactical_focus", "name": "Tactical Focus", "cooldown": 0.0, "is_passive": true, "effects": {"aura_radius": 20.0, "friendly_unit_range_bonus": 1.0}},
+            {"id": "judicial_strike", "name": "Judicial Strike", "cooldown": 45.0, "effects": {"target_type": "single_structure_or_vehicle", "orbital_damage": 750}}
+          ]
+        }
+      ]
+    },
+    "the_syndicate": {
+      "units": [
+        {
+          "id": "syn_sky_skiff",
+          "name": "Widowmaker Sky-Skiff",
+          "tier": 3,
+          "class": "mechanical_vehicle",
+          "cost": {"credits": 280, "lunar_alloy": 80, "command_capacity": 4},
+          "stats": {"max_hp": 420, "armor": 4, "movement_speed": 6.5, "vision_range": 14.0},
+          "weapon": {"name": "Underside Minigun", "type": "kinetic", "damage": 15, "attack_range": 7.5, "fire_rate_seconds": 0.15, "is_aoe_suppressive": true},
+          "abilities": [
+            {"id": "air_drop", "name": "Air Drop", "cooldown": 30.0, "effects": {"max_drop_slots": 2, "ignores_ground_collision": true}},
+            {"id": "chaff_flare", "name": "Chaff Flare", "cooldown": 20.0, "duration": 4.0, "effects": {"breaks_missile_locks": true, "breaks_orbital_tracking": true}}
+          ]
+        },
+        {
+          "id": "syn_hero_fixer",
+          "name": "The Fixer",
+          "tier": 3,
+          "class": "hero_officer",
+          "cost": {"credits": 400, "lunar_alloy": 100, "intel": 100, "command_capacity": 5},
+          "stats": {"max_hp": 400, "armor": 3, "movement_speed": 5.0, "vision_range": 14.0},
+          "weapon": {"name": "Custom Snub-Nose Railgun", "type": "energy", "damage": 65, "attack_range": 7.0, "fire_rate_seconds": 1.0, "bonus_shield_damage_multiplier": 2.0},
+          "abilities": [
+            {"id": "bribery_aura", "name": "Bribery Aura", "cooldown": 0.0, "is_passive": true, "effects": {"aura_radius": 15.0, "enemy_t1_damage_multiplier": 0.8}},
+            {"id": "blackout_device", "name": "Blackout", "cooldown": 60.0, "duration": 10.0, "effects": {"blind_enemy_minimap": true, "disable_enemy_communications": true}}
+          ]
+        }
+      ]
+    },
+    "the_nullborn": {
+      "units": [],
+      "implementation_note": "This upload defines Tier 3 stats for Peacekeepers and Syndicate only. Nullborn Tier 3 implementation remains specified by data/roster_roadmap.json until authoritative numeric profiles are added."
+    }
+  }
+}
