@@ -24,30 +24,35 @@ var errors: Array[String] = []
 func _init(resource_bank: MoonGoonsResourceBank = null) -> void:
 	_resource_bank = resource_bank
 
-func load_catalog(paths: Array[String] = MISSION_DATA_PATHS) -> bool:
+func load_catalog(paths: Array = []) -> bool:
 	errors.clear()
 	_catalog = {"missions": []}
 	var loaded_mission_ids: Dictionary = {}
-	for path: String in paths:
-		var source: Dictionary = _load_catalog_source(path)
+	var selected_paths: Array = MISSION_DATA_PATHS if paths.is_empty() else paths
+	var catalog_missions: Array = []
+	for source_path_value: Variant in selected_paths:
+		var source_path: String = String(source_path_value)
+		var source: Dictionary = _load_catalog_source(source_path)
 		if source.is_empty():
 			continue
-		var source_missions: Array = source.get("missions", [])
+		var source_missions: Array = source.get("missions", []) as Array
 		for entry: Variant in source_missions:
 			if not (entry is Dictionary):
-				errors.append("Campaign source contains a non-dictionary mission: %s" % path)
+				errors.append("Campaign source contains a non-dictionary mission: %s" % source_path)
 				continue
 			var mission: Dictionary = entry as Dictionary
-			var mission_id := String(mission.get("id", ""))
+			var mission_id: String = String(mission.get("id", ""))
 			if mission_id.is_empty() or loaded_mission_ids.has(mission_id):
 				errors.append("Campaign source has duplicate or empty mission id: %s" % mission_id)
 				continue
-			(_catalog["missions"] as Array).append(mission.duplicate(true))
+			catalog_missions.append(mission.duplicate(true))
 			loaded_mission_ids[mission_id] = true
+	_catalog["missions"] = catalog_missions
 	return errors.is_empty()
 
 func start_mission(mission_id: String) -> bool:
-	if (_catalog.get("missions", []) as Array).is_empty() and not load_catalog():
+	var loaded_missions: Array = _catalog.get("missions", []) as Array
+	if loaded_missions.is_empty() and not load_catalog():
 		return false
 	var mission: Dictionary = _find_mission(mission_id)
 	if mission.is_empty():
@@ -56,11 +61,11 @@ func start_mission(mission_id: String) -> bool:
 	_mission = mission
 	_objective_states.clear()
 	_fired_trigger_ids.clear()
-	var objectives: Array = _mission.get("objectives", [])
+	var objectives: Array = _mission.get("objectives", []) as Array
 	for entry: Variant in objectives:
 		if entry is Dictionary:
 			var objective: Dictionary = entry as Dictionary
-			var objective_id := String(objective.get("id", ""))
+			var objective_id: String = String(objective.get("id", ""))
 			if not objective_id.is_empty():
 				_objective_states[objective_id] = "hidden"
 	mission_loaded.emit(mission_id)
@@ -71,21 +76,21 @@ func notify_event(event_id: String, payload: Dictionary = {}) -> void:
 	if _mission.is_empty():
 		return
 	_update_objective_completions(event_id, payload)
-	var triggers: Array = _mission.get("triggers", [])
+	var triggers: Array = _mission.get("triggers", []) as Array
 	for entry: Variant in triggers:
 		if not (entry is Dictionary):
 			continue
 		var trigger: Dictionary = entry as Dictionary
 		if String(trigger.get("event", "")) != event_id:
 			continue
-		var trigger_id := String(trigger.get("id", ""))
+		var trigger_id: String = String(trigger.get("id", ""))
 		if bool(trigger.get("once", false)) and _fired_trigger_ids.has(trigger_id):
 			continue
-		var conditions: Dictionary = trigger.get("conditions", {})
+		var conditions: Dictionary = trigger.get("conditions", {}) as Dictionary
 		if not _conditions_match(conditions, payload):
 			continue
 		_fired_trigger_ids[trigger_id] = true
-		var effects: Array = trigger.get("effects", [])
+		var effects: Array = trigger.get("effects", []) as Array
 		_apply_effects(effects)
 
 func get_objective_state(objective_id: String) -> String:
@@ -93,7 +98,8 @@ func get_objective_state(objective_id: String) -> String:
 
 func get_loaded_mission_ids() -> Array[String]:
 	var result: Array[String] = []
-	for entry: Variant in _catalog.get("missions", []):
+	var missions: Array = _catalog.get("missions", []) as Array
+	for entry: Variant in missions:
 		if entry is Dictionary:
 			result.append(String((entry as Dictionary).get("id", "")))
 	result.sort()
@@ -107,7 +113,7 @@ func serialize_state() -> Dictionary:
 	}
 
 func restore_state(state: Dictionary) -> bool:
-	var mission_id := String(state.get("mission_id", ""))
+	var mission_id: String = String(state.get("mission_id", ""))
 	if mission_id.is_empty() or not start_mission(mission_id):
 		return false
 	_objective_states = (state.get("objective_states", {}) as Dictionary).duplicate(true)
@@ -129,7 +135,7 @@ func _load_catalog_source(path: String) -> Dictionary:
 	return parsed as Dictionary
 
 func _find_mission(mission_id: String) -> Dictionary:
-	var missions: Array = _catalog.get("missions", [])
+	var missions: Array = _catalog.get("missions", []) as Array
 	for entry: Variant in missions:
 		if entry is Dictionary:
 			var mission: Dictionary = entry as Dictionary
@@ -138,17 +144,17 @@ func _find_mission(mission_id: String) -> Dictionary:
 	return {}
 
 func _update_objective_completions(event_id: String, payload: Dictionary) -> void:
-	var objectives: Array = _mission.get("objectives", [])
+	var objectives: Array = _mission.get("objectives", []) as Array
 	for entry: Variant in objectives:
 		if not (entry is Dictionary):
 			continue
 		var objective: Dictionary = entry as Dictionary
-		var objective_id := String(objective.get("id", ""))
+		var objective_id: String = String(objective.get("id", ""))
 		if objective_id.is_empty() or get_objective_state(objective_id) == "completed":
 			continue
 		if String(objective.get("completion_event", "")) != event_id:
 			continue
-		var completion_conditions: Dictionary = objective.get("completion_conditions", {})
+		var completion_conditions: Dictionary = objective.get("completion_conditions", {}) as Dictionary
 		if _conditions_match(completion_conditions, payload):
 			_set_objective_state(objective_id, "completed")
 
@@ -156,17 +162,17 @@ func _conditions_match(conditions: Dictionary, payload: Dictionary) -> bool:
 	if conditions.is_empty():
 		return true
 	for key: Variant in conditions:
-		var key_name := String(key)
+		var key_name: String = String(key)
 		var expected: Variant = conditions[key]
 		match key_name:
 			"required_buildings":
-				var built_buildings: Array = payload.get("built_building_ids", [])
+				var built_buildings: Array = payload.get("built_building_ids", []) as Array
 				var required_buildings: Array = expected as Array
 				for building_id: Variant in required_buildings:
 					if not built_buildings.has(building_id):
 						return false
 			"minimum":
-				var current_value := int(payload.get("value", payload.get("counter_value", 0)))
+				var current_value: int = int(payload.get("value", payload.get("counter_value", 0)))
 				if current_value < int(expected):
 					return false
 			"health_pct_max":
@@ -182,7 +188,7 @@ func _apply_effects(effects: Array) -> void:
 		if not (entry is Dictionary):
 			continue
 		var effect: Dictionary = entry as Dictionary
-		var effect_type := String(effect.get("type", ""))
+		var effect_type: String = String(effect.get("type", ""))
 		match effect_type:
 			"set_objective":
 				_set_objective_state(String(effect.get("objective_id", "")), "active")
@@ -206,8 +212,8 @@ func _set_objective_state(objective_id: String, state: String) -> void:
 func _award_resource(effect: Dictionary) -> void:
 	if _resource_bank == null:
 		return
-	var player_id := int(effect.get("player_id", 1))
-	var amount := int(effect.get("amount", 0))
+	var player_id: int = int(effect.get("player_id", 1))
+	var amount: int = int(effect.get("amount", 0))
 	match String(effect.get("resource", "")):
 		"credits":
 			_resource_bank.award_resources_fp(player_id, amount * MoonGoonsFixedMath.SCALE)
