@@ -1,0 +1,27 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.4.0",
+  "phase": "recon-fog-and-tactical-intelligence",
+  "fog": {
+    "tile_size": 32,
+    "unexplored_opacity": 0.92,
+    "explored_opacity": 0.54,
+    "worker_vision_radius": 100.0,
+    "deputy_vision_radius": 165.0,
+    "vanguard_vision_radius": 140.0,
+    "command_nexus_vision_radius": 220.0,
+    "relay_vision_radius": 185.0,
+    "armory_vision_radius": 125.0,
+    "turret_vision_radius": 150.0,
+    "secured_sector_vision_radius": 96.0,
+    "forward_relay_bonus_vision_radius": 72.0
+  },
+  "tactical_scan": {
+    "intel_cost": 4,
+    "radius": 170.0,
+    "duration_seconds": 10.0,
+    "cooldown_seconds": 18.0,
+    "hotkey": "X",
+    "description": "Spend Intel to reveal a chosen lunar area and expose Syndicate movement."
+  }
+}
