@@ -6,13 +6,15 @@
 2. Import `project.godot` in Godot Project Manager.
 3. Open the project and press **F6** or the Play button.
 
-The live mode is a single-player Lunar Peacekeepers versus Syndicate RTS skirmish.
+The current build is a single-player Lunar Peacekeepers story campaign versus the Syndicate.
 
 ## Objective
 
-Win by destroying the **Syndicate Hideout**.
+Win a dispatch by destroying the **Syndicate Hideout**.
 
 Lose if the **Command Nexus** reaches zero integrity.
+
+A campaign victory advances the story to its next required chapter automatically.
 
 ## Controls
 
@@ -38,12 +40,27 @@ Lose if the **Command Nexus** reaches zero integrity.
 | `G` | Gather from resource nearest the cursor |
 | `B` | Cancel building placement |
 | `M` | Toggle terrain labels and outlines |
+| `C` | Open Story Dispatch and choose opponent difficulty |
 | `Shift + 1` through `Shift + 5` | Assign control group |
 | `1` through `5` | Recall control group |
 | `Shift + right-click` | Set production rally points |
 | Tactical-map left-click | Move selected units or workers |
 | Tactical-map Shift-click | Attack-move selected combat units |
 | `F1` | Developer console in debug/editor builds |
+
+## Story campaign and difficulty
+
+The current campaign follows the **Lunar Peacekeepers** in a fixed story order. Operations are not manually selectable and cannot be skipped.
+
+Press `C` to open **Story Dispatch**. It shows the mandatory next chapter, briefing, and objective. The only campaign match choice is opponent difficulty:
+
+| Difficulty | Enemy behavior |
+|---|---|
+| **Easy** | Slower raids, weaker Syndicate units, reduced War Chest funding |
+| **Medium** | Intended story balance |
+| **Hard** | Faster raids, stronger Syndicate units, increased War Chest funding |
+
+The chosen setting persists locally and applies when the current dispatch begins. The Syndicate and Nullborn routes are reserved until those factions are actually playable; they are not selectable placeholder campaigns.
 
 ## Economy
 
@@ -108,11 +125,11 @@ Combat units capture a sector while standing inside its glowing ring without Syn
 - **Gravity Foundry** supplies Lunar Alloy.
 - **Eclipse Signal Tower** supplies Credits near the Hideout.
 
-Captures increase Syndicate pressure, so establish defenses before expanding too far.
+Captures increase Syndicate pressure, but they also reduce its War Chest. Establish defenses before expanding too far.
 
 ## Terrain, tactical map, and routes
 
-Units now steer around lunar obstacles. Impact Ridges, Collapsed Conduits, and Shardfields also block building placement. Use the blue Transit Lane for faster movement and avoid the brown-orange Glass Regolith when time matters.
+Units steer around lunar obstacles. Impact Ridges, Collapsed Conduits, and Shardfields also block building placement. Use the blue Transit Lane for faster movement and avoid the brown-orange Glass Regolith when time matters.
 
 The sidebar tactical map gives quick battlefield orders. A yellow marker records its latest destination.
 
@@ -130,11 +147,13 @@ The field has visible, explored, and unexplored areas. Units, structures, secure
 
 Tactical Scan costs 4 Intel, reveals the cursor area for 10 seconds, and has an 18-second cooldown. Use it to check fog, contested sectors, and suspected Siphon activity.
 
-## Syndicate Siphon Raids
+## Syndicate War Chest and Siphon Raids
 
 Siphon Arrays can hide at active resource nodes. They drain material from the occupied node and steal from the matching stockpile.
 
-The Counter-Intelligence panel warns when one is active but does not show its location. Sweep mining routes with Patrol Deputies or use Tactical Scan. Destroying an Array grants additional Intel.
+The Counter-Intelligence panel warns when one is active but does not show its location. Sweep mining routes with Patrol Deputies or use Tactical Scan. Destroying an Array grants additional Intel and cuts into the Syndicate War Chest.
+
+As the War Chest rises, the Syndicate unlocks faster Shades, armored Bruisers, and accelerated attack waves. Secure sectors and stop Siphons before its doctrines harden into a larger problem.
 
 ## Developer console: debug/editor only
 
@@ -170,6 +189,8 @@ For a failed GitHub Actions run, open the newest `verify-godot-project` job and 
 
 When construction fails, select at least one Survey Drone, verify your resources, and place the building clear of resource nodes and other structures.
 
+To reset campaign progress during development, close the game and delete `user://moongoons_campaign_profile.json`. This returns the Peacekeeper story to Operation 1.01 and difficulty to Medium.
+
 ## Current scope
 
-The present prototype does not yet include full navmesh pathfinding, camera scrolling, zoomable minimap, full playable Syndicate or Nullborn economies, final art/audio, Android controls, campaign-map scenes, or online multiplayer.
+The present prototype does not yet include full navmesh pathfinding, camera scrolling, zoomable minimap, full playable Syndicate or Nullborn economies, dedicated campaign maps, scripted secondary objectives, final art/audio, Android controls, or online multiplayer.
