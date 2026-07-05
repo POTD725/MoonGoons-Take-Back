@@ -1,0 +1,39 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "mode": "lunar_rts_skirmish",
+  "core_match_loop": {
+    "resources": ["credits", "lunar_alloy"],
+    "worker_unit": "survey_drone",
+    "supply_system": "command_capacity",
+    "primary_win_condition": "destroy_enemy_command_structure",
+    "primary_loss_condition": "lose_command_nexus"
+  },
+  "peacekeepers": {
+    "playstyle": "disciplined combined-arms defense and secure expansion",
+    "economy": "Survey Drones harvest Credits and Lunar Alloy, then return cargo to the Command Nexus.",
+    "supply": "Communications Relays add 10 Command Capacity after construction.",
+    "tech": "Tactical Armory unlocks Riot Vanguards; Security Turrets defend expansions.",
+    "units": ["survey_drone", "patrol_deputy", "riot_vanguard"]
+  },
+  "syndicate": {
+    "playstyle": "mobility, raiding, stealth, and resource disruption",
+    "current_prototype_role": "The Syndicate Hideout sends escalating Runner and Bruiser waves.",
+    "future_economy": "Mobile Siphon teams steal Credits from exposed resource sites rather than relying on fixed depots."
+  },
+  "nullborn": {
+    "playstyle": "territorial corruption, attrition, and mass-produced biological pressure",
+    "future_economy": "Biomass Vents consume resource nodes and spread Corrupted Ground that enables Nullborn construction."
+  },
+  "starter_match": {
+    "credits": 180,
+    "lunar_alloy": 0,
+    "command_capacity": 14,
+    "starting_workers": 3,
+    "starting_patrol_deputies": 2,
+    "resource_nodes": {
+      "credits": 3,
+      "lunar_alloy": 3
+    }
+  }
+}
