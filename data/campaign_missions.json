@@ -1,0 +1,163 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "missions": [
+    {
+      "id": "m_1_01",
+      "act": 1,
+      "title": "First Response",
+      "location": "Sub-Sector 01-A: Outer Crater Slums",
+      "starting_state": {
+        "player_faction": "lunar_peacekeepers",
+        "hero_unit_id": "pk_patrol_deputy",
+        "hero_callsign": "Deputy Reed",
+        "starting_units": ["pk_patrol_deputy"],
+        "starting_structures": [],
+        "fog_of_war": true
+      },
+      "objectives": [
+        {
+          "id": "secure_local_nexus",
+          "text_key": "mission.m_1_01.secure_local_nexus",
+          "completion_event": "on_enter_area",
+          "completion_conditions": {"area_id": "abandoned_outpost_core"}
+        },
+        {
+          "id": "detain_runner",
+          "text_key": "mission.m_1_01.detain_runner",
+          "completion_event": "on_unit_arrest",
+          "completion_conditions": {"target_faction": "the_syndicate"}
+        }
+      ],
+      "triggers": [
+        {
+          "id": "intro_dispatch",
+          "event": "on_mission_started",
+          "effects": [
+            {"type": "play_audio_event", "event_id": "music_ambient_crater_slums"},
+            {"type": "dialogue", "speaker": "RADIO DISPATCH", "text": "All active units, Code 3 emergency in Sector 01-A. Courier Transport 9-Delta has been ambushed. Respond immediately."},
+            {"type": "dialogue", "speaker": "DEPUTY REED", "text": "Copy that, Central. I am on-site. Fresh tracks lead into the smuggling tunnels."}
+          ]
+        },
+        {
+          "id": "select_reed",
+          "event": "on_unit_selected",
+          "conditions": {"unit_callsign": "Deputy Reed"},
+          "once": true,
+          "effects": [
+            {"type": "set_objective", "objective_id": "secure_local_nexus"},
+            {"type": "spawn_units", "unit_id": "syn_black_market_runner", "count": 4, "spawn_group": "outpost_fog_ambush", "order": "attack_selected_hero"}
+          ]
+        },
+        {
+          "id": "outpost_reached",
+          "event": "on_enter_area",
+          "conditions": {"area_id": "abandoned_outpost_core"},
+          "once": true,
+          "effects": [
+            {"type": "dialogue", "speaker": "DEPUTY REED", "text": "The security grid is offline. This was a hit, not an accident."}
+          ]
+        },
+        {
+          "id": "arrest_tutorial",
+          "event": "on_target_low_health",
+          "conditions": {"target_faction": "the_syndicate", "health_pct_max": 0.25},
+          "once": true,
+          "effects": [
+            {"type": "pause_input", "seconds": 0},
+            {"type": "tutorial", "hotkey": "W", "text": "Use Detain on low-health organic targets to arrest them for Evidence."},
+            {"type": "dialogue", "speaker": "RADIO DISPATCH", "text": "We need information, Reed. Detain that suspect."}
+          ]
+        },
+        {
+          "id": "runner_detained",
+          "event": "on_unit_arrest",
+          "conditions": {"target_faction": "the_syndicate"},
+          "once": true,
+          "effects": [
+            {"type": "complete_objective", "objective_id": "secure_local_nexus"},
+            {"type": "set_objective", "objective_id": "detain_runner"},
+            {"type": "dialogue", "speaker": "ARRESTED RUNNER", "text": "The boss took the cargo to the black-market spaceport. They are shipping it off-world tonight."},
+            {"type": "path_hint", "target_id": "black_market_spaceport_gate"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m_1_02",
+      "act": 1,
+      "title": "The Breach",
+      "location": "Sub-Sector 02-B: Abandoned Mining Facility",
+      "starting_state": {
+        "player_faction": "lunar_peacekeepers",
+        "starting_units": ["pk_patrol_deputy", "pk_patrol_deputy", "pk_patrol_deputy"],
+        "starting_structures": ["pk_command_nexus"],
+        "fog_of_war": true
+      },
+      "objectives": [
+        {
+          "id": "build_perimeter",
+          "text_key": "mission.m_1_02.build_perimeter",
+          "completion_event": "on_buildings_changed",
+          "completion_conditions": {"required_buildings": ["pk_tactical_armory", "pk_drone_bay"]}
+        },
+        {
+          "id": "secure_mining_intel",
+          "text_key": "mission.m_1_02.secure_mining_intel",
+          "completion_event": "on_enter_area",
+          "completion_conditions": {"area_id": "mining_terminal"}
+        }
+      ],
+      "triggers": [
+        {
+          "id": "establish_grid",
+          "event": "on_mission_started",
+          "effects": [
+            {"type": "play_audio_event", "event_id": "music_ambient_mining_facility"},
+            {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "Secure a staging perimeter before we follow the scavengers into the mining lines."},
+            {"type": "dialogue", "speaker": "DEPUTY REED", "text": "Deploying resource processing. The sensor grids are dead, so we are blind out here."},
+            {"type": "set_objective", "objective_id": "build_perimeter"},
+            {"type": "tutorial", "hotkey": "Q", "text": "Select the Command Nexus, queue a worker drone, and harvest Helium-3 vents for Credits."}
+          ]
+        },
+        {
+          "id": "perimeter_built",
+          "event": "on_buildings_changed",
+          "conditions": {"required_buildings": ["pk_tactical_armory", "pk_drone_bay"]},
+          "once": true,
+          "effects": [
+            {"type": "complete_objective", "objective_id": "build_perimeter"},
+            {"type": "spawn_units", "unit_id": "syn_smuggler_bruiser", "count": 2, "spawn_group": "valley_barricade", "order": "hold_choke"},
+            {"type": "reveal_area", "area_id": "northern_valley"},
+            {"type": "set_objective", "objective_id": "secure_mining_intel"}
+          ]
+        },
+        {
+          "id": "valley_ambush",
+          "event": "on_enter_area",
+          "conditions": {"area_id": "northern_choke"},
+          "once": true,
+          "effects": [
+            {"type": "tutorial", "hotkey": "Q", "text": "Riot Vanguards absorb mining-laser fire. Activate Shield Wall at the choke point."},
+            {"type": "dialogue", "speaker": "SYNDICATE BRUISER", "text": "Keep those mining lasers locked on the choke line!"}
+          ]
+        },
+        {
+          "id": "terminal_breach",
+          "event": "on_enter_area",
+          "conditions": {"area_id": "mining_terminal", "hostiles_cleared_in_area": "mining_yard"},
+          "once": true,
+          "effects": [
+            {"type": "lock_player_input", "seconds": 3},
+            {"type": "show_progress", "seconds": 3, "label": "Downloading shipping logs"},
+            {"type": "dialogue", "speaker": "DEPUTY REED", "text": "The Syndicate has been transporting volatile ancient biological material from the deep crust."},
+            {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "The Nullborn files were purged decades ago. Sector 02-B is now under emergency quarantine."},
+            {"type": "award_resource", "resource": "evidence", "amount": 50},
+            {"type": "complete_objective", "objective_id": "secure_mining_intel"},
+            {"type": "complete_mission", "mission_id": "m_1_02"}
+          ]
+        }
+      ]
+    }
+  ]
+}
