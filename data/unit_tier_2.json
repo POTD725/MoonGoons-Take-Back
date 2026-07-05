@@ -1,0 +1,70 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "data_type": "unit_profiles_tier_2",
+  "factions": {
+    "lunar_peacekeepers": {
+      "units": [
+        {
+          "id": "pk_riot_vanguard",
+          "name": "Riot Vanguard",
+          "tier": 2,
+          "class": "heavy_infantry",
+          "cost": {"credits": 175, "lunar_alloy": 40, "command_capacity": 2},
+          "stats": {"max_hp": 320, "armor": 6, "movement_speed": 3.6, "vision_range": 10.0},
+          "weapon": {"name": "Kinetic Shotgun", "type": "kinetic", "damage": 28, "attack_range": 3.5, "fire_rate_seconds": 1.5, "is_aoe_cone": true},
+          "abilities": [
+            {"id": "shield_wall", "name": "Shield Wall", "cooldown": 12.0, "duration": 8.0, "effects": {"self_speed_multiplier": 0.0, "frontal_damage_reduction_pct": 0.75}},
+            {"id": "flashbang", "name": "Flashbang", "cooldown": 20.0, "effects": {"aoe_radius": 3.0, "stun_duration_seconds": 3.0, "silence_duration_seconds": 3.0}}
+          ]
+        },
+        {
+          "id": "pk_k9_operator",
+          "name": "K-9 Drone Operator",
+          "tier": 2,
+          "class": "specialist_infantry",
+          "cost": {"credits": 150, "lunar_alloy": 30, "command_capacity": 2},
+          "stats": {"max_hp": 180, "armor": 2, "movement_speed": 4.5, "vision_range": 14.0},
+          "weapon": {"name": "Submachine Gun", "type": "kinetic", "damage": 8, "attack_range": 6.5, "fire_rate_seconds": 0.25},
+          "abilities": [
+            {"id": "release_hounds", "name": "Release the Hounds", "cooldown": 25.0, "effects": {"spawn_unit_id": "pk_cyber_canine", "spawn_count": 2, "lifetime_seconds": 15.0}},
+            {"id": "proximity_sensor", "name": "Proximity Sensor", "cooldown": 15.0, "effects": {"sensor_radius": 8.0, "reveals_stealth": true}}
+          ]
+        }
+      ]
+    },
+    "the_syndicate": {
+      "units": [
+        {
+          "id": "syn_shadow_stalker",
+          "name": "Shadow-Stalker Infiltrator",
+          "tier": 2,
+          "class": "specialist_infantry",
+          "cost": {"credits": 160, "lunar_alloy": 35, "command_capacity": 2},
+          "stats": {"max_hp": 140, "armor": 1, "movement_speed": 5.2, "vision_range": 13.0},
+          "weapon": {"name": "Monomolecular Vibro-Blades", "type": "kinetic", "damage": 42, "attack_range": 1.2, "fire_rate_seconds": 0.6, "armor_piercing_pct": 0.5},
+          "abilities": [
+            {"id": "active_cloaking", "name": "Active Cloaking", "cooldown": 0.0, "is_passive": true, "effects": {"is_invisible": true, "breaks_on_attack": true}},
+            {"id": "sabotage_charge", "name": "Sabotage Charge", "cooldown": 30.0, "target_type": "structure", "effects": {"detonation_delay_seconds": 8.0, "structural_damage": 600}}
+          ]
+        },
+        {
+          "id": "syn_smuggler_bruiser",
+          "name": "Smuggler Bruiser",
+          "tier": 2,
+          "class": "heavy_infantry",
+          "cost": {"credits": 190, "lunar_alloy": 50, "command_capacity": 2},
+          "stats": {"max_hp": 280, "armor": 4, "movement_speed": 4.0, "vision_range": 11.0},
+          "weapon": {"name": "Modified Mining Laser", "type": "energy", "damage_base": 15, "damage_ramp_per_second": 5, "damage_max": 40, "attack_range": 5.5, "fire_rate_seconds": 0.5},
+          "abilities": [
+            {"id": "adrenaline_surge", "name": "Adrenaline Surge", "cooldown": 22.0, "effects": {"instant_heal_pct": 0.25, "cc_immunity_duration_seconds": 4.0}},
+            {"id": "scavenge", "name": "Scavenge", "cooldown": 0.0, "is_passive": true, "target_condition": "on_kill_vehicle", "effects": {"lunar_alloy_grant": 50}}
+          ]
+        }
+      ]
+    },
+    "the_nullborn": {
+      "units": []
+    }
+  }
+}
