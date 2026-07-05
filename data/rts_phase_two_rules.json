@@ -1,0 +1,49 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.2.0",
+  "phase": "command-and-production",
+  "peacekeeper_runtime": {
+    "patrol_deputy": {
+      "catalog_id": "pk_patrol_deputy",
+      "display_name": "Patrol Deputy",
+      "production_building": "command_nexus",
+      "rally_behavior": "rally_to_nexus_point",
+      "role": "ranged_line_infantry"
+    },
+    "riot_vanguard": {
+      "catalog_id": "pk_riot_vanguard",
+      "display_name": "Riot Vanguard",
+      "production_building": "tactical_armory",
+      "rally_behavior": "rally_to_armory_point",
+      "role": "frontline_heavy_infantry",
+      "active_ability": {
+        "id": "shield_wall",
+        "hotkey": "S",
+        "duration_seconds": 6.0,
+        "cooldown_seconds": 14.0,
+        "incoming_damage_multiplier": 0.45,
+        "movement_multiplier": 0.55
+      }
+    }
+  },
+  "command_features": {
+    "control_groups": [1, 2, 3, 4, 5],
+    "assign_modifier": "Shift + number",
+    "rally_modifier": "Shift + right-click Command Nexus or Tactical Armory",
+    "hold_position_hotkey": "H",
+    "attack_move_hotkey": "A",
+    "auto_harvest_reassignment": true
+  },
+  "enemy_escalation": {
+    "response_thresholds": {
+      "deputy_count": 5,
+      "vanguard_count": 2,
+      "relay_count": 2
+    },
+    "responses": [
+      "reinforce_runner_wave",
+      "add_bruiser_pressure",
+      "prioritize_resource_harass"
+    ]
+  }
+}
