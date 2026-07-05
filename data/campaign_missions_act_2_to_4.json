@@ -1,0 +1,244 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "data_type": "campaign_missions_act_2_to_4",
+  "missions": [
+    {
+      "id": "m_1_03",
+      "act": 2,
+      "title": "Smuggler's Run",
+      "location": "Black-Market Spaceport / Orbital Docks",
+      "campaign_route": "choice_a",
+      "mechanics_introduced": ["low_gravity", "syn_sky_skiff"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "tag_freighters", "text_key": "mission.m_1_03.tag_freighters", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "freighters_tagged", "minimum": 3}}],
+      "triggers": [
+        {"id": "spaceport_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "tag_freighters"}, {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "If those cargo hulls leave the dockyard, we lose the trace on the biological anomalies."}, {"type": "environment_modifier", "modifier_id": "low_gravity", "speed_multiplier": 1.25, "range_bonus": 2.0, "armor_multiplier": 0.8}, {"type": "tutorial", "text": "Low-gravity pockets increase movement and range, but reduce armor."}]},
+        {"id": "skiff_ambush", "event": "on_counter_changed", "conditions": {"counter_id": "freighters_tagged", "minimum": 2}, "once": true, "effects": [{"type": "spawn_units", "unit_id": "syn_sky_skiff", "count": 1, "spawn_group": "landing_pad", "order": "suppressive_attack_move"}, {"type": "tutorial", "text": "Deploy Proximity Sensors to track the Sky-Skiff above terrain."}, {"type": "dialogue", "speaker": "SYNDICATE SKIFF PILOT", "text": "Spin up the miniguns and sweep these cops off the scaffolding!"}]}
+      ]
+    },
+    {
+      "id": "m_1_04",
+      "act": 2,
+      "title": "Cold Storage",
+      "location": "Frozen Lunar Valley / Sealed Core Lab",
+      "campaign_route": "choice_b",
+      "mechanics_introduced": ["corrosive_gas_vent", "evidence_extraction", "syn_shadow_stalker"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "secure_evidence", "text_key": "mission.m_1_04.secure_evidence", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "evidence_canisters_secured", "minimum": 4}}],
+      "triggers": [
+        {"id": "cold_storage_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "secure_evidence"}, {"type": "dialogue", "speaker": "DEPUTY REED", "text": "Perimeter breached. The security logs were wiped from the inside."}, {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "Watch the old fuel conduits. A rupture turns the atmosphere toxic."}]},
+        {"id": "shadow_strike", "event": "on_enter_area", "conditions": {"area_id": "central_evidence_vault"}, "once": true, "effects": [{"type": "spawn_units", "unit_id": "syn_shadow_stalker", "count": 3, "spawn_group": "behind_support_line", "stealthed": true, "order": "assassinate_support"}, {"type": "spawn_hazard", "hazard_id": "corrosive_gas_vent", "area_id": "evidence_vault_adjacent", "duration_seconds": 12}, {"type": "tutorial", "hotkey": "W", "text": "Use Riot Vanguard Flashbangs to reveal and disrupt infiltrators."}]}
+      ]
+    },
+    {
+      "id": "m_1_05",
+      "act": 2,
+      "title": "The Quarantine Line",
+      "location": "Ruined Research Outpost / Perimeter Junction Block",
+      "mechanics_introduced": ["nullborn_swarm_ai", "corrupted_ground", "base_defense"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "hold_gate", "text_key": "mission.m_1_05.hold_gate", "completion_event": "on_timer_elapsed", "completion_conditions": {"timer_id": "gate_defense", "seconds": 600}}],
+      "triggers": [
+        {"id": "quarantine_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "hold_gate"}, {"type": "start_timer", "timer_id": "gate_defense", "seconds": 600}, {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "The Nullborn protocols are verified active. Pull all security squads behind the gate."}]},
+        {"id": "creeping_corruption", "event": "on_timer_remaining", "conditions": {"timer_id": "gate_defense", "seconds": 300}, "once": true, "effects": [{"type": "apply_terrain", "terrain_id": "corrupted_ground", "area_id": "center_valley", "coverage_pct": 0.4}, {"type": "ai_state", "faction_id": "the_nullborn", "state": "FULL_ASSAULT"}, {"type": "spawn_wave", "unit_id": "nb_corrupted_scavenger", "target_id": "perimeter_gate", "wave_profile": "assault"}, {"type": "tutorial", "text": "Corrupted Ground slows units by 15%. Communications Relays improve frontline sight lines."}]}
+      ]
+    },
+    {
+      "id": "m_1_06",
+      "act": 2,
+      "title": "The Protection Racket",
+      "location": "Sub-Sector 03-C / Crater Slum Sector",
+      "mechanics_introduced": ["siphon_override", "blackout"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "disconnect_siphons", "text_key": "mission.m_1_06.disconnect_siphons", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "siphon_overrides_disabled", "minimum": 3}}],
+      "triggers": [
+        {"id": "racket_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "disconnect_siphons"}]},
+        {"id": "fixer_blackout", "event": "on_counter_changed", "conditions": {"counter_id": "siphon_overrides_disabled", "minimum": 3}, "once": true, "effects": [{"type": "ui_blackout", "duration_seconds": 10, "hide_minimap": true}, {"type": "dialogue", "speaker": "THE FIXER", "text": "Business is business, Reed. And business is closed."}]}
+      ]
+    },
+    {
+      "id": "m_1_07",
+      "act": 2,
+      "title": "Black-Market Hijack",
+      "location": "Deserted Lunar Valley / Supply Route Junction",
+      "mechanics_introduced": ["escort", "dynamic_path_block", "low_gravity"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "escort_truck", "text_key": "mission.m_1_07.escort_truck", "completion_event": "on_unit_enter_area", "completion_conditions": {"unit_tag": "captured_supply_truck", "area_id": "safe_sector"}}],
+      "triggers": [
+        {"id": "hijack_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "escort_truck"}]},
+        {"id": "ridge_detonation", "event": "on_enter_area", "conditions": {"area_id": "ridge_junction"}, "once": true, "effects": [{"type": "block_path", "path_id": "primary_supply_route", "reason": "ridge_debris"}, {"type": "redirect_route", "unit_tag": "captured_supply_truck", "route_id": "low_gravity_canyon"}, {"type": "environment_modifier", "modifier_id": "low_gravity", "area_id": "low_gravity_canyon", "speed_multiplier": 1.25, "range_bonus": 2.0, "armor_multiplier": 0.8}]}
+      ]
+    },
+    {
+      "id": "m_1_08",
+      "act": 2,
+      "title": "The Informant",
+      "location": "Underground Tunnel System / Transit Core",
+      "mechanics_introduced": ["escort", "intel_channel", "protect_target"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "extract_informant", "text_key": "mission.m_1_08.extract_informant", "completion_event": "on_unit_enter_area", "completion_conditions": {"unit_tag": "rogue_technician", "area_id": "extraction_zone"}}],
+      "triggers": [
+        {"id": "informant_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "extract_informant"}]},
+        {"id": "download_intel", "event": "on_interact", "conditions": {"interactable_id": "transit_core_mainframe"}, "once": true, "effects": [{"type": "start_channel", "channel_id": "technician_download", "seconds": 45}, {"type": "resource_stream", "resource": "intel", "amount_per_second": 2, "while_channel": "technician_download"}, {"type": "protect_unit", "unit_tag": "rogue_technician"}, {"type": "dialogue", "speaker": "TECHNICIAN", "text": "If the Enforcers see these server grids flashing, they will blow the entire tunnel layout!"}]}
+      ]
+    },
+    {
+      "id": "m_1_09",
+      "act": 2,
+      "title": "Precinct Under Siege",
+      "location": "Forward Peacekeeper Precinct Outpost",
+      "mechanics_introduced": ["defense", "sky_skiff_airdrop"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "survive_siege", "text_key": "mission.m_1_09.survive_siege", "completion_event": "on_timer_elapsed", "completion_conditions": {"timer_id": "precinct_siege", "seconds": 480}}],
+      "triggers": [
+        {"id": "siege_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "survive_siege"}, {"type": "start_timer", "timer_id": "precinct_siege", "seconds": 480}]},
+        {"id": "airdrop_breach", "event": "on_timer_elapsed", "conditions": {"timer_id": "precinct_siege", "seconds": 180}, "once": true, "effects": [{"type": "spawn_units", "unit_id": "syn_sky_skiff", "count": 2, "spawn_group": "outer_airspace", "order": "air_drop_infiltrators"}, {"type": "spawn_units", "unit_id": "syn_shadow_stalker", "count": 4, "spawn_group": "resource_gatherer_zone", "stealthed": true}, {"type": "alert", "text": "Enemy Sky-Skiffs are dropping Infiltrators inside the Command Nexus Security Grid."}]}
+      ]
+    },
+    {
+      "id": "m_1_10",
+      "act": 2,
+      "title": "Raid on Vault 7",
+      "location": "Deep Underground / Armored Syndicate Stronghold",
+      "mechanics_introduced": ["shield_wall", "energy_ramp_laser", "vault_assault"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "secure_evidence_vault", "text_key": "mission.m_1_10.secure_evidence_vault", "completion_event": "on_interact", "completion_conditions": {"interactable_id": "vault_7_evidence_core"}}],
+      "triggers": [
+        {"id": "vault_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "secure_evidence_vault"}]},
+        {"id": "mining_turrets", "event": "on_enter_area", "conditions": {"area_id": "vault_blast_gates"}, "once": true, "effects": [{"type": "activate_defenses", "defense_group": "vault_energy_turrets", "weapon_profile": "energy_ramp_laser"}, {"type": "tutorial", "text": "Link Riot Vanguard Shield Walls in a frontal line to absorb energy-ramp fire."}, {"type": "dialogue", "speaker": "DEPUTY REED", "text": "Lock shields! Do not break formation until those battery cores overheat!"}]}
+      ]
+    },
+    {
+      "id": "m_1_11",
+      "act": 3,
+      "title": "The First Spore",
+      "location": "Sealed Corporate Biosphere Outpost",
+      "mechanics_introduced": ["biomass_vent", "corrosive_gas", "infected_ground"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "destroy_biomass_vents", "text_key": "mission.m_1_11.destroy_biomass_vents", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "biomass_vents_destroyed", "minimum": 4}}],
+      "triggers": [
+        {"id": "spore_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "destroy_biomass_vents"}, {"type": "apply_terrain", "terrain_id": "infected_ground", "movement_multiplier": 0.85}]},
+        {"id": "vent_rupture", "event": "on_structure_destroyed", "conditions": {"structure_tag": "nullborn_biomass_vent"}, "effects": [{"type": "spawn_hazard", "hazard_id": "corrosive_gas_vent", "duration_seconds": 12}, {"type": "alert", "text": "Biomass Vent ruptured. Move units out of the gas cloud."}]}
+      ]
+    },
+    {
+      "id": "m_1_12",
+      "act": 3,
+      "title": "Uneasy Alliance",
+      "location": "Ruined Research Core / Contested Sectors",
+      "mechanics_introduced": ["temporary_allies", "fail_structure_defense"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "defend_hideout", "text_key": "mission.m_1_12.defend_hideout", "completion_event": "on_wave_group_defeated", "completion_conditions": {"wave_group": "nullborn_infestation"}}],
+      "triggers": [
+        {"id": "alliance_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "defend_hideout"}, {"type": "set_ai_alliance", "faction_id": "the_syndicate", "allied": true, "team_color": "green"}, {"type": "fail_if_destroyed", "structure_id": "syndicate_hideout"}, {"type": "dialogue", "speaker": "SYNDICATE BOSS", "text": "Those things do not care about credits. Keep firing!"}]}
+      ]
+    },
+    {
+      "id": "m_1_13",
+      "act": 3,
+      "title": "The Deep Crust Lab",
+      "location": "Forgotten Ancient Lunar Facility",
+      "mechanics_introduced": ["burrow_ambush", "silence"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "retrieve_sequence", "text_key": "mission.m_1_13.retrieve_sequence", "completion_event": "on_interact", "completion_conditions": {"interactable_id": "biological_sequence_mainframe"}}],
+      "triggers": [
+        {"id": "lab_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "retrieve_sequence"}]},
+        {"id": "defiler_burrow", "event": "on_enter_area", "conditions": {"area_id": "lab_inner_core"}, "once": true, "effects": [{"type": "spawn_units", "unit_id": "nb_abyssal_defiler", "count": 3, "spawn_group": "under_support_line", "order": "burrow_ambush"}, {"type": "apply_status_area", "status_id": "silenced", "target_role": "support", "duration_seconds": 3}, {"type": "tutorial", "text": "Abyssal Defilers ambush support lines. Use Flashbangs to stun them."}]}
+      ]
+    },
+    {
+      "id": "m_1_14",
+      "act": 3,
+      "title": "The Corrupted Relays",
+      "location": "Mountainous Crater Rim / Communications Sector",
+      "mechanics_introduced": ["relay_capture", "fog_interference"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "cleanse_relays", "text_key": "mission.m_1_14.cleanse_relays", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "corrupted_relays_cleansed", "minimum": 3}}],
+      "triggers": [
+        {"id": "relay_brief", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "cleanse_relays"}]},
+        {"id": "relay_static", "event": "on_capture_terminal", "conditions": {"terminal_tag": "corrupted_communications_relay"}, "effects": [{"type": "ui_static_interference", "duration_seconds": 3}, {"type": "reveal_area", "mode": "irregular_fog_pulse"}, {"type": "dialogue", "speaker": "RADIO DISPATCH", "text": "The digital noise coming off those relays is screaming."}]}
+      ]
+    },
+    {
+      "id": "m_1_15",
+      "act": 3,
+      "title": "Evacuation Alpha",
+      "location": "Civilian Colony Transit Hub",
+      "mechanics_introduced": ["civilian_evacuation", "goliath_siege", "grave_spores"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "launch_transports", "text_key": "mission.m_1_15.launch_transports", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "civilian_transports_launched", "minimum": 5}}],
+      "triggers": [
+        {"id": "evac_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "launch_transports"}]},
+        {"id": "goliath_wave", "event": "on_timer_interval", "conditions": {"timer_id": "evacuation_wave_clock", "seconds": 120}, "effects": [{"type": "spawn_units", "unit_id": "nb_goliath_flesh_titan", "count": 1, "spawn_group": "map_center", "order": "siege_checkpoints"}, {"type": "spawn_effect", "effect_id": "grave_spores", "converts_fallen_infantry": "nb_corrupted_scavenger"}, {"type": "alert", "text": "Goliath Titan approaching checkpoint. Fallen infantry may transform into hostile scavengers."}]}
+      ]
+    },
+    {
+      "id": "m_1_16",
+      "act": 4,
+      "title": "The Swallowed Colony",
+      "location": "Major Lunar Capital City / Corrupted Ground",
+      "mechanics_introduced": ["organic_drain", "security_grid_safe_zone"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "establish_city_nexus", "text_key": "mission.m_1_16.establish_city_nexus", "completion_event": "on_structure_built", "completion_conditions": {"building_id": "pk_command_nexus", "area_id": "infected_city_center"}}],
+      "triggers": [
+        {"id": "swallowed_colony_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "establish_city_nexus"}, {"type": "apply_global_status", "status_id": "organic_health_drain", "exceptions": ["pk_security_grid"]}, {"type": "dialogue", "speaker": "DEPUTY REED", "text": "The city is gone. It is one giant breathing organism now."}]}
+      ]
+    },
+    {
+      "id": "m_1_17",
+      "act": 4,
+      "title": "The Fixer's Final Gamble",
+      "location": "Falling Orbital Spaceport Platform",
+      "mechanics_introduced": ["boss_fight", "blackout"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "defeat_fixer", "text_key": "mission.m_1_17.defeat_fixer", "completion_event": "on_unit_destroyed", "completion_conditions": {"unit_id": "syn_hero_fixer"}}],
+      "triggers": [
+        {"id": "fixer_boss_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "defeat_fixer"}, {"type": "ui_blackout", "duration_seconds": 30, "hide_minimap": true, "disable_communications": true}, {"type": "spawn_units", "unit_id": "syn_hero_fixer", "count": 1, "spawn_group": "platform_control"}, {"type": "dialogue", "speaker": "THE FIXER", "text": "If the underworld is going down, I am selling the remaining pieces to the highest bidder."}]}
+      ]
+    },
+    {
+      "id": "m_1_18",
+      "act": 4,
+      "title": "Into the Maw",
+      "location": "Deep Core Fault Line / Central Nullborn Nest",
+      "mechanics_introduced": ["escort_bomb", "random_gravity_tremor"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "escort_alloy_core", "text_key": "mission.m_1_18.escort_alloy_core", "completion_event": "on_unit_enter_area", "completion_conditions": {"unit_tag": "experimental_alloy_core", "area_id": "hive_epicenter"}}],
+      "triggers": [
+        {"id": "maw_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "escort_alloy_core"}]},
+        {"id": "core_tremor", "event": "on_timer_interval", "conditions": {"timer_id": "tremor_clock", "seconds": 60}, "effects": [{"type": "random_sector_modifier", "modifier_id": "low_gravity", "duration_seconds": 60}, {"type": "alert", "text": "Core tremor detected. Gravity variables are alternating across map sectors."}]}
+      ]
+    },
+    {
+      "id": "m_1_19",
+      "act": 4,
+      "title": "The Reality Tear",
+      "location": "Root Singularity Chamber",
+      "mechanics_introduced": ["boss_fight", "reality_tear", "anchors"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [{"id": "destroy_reality_anchors", "text_key": "mission.m_1_19.destroy_reality_anchors", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "reality_anchors_destroyed", "minimum": 3}}],
+      "triggers": [
+        {"id": "reality_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "destroy_reality_anchors"}, {"type": "spawn_units", "unit_id": "nb_singularity", "count": 1, "spawn_group": "root_chamber"}]},
+        {"id": "reality_tear", "event": "on_boss_ability", "conditions": {"unit_id": "nb_singularity", "ability_id": "reality_tear"}, "effects": [{"type": "pull_units", "center_id": "nb_singularity", "duration_seconds": 4, "freeze": true}, {"type": "spawn_effect", "effect_id": "void_plasma_barrage"}, {"type": "alert", "text": "Spatial dimension parameters failing. Structural synchronization breaking down."}]}
+      ]
+    },
+    {
+      "id": "m_1_20",
+      "act": 4,
+      "title": "MoonGoons: Crime Wars",
+      "location": "Total Lunar Surface / The Grand Synthesis",
+      "mechanics_introduced": ["finale", "orbital_countdown", "evacuation", "credits"],
+      "starting_state": {"player_faction": "lunar_peacekeepers", "fog_of_war": true},
+      "objectives": [
+        {"id": "destroy_spore_heart", "text_key": "mission.m_1_20.destroy_spore_heart", "completion_event": "on_structure_destroyed", "completion_conditions": {"structure_id": "spore_heart"}},
+        {"id": "evacuate_survivors", "text_key": "mission.m_1_20.evacuate_survivors", "completion_event": "on_counter_changed", "completion_conditions": {"counter_id": "combat_units_in_safe_zone", "minimum": 1}}
+      ],
+      "triggers": [
+        {"id": "finale_start", "event": "on_mission_started", "once": true, "effects": [{"type": "set_objective", "objective_id": "destroy_spore_heart"}, {"type": "spawn_wave", "unit_id": "syn_black_market_runner", "wave_profile": "renegade_raids"}, {"type": "spawn_wave", "unit_id": "nb_corrupted_scavenger", "wave_profile": "nullborn_swarms"}]},
+        {"id": "spore_heart_critical", "event": "on_target_low_health", "conditions": {"target_id": "spore_heart", "health_pct_max": 0.1}, "once": true, "effects": [{"type": "set_objective", "objective_id": "evacuate_survivors"}, {"type": "start_timer", "timer_id": "orbital_strike", "seconds": 60}, {"type": "alert", "text": "Orbital Watchtower locked onto your position. Get surviving squads to the safe transport zone."}, {"type": "dialogue", "speaker": "COMMANDER VANCE", "text": "Reed! Get your squads out before the strike cleanses the sector!"}]},
+        {"id": "finale_complete", "event": "on_timer_elapsed", "conditions": {"timer_id": "orbital_strike", "seconds": 60}, "once": true, "effects": [{"type": "complete_mission", "mission_id": "m_1_20"}, {"type": "unlock_content", "content_id": "custom_skirmish_sandbox_all_factions"}, {"type": "play_credits"}]}
+      ]
+    }
+  ]
+}
