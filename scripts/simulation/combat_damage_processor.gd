@@ -75,7 +75,7 @@ func get_entity(entity_id: String) -> CombatEntity:
 	return null
 
 func get_entity_snapshot(entity_id: String) -> Dictionary:
-	var entity := get_entity(entity_id)
+	var entity: CombatEntity = get_entity(entity_id)
 	return entity.serialize_state() if entity != null else {}
 
 func get_all_entity_snapshots() -> Array[Dictionary]:
@@ -98,11 +98,11 @@ func apply_weapon_impact(
 	random_source: MoonGoonsGameRand = null,
 	force_detain: bool = false
 ) -> Dictionary:
-	var target := get_entity(target_id)
+	var target: CombatEntity = get_entity(target_id)
 	if target == null or not target.is_alive or target.is_arrested:
 		return {"ok": false, "reason": "invalid_target"}
-	var modifier_fp := _damage_modifier_fp(damage_type, target.armor_class)
-	var final_damage_fp := MoonGoonsFixedMath.multiply(raw_damage_fp, modifier_fp)
+	var modifier_fp: int = _damage_modifier_fp(damage_type, target.armor_class)
+	var final_damage_fp: int = MoonGoonsFixedMath.multiply(raw_damage_fp, modifier_fp)
 	target.current_hp_fp = maxi(0, target.current_hp_fp - final_damage_fp)
 	entity_damaged.emit(attacker_id, target_id, final_damage_fp, target.current_hp_fp)
 	if target.current_hp_fp > 0:
@@ -115,33 +115,36 @@ func apply_weapon_impact(
 	return {"ok": true, "damage_fp": final_damage_fp, "result": "destroyed"}
 
 func detain_target(attacker_id: String, attacker_player_id: int, target_id: String) -> bool:
-	var target := get_entity(target_id)
+	var target: CombatEntity = get_entity(target_id)
 	if target == null or not target.is_alive or not target.is_organic or target.is_arrested:
 		return false
-	if target.current_hp_fp > MoonGoonsFixedMath.from_float(0.25 * MoonGoonsFixedMath.to_float(target.max_hp_fp)):
+	if target.current_hp_fp > target.max_hp_fp / 4:
 		return false
 	_arrest_target(attacker_id, attacker_player_id, target)
 	return true
 
 func apply_status(entity_id: String, status_id: String, duration_ticks: int, payload: Dictionary = {}) -> bool:
-	var entity := get_entity(entity_id)
+	var entity: CombatEntity = get_entity(entity_id)
 	if entity == null or not entity.is_alive:
 		return false
 	entity.status_flags[status_id] = {
-		"remaining_ticks": maxi(0, duration_ticks),
+		"remaining_ticks": duration_ticks,
 		"payload": payload.duplicate(true)
 	}
 	return true
 
 func process_status_tick() -> void:
 	for entity_snapshot: Dictionary in get_all_entity_snapshots():
-		var entity := get_entity(String(entity_snapshot.get("entity_id", "")))
+		var entity: CombatEntity = get_entity(String(entity_snapshot.get("entity_id", "")))
 		if entity == null:
 			continue
 		var expired: Array[String] = []
 		for status_id: Variant in entity.status_flags:
 			var state: Dictionary = entity.status_flags[status_id]
-			var remaining := int(state.get("remaining_ticks", 0)) - 1
+			var remaining: int = int(state.get("remaining_ticks", 0))
+			if remaining < 0:
+				continue
+			remaining -= 1
 			if remaining <= 0:
 				expired.append(String(status_id))
 			else:
@@ -171,7 +174,7 @@ func restore_state(snapshots: Array[Dictionary]) -> void:
 		_entities_by_id[entity_id] = entity
 
 func _damage_modifier_fp(damage_type: String, armor_class: String) -> int:
-	var normalized_armor := _normalize_armor_class(armor_class)
+	var normalized_armor: String = _normalize_armor_class(armor_class)
 	var row: Dictionary = DAMAGE_MATRIX.get(damage_type, DAMAGE_MATRIX["kinetic"])
 	return int(row.get(normalized_armor, MoonGoonsFixedMath.SCALE))
 
