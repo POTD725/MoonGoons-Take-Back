@@ -9,10 +9,13 @@ signal dialogue_requested(speaker: String, text: String)
 signal effect_requested(effect: Dictionary)
 signal mission_completed(mission_id: String)
 
-const MISSION_DATA_PATH := "res://data/campaign_missions.json"
+const MISSION_DATA_PATHS := [
+	"res://data/campaign_missions.json",
+	"res://data/campaign_missions_act_2_to_4.json"
+]
 
 var _resource_bank: MoonGoonsResourceBank
-var _catalog: Dictionary = {}
+var _catalog: Dictionary = {"missions": []}
 var _mission: Dictionary = {}
 var _objective_states: Dictionary = {}
 var _fired_trigger_ids: Dictionary = {}
@@ -21,25 +24,30 @@ var errors: Array[String] = []
 func _init(resource_bank: MoonGoonsResourceBank = null) -> void:
 	_resource_bank = resource_bank
 
-func load_catalog(path: String = MISSION_DATA_PATH) -> bool:
+func load_catalog(paths: Array[String] = MISSION_DATA_PATHS) -> bool:
 	errors.clear()
-	_catalog.clear()
-	if not FileAccess.file_exists(path):
-		errors.append("Missing campaign mission data: %s" % path)
-		return false
-	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
-	if file == null:
-		errors.append("Could not open campaign mission data: %s" % path)
-		return false
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if not (parsed is Dictionary):
-		errors.append("Campaign mission data must be a JSON object.")
-		return false
-	_catalog = parsed as Dictionary
-	return true
+	_catalog = {"missions": []}
+	var loaded_mission_ids: Dictionary = {}
+	for path: String in paths:
+		var source: Dictionary = _load_catalog_source(path)
+		if source.is_empty():
+			continue
+		var source_missions: Array = source.get("missions", [])
+		for entry: Variant in source_missions:
+			if not (entry is Dictionary):
+				errors.append("Campaign source contains a non-dictionary mission: %s" % path)
+				continue
+			var mission: Dictionary = entry as Dictionary
+			var mission_id := String(mission.get("id", ""))
+			if mission_id.is_empty() or loaded_mission_ids.has(mission_id):
+				errors.append("Campaign source has duplicate or empty mission id: %s" % mission_id)
+				continue
+			(_catalog["missions"] as Array).append(mission.duplicate(true))
+			loaded_mission_ids[mission_id] = true
+	return errors.is_empty()
 
 func start_mission(mission_id: String) -> bool:
-	if _catalog.is_empty() and not load_catalog():
+	if (_catalog.get("missions", []) as Array).is_empty() and not load_catalog():
 		return false
 	var mission: Dictionary = _find_mission(mission_id)
 	if mission.is_empty():
@@ -62,6 +70,7 @@ func start_mission(mission_id: String) -> bool:
 func notify_event(event_id: String, payload: Dictionary = {}) -> void:
 	if _mission.is_empty():
 		return
+	_update_objective_completions(event_id, payload)
 	var triggers: Array = _mission.get("triggers", [])
 	for entry: Variant in triggers:
 		if not (entry is Dictionary):
@@ -82,6 +91,14 @@ func notify_event(event_id: String, payload: Dictionary = {}) -> void:
 func get_objective_state(objective_id: String) -> String:
 	return String(_objective_states.get(objective_id, "unknown"))
 
+func get_loaded_mission_ids() -> Array[String]:
+	var result: Array[String] = []
+	for entry: Variant in _catalog.get("missions", []):
+		if entry is Dictionary:
+			result.append(String((entry as Dictionary).get("id", "")))
+	result.sort()
+	return result
+
 func serialize_state() -> Dictionary:
 	return {
 		"mission_id": String(_mission.get("id", "")),
@@ -97,6 +114,20 @@ func restore_state(state: Dictionary) -> bool:
 	_fired_trigger_ids = (state.get("fired_trigger_ids", {}) as Dictionary).duplicate(true)
 	return true
 
+func _load_catalog_source(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		errors.append("Missing campaign mission data: %s" % path)
+		return {}
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		errors.append("Could not open campaign mission data: %s" % path)
+		return {}
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if not (parsed is Dictionary):
+		errors.append("Campaign mission data must be a JSON object: %s" % path)
+		return {}
+	return parsed as Dictionary
+
 func _find_mission(mission_id: String) -> Dictionary:
 	var missions: Array = _catalog.get("missions", [])
 	for entry: Variant in missions:
@@ -106,23 +137,43 @@ func _find_mission(mission_id: String) -> Dictionary:
 				return mission.duplicate(true)
 	return {}
 
+func _update_objective_completions(event_id: String, payload: Dictionary) -> void:
+	var objectives: Array = _mission.get("objectives", [])
+	for entry: Variant in objectives:
+		if not (entry is Dictionary):
+			continue
+		var objective: Dictionary = entry as Dictionary
+		var objective_id := String(objective.get("id", ""))
+		if objective_id.is_empty() or get_objective_state(objective_id) == "completed":
+			continue
+		if String(objective.get("completion_event", "")) != event_id:
+			continue
+		var completion_conditions: Dictionary = objective.get("completion_conditions", {})
+		if _conditions_match(completion_conditions, payload):
+			_set_objective_state(objective_id, "completed")
+
 func _conditions_match(conditions: Dictionary, payload: Dictionary) -> bool:
 	if conditions.is_empty():
 		return true
 	for key: Variant in conditions:
+		var key_name := String(key)
 		var expected: Variant = conditions[key]
-		match String(key):
+		match key_name:
 			"required_buildings":
 				var built_buildings: Array = payload.get("built_building_ids", [])
 				var required_buildings: Array = expected as Array
 				for building_id: Variant in required_buildings:
 					if not built_buildings.has(building_id):
 						return false
+			"minimum":
+				var current_value := int(payload.get("value", payload.get("counter_value", 0)))
+				if current_value < int(expected):
+					return false
 			"health_pct_max":
 				if float(payload.get("health_pct", 1.0)) > float(expected):
 					return false
 			_:
-				if payload.get(String(key)) != expected:
+				if payload.get(key_name) != expected:
 					return false
 	return true
 
