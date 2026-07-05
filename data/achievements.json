@@ -1,0 +1,56 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "event_evaluation_policy": "Evaluate on explicit gameplay events, especially mission completion, match end, unit arrest, and siphon ticks. Do not scan every achievement every simulation frame.",
+  "achievements": [
+    {
+      "id": "ach_campaign_act1_complete",
+      "name": "Badge of Office",
+      "category": "campaign",
+      "tracking_event": "on_mission_complete",
+      "criteria": {"mission_id": "m_1_02", "condition": "completed"},
+      "reward": {"type": "cosmetic", "id": "pk_deputy_skin_alt01"}
+    },
+    {
+      "id": "ach_campaign_all_evidence",
+      "name": "Cold Case Closed",
+      "category": "campaign",
+      "tracking_event": "on_match_end",
+      "criteria": {"evidence_collected_count_equals": "max_campaign_evidence"},
+      "reward": {"type": "campaign_modifier", "id": "starting_intel_capacity_bonus", "value_pct": 5}
+    },
+    {
+      "id": "ach_pk_arrest_streak",
+      "name": "Miranda Rights",
+      "category": "tactical",
+      "tracking_event": "on_unit_arrest",
+      "criteria": {"session_counter": "current_match_arrests", "minimum": 30},
+      "reward": {"type": "profile_banner", "id": "precinct_captain"}
+    },
+    {
+      "id": "ach_syn_siphon_max",
+      "name": "Corporate Espionage",
+      "category": "tactical",
+      "tracking_event": "on_siphon_tick",
+      "criteria": {"persistent_counter": "total_credits_siphoned", "minimum": 5000},
+      "reward": {"type": "structure_emblem", "id": "syn_black_market_emblem"}
+    },
+    {
+      "id": "ach_nb_corruption_map",
+      "name": "Patient Zero",
+      "category": "tactical",
+      "tracking_event": "on_match_end",
+      "criteria": {"faction": "the_nullborn", "outcome": "victory", "corrupted_cells_pct_minimum": 0.8},
+      "reward": {"type": "menu_background", "id": "apex_singularity"}
+    }
+  ],
+  "default_profile": {
+    "profile_id": "local_commander",
+    "persistent_progression": {
+      "campaign_completed_acts": [],
+      "total_credits_siphoned": 0,
+      "unlocked_cosmetics": [],
+      "unlocked_achievements": []
+    }
+  }
+}
