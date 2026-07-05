@@ -1,22 +1,23 @@
 # MoonGoons Take Back 🌙
 
-**MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the wider MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish forward operations, scout unknown sectors, counter Syndicate extraction, and dismantle the enemy network before the Nullborn crisis consumes the Moon.
+**MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish Forward Relays, scout unknown sectors, counter Syndicate extraction, complete campaign dispatches, and dismantle hostile command networks before the Nullborn crisis consumes the Moon.
 
-## Playable RTS prototype: Phase Five
+## Playable RTS prototype: Phase Nine
 
-`scenes/Main.tscn` launches a code-drawn Peacekeeper versus Syndicate RTS skirmish.
+`scenes/Main.tscn` launches a code-drawn Lunar Peacekeepers versus Syndicate RTS campaign-skirmish build.
 
 - Survey Drones harvest Credits and Lunar Alloy, returning cargo to the Command Nexus.
 - Communications Relays expand Command Capacity; Tactical Armories unlock Riot Vanguards.
-- Use control groups, rally points, attack-move, hold position, and Riot Vanguard Shield Wall.
+- Use control groups, production rally points, attack-move, hold position, Riot Vanguard Shield Wall, and queued route commands.
 - Capture Aurora Exchange, Gravity Foundry, and Eclipse Signal Tower.
-- Place a completed Communications Relay in a secured sector to create a Forward Relay that doubles sector income and extends sight.
-- Explore through unit and structure vision. Previously scouted terrain remains dim; unknown terrain is hidden by lunar fog.
-- Gain Intel from neutralizing Syndicate forces. Press `X` or use Tactical Scan to reveal the cursor area temporarily.
-- Respond to hidden Syndicate **Siphon Raids** before their extraction arrays drain a resource node and matching stockpile.
-- Destroy Siphon Arrays for additional Intel, then destroy the Syndicate Hideout before its escalating waves destroy the Command Nexus.
+- Build a completed Relay in a secured sector to create a Forward Relay, doubling sector income and extending vision.
+- Explore through unit and structure vision. Unknown terrain is hidden by lunar fog.
+- Spend Intel on Tactical Scan to expose fog-covered threats.
+- Respond to hidden Siphon Raids before their extraction arrays drain resources and fund the Syndicate War Chest.
+- Counter Syndicate doctrines: fast Shades, armored Bruisers, and accelerated relay-network raids.
+- Press `C` to open Campaign Operations, choose Act I dispatches, and persist operation clearance locally.
 
-This is an early skirmish slice, not a complete commercial RTS. The active game uses code-drawn visuals without external texture or font dependencies.
+The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn visuals and does not require external textures or fonts to run.
 
 ## Run it
 
@@ -32,51 +33,70 @@ chmod +x compile_and_test.sh
 ./compile_and_test.sh
 ```
 
-See [`INSTALL.md`](INSTALL.md) for setup and troubleshooting.
+You can also manually start the GitHub Actions workflow from **Actions → MoonGoons Godot Verification → Run workflow**.
 
-## RTS controls
+## Core controls
 
-| Key | Action |
+| Control | Action |
 |---|---|
+| Left-click / left-drag | Select one unit / select a group |
+| Right-click | Immediate move, harvest, or attack order |
+| `Ctrl + right-click` | Queue movement waypoint |
+| `Ctrl + Shift + right-click` | Queue attack-move waypoint |
 | `Q` / `W` | Queue Survey Drone / Patrol Deputy |
 | `E` / `R` / `T` | Build Relay / Armory / Security Turret |
 | `F` | Queue Riot Vanguard after Armory completion |
 | `A` / `H` | Attack-move / hold position |
 | `S` | Riot Vanguard Shield Wall |
 | `X` | Tactical Scan at cursor |
-| `G` / `B` | Gather nearest resource / cancel build |
-| `Shift + 1–5` / `1–5` | Assign / recall control group |
-| `Shift + right-click` | Set production rally points |
+| `G` / `B` | Gather nearest resource / cancel build placement |
+| `M` | Toggle terrain labels and outlines |
+| `Shift + 1–5` / `1–5` | Assign / recall control groups |
+| `Shift + right-click` | Set production rally point |
+| Tactical-map click | Move selected units or workers |
+| Tactical-map Shift-click | Attack-move selected combat units |
+| `C` | Campaign Operations Board |
+| `F1` | Developer console in debug/editor builds |
+
+## Campaign Operations
+
+Campaign progression currently begins with five linked Act I operations, `1.01` through `1.05`.
+
+Each operation applies its own live-match profile for starting resources, Command Capacity, Command Nexus integrity, Hideout integrity, first-wave timing, and Syndicate War Chest strength. Completing an operation records local progress and unlocks the next dispatch.
+
+See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for campaign and profile details.
 
 ## Current foundations
 
 - Tier 1–3 unit catalogs, building trees, economy, damage, VFX, achievements, and localization data.
-- A 20-mission campaign catalog from Mission 1.01 through Mission 1.20.
-- Fixed-point helpers, seeded RNG, lockstep buffering, state hashing, saves, Resource Bank, combat/arrest resolution, and ability cooldowns.
-- GitHub Actions import and smoke-test automation.
-- A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, and hidden Syndicate Siphon Raids.
+- A 20-mission campaign catalog, plus the first playable Act I campaign-operation bridge.
+- Fixed-point helpers, seeded RNG, lockstep buffering, state hashing, local saves, Resource Bank, combat/arrest resolution, and ability cooldowns.
+- GitHub Actions import and smoke-test automation with a manual workflow trigger.
+- A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, Siphon Raids, terrain steering, tactical-map orders, queued routes, Syndicate doctrine pressure, and persistent Act I campaign progression.
 
 ## Three-faction destination
 
 - **Lunar Peacekeepers:** combined arms, defensive grids, territory reclamation, visibility infrastructure, and tactical defensive abilities.
-- **The Syndicate:** mobility, stealth, sensor disruption, air-drop raids, Credit Siphons, counter-intelligence, and sabotage.
+- **The Syndicate:** mobility, stealth, sensor disruption, air-drop raids, Credit Siphons, War Chest doctrine escalation, counter-intelligence, and sabotage.
 - **The Nullborn:** Corrupted Ground, Biomass Vents, hidden growth, swarm pressure, and territorial attrition.
 
-The current playable skirmish is Peacekeeper versus Syndicate. Playable Syndicate and Nullborn economies, obstacle-aware pathfinding, worker repair, full build trees, minimap/camera movement, deeper abilities, campaign scenes, original art/audio, Android controls, and online network transport remain future work.
+The current playable scenario is Peacekeepers versus a live Syndicate director. Player-selectable Syndicate and Nullborn economies, full navmesh pathfinding, camera scrolling, zoomable minimap, dedicated campaign maps, scripted mission objectives, final art/audio, Android controls, and online multiplayer remain future work.
 
 ## Key project files
 
 ```text
-scenes/Main.tscn                              Current Phase Five RTS skirmish
-scripts/moongoons_rts_phase_four.gd           Fog of war and Tactical Scan layer
-scripts/moongoons_rts_phase_five.gd           Siphon Raid and counter-operation layer
-data/rts_phase_four_recon.json                Fog, vision, and Tactical Scan rules
-data/rts_phase_five_siphon_raids.json         Siphon Raid values and counter-intel rewards
-tests/rts_phase_four_smoke_test.gd            Phase Four recon smoke test
-tests/rts_phase_five_smoke_test.gd            Phase Five Siphon Raid smoke test
-docs/RTS_SKIRMISH.md                          RTS controls and design scope
-compile_and_test.sh                           Seven-step local verification pipeline
-.github/workflows/godot-ci.yml                GitHub Actions verification
+scenes/Main.tscn                                      Current Phase Nine campaign RTS scene
+scripts/moongoons_rts_phase_nine_campaign.gd          Campaign board and local progression layer
+data/rts_phase_nine_campaign.json                     Act I operation profiles and rewards
+scripts/moongoons_rts_phase_eight_syndicate.gd         Syndicate War Chest and doctrine director
+data/rts_phase_eight_syndicate.json                    Syndicate doctrine rules
+docs/USER_MANUAL.md                                   Full player and debug-console guide
+docs/PHASE_NINE_CAMPAIGN.md                            Campaign operations guide
+docs/PHASE_EIGHT_SYNDICATE.md                          Syndicate counterplay guide
+docs/DEVELOPMENT_ROADMAP.md                            Current development roadmap
+tests/rts_phase_nine_campaign_smoke_test.gd            Phase Nine campaign smoke test
+compile_and_test.sh                                    Twelve-step local verification pipeline
+.github/workflows/godot-ci.yml                         GitHub Actions verification
 ```
 
 ## Licensing
