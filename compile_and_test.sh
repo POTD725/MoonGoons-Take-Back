@@ -59,7 +59,7 @@ run_check "[8/12] Running Phase Six developer console smoke tests..." "${GODOT_B
 run_check "[9/12] Running Phase Seven terrain and tactical-map smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_smoke_test.gd
 run_check "[10/12] Running Phase Seven queued-route smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_routes_smoke_test.gd
 run_check "[11/12] Running Phase Eight Syndicate economy smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_eight_smoke_test.gd
-run_check "[12/12] Running Phase Nine campaign progression smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_nine_campaign_smoke_test.gd
+run_check "[12/12] Running Phase Nine fixed-story campaign and difficulty smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_nine_campaign_smoke_test.gd
 
 echo "==========================================================" | tee -a "${TEST_LOG}"
 if [[ ${FAILURES} -eq 0 ]]; then
