@@ -6,6 +6,7 @@ var syndicate_rules: Dictionary = {}
 var syndicate_war_chest: float = 0.0
 var syndicate_doctrine_index: int = 0
 var previous_active_siphon_count: int = 0
+var previous_captured_sector_count: int = 0
 
 func _ready() -> void:
 	syndicate_rules = _load_syndicate_rules()
@@ -18,6 +19,7 @@ func _reset_match() -> void:
 	syndicate_war_chest = 0.0
 	syndicate_doctrine_index = 0
 	previous_active_siphon_count = 0
+	previous_captured_sector_count = 0
 	super._reset_match()
 
 func _process(delta: float) -> void:
@@ -39,14 +41,6 @@ func _spawn_enemy_wave() -> void:
 		var reduction: float = float(relay_doctrine.get("wave_timer_reduction_seconds", 2.0))
 		enemy_spawn_clock = maxf(minimum_interval, enemy_spawn_clock - reduction)
 
-func _handle_sector_owner_change(sector: Variant, previous_owner: String, new_owner: String) -> void:
-	super._handle_sector_owner_change(sector, previous_owner, new_owner)
-	if new_owner == "peacekeeper" and previous_owner != "peacekeeper":
-		var seized_amount: float = minf(syndicate_war_chest, float(_syndicate_economy_rules().get("sector_recapture_loss", 18.0)))
-		syndicate_war_chest = maxf(0.0, syndicate_war_chest - seized_amount)
-		if seized_amount > 0.0:
-			_log_event("Sector reclamation disrupted %.0f Syndicate War Chest." % seized_amount)
-
 func _draw_world() -> void:
 	super._draw_world()
 	_draw_syndicate_economy_panel()
@@ -63,13 +57,20 @@ func _update_syndicate_economy(delta: float) -> void:
 		var lost_siphons: int = previous_active_siphon_count - active_siphons
 		syndicate_war_chest = maxf(0.0, syndicate_war_chest - loss_per_siphon * float(lost_siphons))
 		_log_event("Siphon neutralization disrupted Syndicate funding.")
+	if captured_sector_count > previous_captured_sector_count:
+		var loss_per_sector: float = float(economy.get("sector_recapture_loss", 18.0))
+		var reclaimed_count: int = captured_sector_count - previous_captured_sector_count
+		syndicate_war_chest = maxf(0.0, syndicate_war_chest - loss_per_sector * float(reclaimed_count))
+		_log_event("Peacekeeper sector reclamation disrupted Syndicate funding.")
 	previous_active_siphon_count = active_siphons
+	previous_captured_sector_count = captured_sector_count
 	_unlock_available_syndicate_doctrines()
 
 func _unlock_available_syndicate_doctrines() -> void:
 	var doctrines: Array = _syndicate_doctrines()
 	while syndicate_doctrine_index < doctrines.size():
-		var doctrine: Dictionary = doctrines[syndicate_doctrine_index] as Dictionary
+		var doctrine_value: Variant = doctrines[syndicate_doctrine_index]
+		var doctrine: Dictionary = doctrine_value as Dictionary if doctrine_value is Dictionary else {}
 		var required_chest: float = float(doctrine.get("war_chest_required", INF))
 		if syndicate_war_chest < required_chest:
 			return
@@ -128,14 +129,18 @@ func _syndicate_economy_rules() -> Dictionary:
 
 func _syndicate_doctrines() -> Array:
 	var doctrines: Variant = syndicate_rules.get("doctrines", [])
-	return doctrines as Array if doctrines is Array else []
+	if doctrines is Array:
+		return doctrines as Array
+	return []
 
 func _doctrine_at(index: int) -> Dictionary:
 	var doctrines: Array = _syndicate_doctrines()
 	if index < 0 or index >= doctrines.size():
 		return {}
 	var doctrine: Variant = doctrines[index]
-	return doctrine as Dictionary if doctrine is Dictionary else {}
+	if doctrine is Dictionary:
+		return doctrine as Dictionary
+	return {}
 
 func _load_syndicate_rules() -> Dictionary:
 	var path: String = "res://data/rts_phase_eight_syndicate.json"
