@@ -22,11 +22,14 @@ echo "==========================================================" | tee "${TEST_
 echo "MOONGOONS: TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
 
-echo "[1/2] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
+echo "[1/3] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
 "${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}"
 
-echo "[2/2] Running data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
+echo "[2/3] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
+
+echo "[3/3] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
+"${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
 echo "==========================================================" | tee -a "${TEST_LOG}"
 echo "SUCCESS: MoonGoons smoke tests passed." | tee -a "${TEST_LOG}"
