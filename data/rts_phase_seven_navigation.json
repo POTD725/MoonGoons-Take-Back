@@ -1,0 +1,51 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.7.0",
+  "phase": "navigation-terrain-and-map-control",
+  "navigation": {
+    "unit_clearance": 18.0,
+    "detour_clearance": 30.0,
+    "features": [
+      {
+        "id": "glass_regolith_basin",
+        "kind": "slow_zone",
+        "rect": [380.0, 132.0, 210.0, 74.0],
+        "speed_multiplier": 0.68,
+        "label": "GLASS REGOLITH"
+      },
+      {
+        "id": "lunar_transit_lane",
+        "kind": "fast_zone",
+        "rect": [268.0, 344.0, 310.0, 36.0],
+        "speed_multiplier": 1.16,
+        "label": "TRANSIT LANE"
+      },
+      {
+        "id": "impact_ridge_alpha",
+        "kind": "obstacle",
+        "center": [442.0, 326.0],
+        "radius": 42.0,
+        "label": "IMPACT RIDGE"
+      },
+      {
+        "id": "collapsed_conduit",
+        "kind": "obstacle",
+        "center": [742.0, 470.0],
+        "radius": 50.0,
+        "label": "COLLAPSED CONDUIT"
+      },
+      {
+        "id": "shardfield",
+        "kind": "obstacle",
+        "center": [646.0, 250.0],
+        "radius": 33.0,
+        "label": "SHARDFIELD"
+      }
+    ],
+    "tactical_map": {
+      "command_mode": "left_click_selected_units",
+      "shift_click_attack_move": true,
+      "display_height": 56.0
+    }
+  }
+}
