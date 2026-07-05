@@ -13,6 +13,7 @@ var mission_controller := MoonGoonsMissionController.new(resource_bank)
 var random_source := MoonGoonsGameRand.new(1)
 var lockstep: MoonGoonsLockstepNetworkManager
 var player_ids: Array[int] = []
+var _passive_income_rates: Dictionary = {}
 var errors: Array[String] = []
 
 func initialize(initial_player_ids: Array[int], match_seed: int) -> bool:
@@ -29,9 +30,10 @@ func initialize(initial_player_ids: Array[int], match_seed: int) -> bool:
 		errors.append_array(unit_parser.errors)
 		return false
 	for player_id: int in player_ids:
-		var starting_capacity := 20 if player_id == 1 else 15
+		var starting_capacity: int = 20 if player_id == 1 else 15
 		resource_bank.initialize_player_account(player_id, starting_capacity)
 	lockstep = MoonGoonsLockstepNetworkManager.new(movement_controller, player_ids)
+	lockstep.simulation_tick_executed.connect(_on_simulation_tick)
 	random_source = MoonGoonsGameRand.new(match_seed)
 	if not mission_controller.load_catalog():
 		errors.append_array(mission_controller.errors)
@@ -47,12 +49,13 @@ func spawn_unit_from_profile(
 	start_z_fp: int,
 	charge_cost: bool = false
 ) -> bool:
-	var profile := unit_parser.get_profile(profile_id)
+	var profile: Dictionary = unit_parser.get_profile(profile_id)
 	if profile.is_empty() or not resource_bank.has_player(owner_player_id):
 		return false
-	if charge_cost and not resource_bank.try_spend(owner_player_id, profile.get("cost", {}) as Dictionary):
+	var cost: Dictionary = profile.get("cost", {})
+	if charge_cost and not resource_bank.try_spend(owner_player_id, cost):
 		return false
-	var unit := unit_parser.spawn_unit_from_catalog(profile_id, faction_id, start_x_fp, start_z_fp, instance_id)
+	var unit: MoonGoonsSimulationUnit = unit_parser.spawn_unit_from_catalog(profile_id, faction_id, start_x_fp, start_z_fp, instance_id)
 	if unit == null or not movement_controller.register_unit(unit):
 		return false
 	var stats: Dictionary = profile.get("stats", {})
@@ -80,17 +83,7 @@ func submit_packet(packet: Dictionary) -> bool:
 func process_network_turn(passive_income_rates: Dictionary = {}) -> Dictionary:
 	if lockstep == null:
 		return {"advanced": false, "reason": "not_initialized"}
-	for player_id: int in player_ids:
-		var rates: Dictionary = passive_income_rates.get(player_id, {})
-		for _tick: int in range(MoonGoonsLockstepNetworkManager.SIMULATION_TICKS_PER_NETWORK_TURN):
-			resource_bank.process_passive_income_tick(
-				player_id,
-				int(rates.get("credits_per_second_fp", 0)),
-				int(rates.get("alloy_per_second_fp", 0)),
-				int(rates.get("intel_per_second_fp", 0))
-			)
-			combat_abilities.process_simulation_tick()
-			combat_damage.process_status_tick()
+	_passive_income_rates = passive_income_rates.duplicate(true)
 	return lockstep.update_network_turn_loop()
 
 func make_authoritative_snapshot() -> Dictionary:
@@ -109,3 +102,15 @@ func make_authoritative_snapshot() -> Dictionary:
 
 func current_state_hash() -> String:
 	return MoonGoonsGameStateHash.hash_snapshot(make_authoritative_snapshot())
+
+func _on_simulation_tick(_simulation_tick: int) -> void:
+	for player_id: int in player_ids:
+		var rates: Dictionary = _passive_income_rates.get(player_id, {})
+		resource_bank.process_passive_income_tick(
+			player_id,
+			int(rates.get("credits_per_second_fp", 0)),
+			int(rates.get("alloy_per_second_fp", 0)),
+			int(rates.get("intel_per_second_fp", 0))
+		)
+	combat_abilities.process_simulation_tick()
+	combat_damage.process_status_tick()
