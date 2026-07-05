@@ -1,7 +1,7 @@
 class_name MoonGoonsMissionController
 extends Node
 ## Data-driven campaign trigger runner for MoonGoons missions.
-## Scene code reports events; this controller evaluates the mission JSON and emits effects.
+## Scene code reports events; this controller evaluates mission data and emits effects.
 
 signal mission_loaded(mission_id: String)
 signal objective_changed(objective_id: String, state: String)
@@ -27,7 +27,7 @@ func load_catalog(path: String = MISSION_DATA_PATH) -> bool:
 	if not FileAccess.file_exists(path):
 		errors.append("Missing campaign mission data: %s" % path)
 		return false
-	var file := FileAccess.open(path, FileAccess.READ)
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		errors.append("Could not open campaign mission data: %s" % path)
 		return false
@@ -41,14 +41,15 @@ func load_catalog(path: String = MISSION_DATA_PATH) -> bool:
 func start_mission(mission_id: String) -> bool:
 	if _catalog.is_empty() and not load_catalog():
 		return false
-	var mission := _find_mission(mission_id)
+	var mission: Dictionary = _find_mission(mission_id)
 	if mission.is_empty():
 		errors.append("Unknown mission: %s" % mission_id)
 		return false
 	_mission = mission
 	_objective_states.clear()
 	_fired_trigger_ids.clear()
-	for entry: Variant in _mission.get("objectives", []):
+	var objectives: Array = _mission.get("objectives", [])
+	for entry: Variant in objectives:
 		if entry is Dictionary:
 			var objective: Dictionary = entry as Dictionary
 			var objective_id := String(objective.get("id", ""))
@@ -61,7 +62,8 @@ func start_mission(mission_id: String) -> bool:
 func notify_event(event_id: String, payload: Dictionary = {}) -> void:
 	if _mission.is_empty():
 		return
-	for entry: Variant in _mission.get("triggers", []):
+	var triggers: Array = _mission.get("triggers", [])
+	for entry: Variant in triggers:
 		if not (entry is Dictionary):
 			continue
 		var trigger: Dictionary = entry as Dictionary
@@ -70,10 +72,12 @@ func notify_event(event_id: String, payload: Dictionary = {}) -> void:
 		var trigger_id := String(trigger.get("id", ""))
 		if bool(trigger.get("once", false)) and _fired_trigger_ids.has(trigger_id):
 			continue
-		if not _conditions_match(trigger.get("conditions", {}) as Dictionary, payload):
+		var conditions: Dictionary = trigger.get("conditions", {})
+		if not _conditions_match(conditions, payload):
 			continue
 		_fired_trigger_ids[trigger_id] = true
-		_apply_effects(trigger.get("effects", []) as Array)
+		var effects: Array = trigger.get("effects", [])
+		_apply_effects(effects)
 
 func get_objective_state(objective_id: String) -> String:
 	return String(_objective_states.get(objective_id, "unknown"))
@@ -94,7 +98,8 @@ func restore_state(state: Dictionary) -> bool:
 	return true
 
 func _find_mission(mission_id: String) -> Dictionary:
-	for entry: Variant in _catalog.get("missions", []):
+	var missions: Array = _catalog.get("missions", [])
+	for entry: Variant in missions:
 		if entry is Dictionary:
 			var mission: Dictionary = entry as Dictionary
 			if String(mission.get("id", "")) == mission_id:
@@ -109,7 +114,8 @@ func _conditions_match(conditions: Dictionary, payload: Dictionary) -> bool:
 		match String(key):
 			"required_buildings":
 				var built_buildings: Array = payload.get("built_building_ids", [])
-				for building_id: Variant in expected as Array:
+				var required_buildings: Array = expected as Array
+				for building_id: Variant in required_buildings:
 					if not built_buildings.has(building_id):
 						return false
 			"health_pct_max":
