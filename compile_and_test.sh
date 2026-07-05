@@ -22,17 +22,20 @@ echo "==========================================================" | tee "${TEST_
 echo "MOONGOONS TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
 
-echo "[1/4] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
+echo "[1/5] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
 "${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}"
 
-echo "[2/4] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
+echo "[2/5] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
-echo "[3/4] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
+echo "[3/5] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
-echo "[4/4] Running phase two RTS command and production smoke tests..." | tee -a "${TEST_LOG}"
+echo "[4/5] Running Phase Two RTS command and production smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
+
+echo "[5/5] Running Phase Three territory and forward-operations smoke tests..." | tee -a "${TEST_LOG}"
+"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_three_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
 echo "==========================================================" | tee -a "${TEST_LOG}"
 echo "SUCCESS: MoonGoons Take Back smoke tests passed." | tee -a "${TEST_LOG}"
