@@ -45,15 +45,16 @@ Still pending within Phase Eight:
 - Initial faction-specific technologies and asymmetrical win pressure.
 - Matchup balancing for Peacekeeper versus Syndicate and Peacekeeper versus Nullborn.
 
-### Phase 9: Campaign and progression
+### Phase 9: Story campaign and progression
 
 Implemented so far:
 
-- Campaign Operations Board opened with `C` or its sidebar button.
-- Five linked Act I mission profiles, from 1.01 through 1.05.
-- Local persistent progression profile for completed missions, selected operation, Clearance, and Intel Cache.
+- A fixed Lunar Peacekeepers story route opened with `C` or the Story Dispatch sidebar button.
+- Five required Act I chapters, from 1.01 through 1.05, advancing automatically in narrative order.
+- Local persistent progression for route, next chapter, difficulty, completed chapters, Clearance, and Intel Cache.
+- Easy, Medium, and Hard opponent settings that modify Syndicate funding, wave timing, unit durability, and damage.
 - Mission-specific starting resources, capacity, Nexus strength, Hideout strength, first-wave timing, and initial Syndicate funding.
-- Victory rewards that unlock the next dispatch.
+- One-time story rewards that advance the following required dispatch.
 
 Still pending within Phase Nine:
 
@@ -61,6 +62,7 @@ Still pending within Phase Nine:
 - Scripted secondary objectives, failure conditions, and bespoke enemy spawns.
 - Cinematic briefing/debriefing sequences, voice work, and unique mission-only bosses.
 - Campaign save-slot UI and multiple player profiles.
+- Campaign routes for the Syndicate and Nullborn once those factions are playable. Race route is the only future campaign-selection layer; individual chapters remain story-locked.
 
 ## Remaining core phase
 
@@ -77,4 +79,4 @@ Online multiplayer is intentionally separate from the core phases above. It need
 
 ## Recommended order
 
-Stabilize the current terrain, faction, and campaign layers through the Godot test workflow. Then use dedicated mission maps and original presentation assets to turn the campaign bridge into a full story-driven MoonGoons experience.
+Stabilize the current terrain, faction, and fixed-story campaign layers through the Godot test workflow. Then create dedicated mission maps and original presentation assets to turn the Act I campaign bridge into a full MoonGoons story experience.
