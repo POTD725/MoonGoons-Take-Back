@@ -45,14 +45,24 @@ Still pending within Phase Eight:
 - Initial faction-specific technologies and asymmetrical win pressure.
 - Matchup balancing for Peacekeeper versus Syndicate and Peacekeeper versus Nullborn.
 
-## Remaining core phases
-
 ### Phase 9: Campaign and progression
 
-- Connect campaign missions to real scene maps and objectives.
-- Mission briefing, debriefing, rewards, unlocks, and persistent progression.
-- Save-slot interface and campaign chapter selection.
-- Hero, ship, or officer progression where it supports the RTS game rather than replacing it.
+Implemented so far:
+
+- Campaign Operations Board opened with `C` or its sidebar button.
+- Five linked Act I mission profiles, from 1.01 through 1.05.
+- Local persistent progression profile for completed missions, selected operation, Clearance, and Intel Cache.
+- Mission-specific starting resources, capacity, Nexus strength, Hideout strength, first-wave timing, and initial Syndicate funding.
+- Victory rewards that unlock the next dispatch.
+
+Still pending within Phase Nine:
+
+- Dedicated campaign map scenes and mission-specific terrain layouts.
+- Scripted secondary objectives, failure conditions, and bespoke enemy spawns.
+- Cinematic briefing/debriefing sequences, voice work, and unique mission-only bosses.
+- Campaign save-slot UI and multiple player profiles.
+
+## Remaining core phase
 
 ### Phase 10: Presentation and release hardening
 
@@ -67,4 +77,4 @@ Online multiplayer is intentionally separate from the core phases above. It need
 
 ## Recommended order
 
-Finish the remaining Phase Seven camera and pathfinding work while stabilizing the current Syndicate director. Then build the player-selectable Syndicate and Nullborn economies on top of proven terrain, movement, and faction systems.
+Stabilize the current terrain, faction, and campaign layers through the Godot test workflow. Then use dedicated mission maps and original presentation assets to turn the campaign bridge into a full story-driven MoonGoons experience.
