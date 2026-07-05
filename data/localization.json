@@ -35,6 +35,16 @@
         "siphon_desc": "Passively drains Credits directly from an uncaptured resource node.",
         "phase_shift_name": "Phase Shift",
         "phase_shift_desc": "Renders the unit completely invulnerable but unable to attack for 3 seconds."
+      },
+      "mission": {
+        "m_1_01": {
+          "secure_local_nexus": "Secure the local Command Nexus.",
+          "detain_runner": "Detain the Syndicate runner and follow the lead to the spaceport."
+        },
+        "m_1_02": {
+          "build_perimeter": "Construct 1 Tactical Armory and 1 Drone Bay.",
+          "secure_mining_intel": "Eliminate the lookouts and download the shipping logs from the terminal."
+        }
       }
     },
     "es": {
@@ -66,6 +76,16 @@
         "siphon_desc": "Extrae créditos de forma pasiva directamente de un nodo de recursos no capturado.",
         "phase_shift_name": "Cambio de fase",
         "phase_shift_desc": "Vuelve a la unidad completamente invulnerable, pero incapaz de atacar durante 3 segundos."
+      },
+      "mission": {
+        "m_1_01": {
+          "secure_local_nexus": "Asegura el Nexo de Mando local.",
+          "detain_runner": "Detén al corredor del Sindicato y sigue la pista hasta el espaciopuerto."
+        },
+        "m_1_02": {
+          "build_perimeter": "Construye 1 Armería Táctica y 1 Bahía de Drones.",
+          "secure_mining_intel": "Elimina a los vigías y descarga los registros de envío desde la terminal."
+        }
       }
     }
   }
