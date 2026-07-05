@@ -1,0 +1,43 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.3.0",
+  "phase": "territory-control-and-forward-operations",
+  "capture_rules": {
+    "radius": 76.0,
+    "capture_rate_per_unit": 0.08,
+    "relay_outpost_radius": 108.0,
+    "outpost_income_multiplier": 2.0,
+    "first_capture_enemy_wave_delay": 5.0,
+    "second_capture_enemy_wave_delay": 4.0,
+    "third_capture_enemy_wave_delay": 3.0
+  },
+  "territories": [
+    {
+      "id": "aurora_exchange",
+      "display_name": "Aurora Exchange",
+      "position": [230.0, 220.0],
+      "resource": "credits",
+      "income_amount": 9,
+      "income_interval_seconds": 4.0,
+      "description": "A seized Syndicate ledger uplink. Secure it to reclaim Credits."
+    },
+    {
+      "id": "gravity_foundry",
+      "display_name": "Gravity Foundry",
+      "position": [648.0, 575.0],
+      "resource": "lunar_alloy",
+      "income_amount": 7,
+      "income_interval_seconds": 5.0,
+      "description": "A low-gravity fabrication line. Secure it to refine Lunar Alloy."
+    },
+    {
+      "id": "eclipse_signal_tower",
+      "display_name": "Eclipse Signal Tower",
+      "position": [742.0, 310.0],
+      "resource": "credits",
+      "income_amount": 13,
+      "income_interval_seconds": 5.0,
+      "description": "A strategic broadcast tower near the Hideout. Secure it to cut into Syndicate funding."
+    }
+  ]
+}
