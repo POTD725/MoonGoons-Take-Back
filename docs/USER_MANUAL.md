@@ -20,9 +20,11 @@ Lose if the **Command Nexus** reaches zero integrity.
 |---|---|
 | Left-click | Select a unit |
 | Left-drag | Select a group of units |
-| Right-click terrain | Move selected units |
+| Right-click terrain | Issue immediate movement order |
 | Right-click resource | Send selected Survey Drones to harvest |
 | Right-click enemy | Attack that enemy |
+| `Ctrl + right-click` | Queue a movement waypoint |
+| `Ctrl + Shift + right-click` | Queue an attack-move waypoint |
 | `Q` | Queue Survey Drone |
 | `W` | Queue Patrol Deputy |
 | `E` | Build Communications Relay |
@@ -35,9 +37,12 @@ Lose if the **Command Nexus** reaches zero integrity.
 | `X` | Tactical Scan at the cursor |
 | `G` | Gather from resource nearest the cursor |
 | `B` | Cancel building placement |
+| `M` | Toggle terrain labels and outlines |
 | `Shift + 1` through `Shift + 5` | Assign control group |
 | `1` through `5` | Recall control group |
 | `Shift + right-click` | Set production rally points |
+| Tactical-map left-click | Move selected units or workers |
+| Tactical-map Shift-click | Attack-move selected combat units |
 | `F1` | Developer console in debug/editor builds |
 
 ## Economy
@@ -105,6 +110,20 @@ Combat units capture a sector while standing inside its glowing ring without Syn
 
 Captures increase Syndicate pressure, so establish defenses before expanding too far.
 
+## Terrain, tactical map, and routes
+
+Units now steer around lunar obstacles. Impact Ridges, Collapsed Conduits, and Shardfields also block building placement. Use the blue Transit Lane for faster movement and avoid the brown-orange Glass Regolith when time matters.
+
+The sidebar tactical map gives quick battlefield orders. A yellow marker records its latest destination.
+
+Route queues support deliberate navigation through choke points:
+
+- Select units.
+- Use `Ctrl + right-click` for the first or next movement waypoint.
+- Use `Ctrl + Shift + right-click` to queue an attack-move waypoint.
+- Each route holds up to six waypoints and draws its planned path in the field.
+- Normal right-click orders replace that unit’s queued route.
+
 ## Fog and Tactical Scan
 
 The field has visible, explored, and unexplored areas. Units, structures, secured sectors, and Forward Relays provide sight.
@@ -153,4 +172,4 @@ When construction fails, select at least one Survey Drone, verify your resources
 
 ## Current scope
 
-The present prototype does not yet include obstacle-aware pathfinding, camera scrolling, minimap, full playable Syndicate or Nullborn economies, final art/audio, Android controls, campaign-map scenes, or online multiplayer.
+The present prototype does not yet include full navmesh pathfinding, camera scrolling, zoomable minimap, full playable Syndicate or Nullborn economies, final art/audio, Android controls, campaign-map scenes, or online multiplayer.
