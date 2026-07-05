@@ -44,6 +44,27 @@
         "m_1_02": {
           "build_perimeter": "Construct 1 Tactical Armory and 1 Drone Bay.",
           "secure_mining_intel": "Eliminate the lookouts and download the shipping logs from the terminal."
+        },
+        "m_1_03": {"tag_freighters": "Plant tracking indicators on 3 Syndicate cargo freighters."},
+        "m_1_04": {"secure_evidence": "Secure 4 high-value Evidence canisters from the vault chambers."},
+        "m_1_05": {"hold_gate": "Hold the primary sector defense gate for 10 minutes."},
+        "m_1_06": {"disconnect_siphons": "Disconnect 3 Syndicate Siphon Overrides."},
+        "m_1_07": {"escort_truck": "Escort the captured Syndicate supply truck to the safe sector."},
+        "m_1_08": {"extract_informant": "Extract the rogue Syndicate technician to the evacuation zone."},
+        "m_1_09": {"survive_siege": "Defend the Command Nexus through the full Syndicate assault."},
+        "m_1_10": {"secure_evidence_vault": "Breach the blast gates and secure the Vault 7 Evidence core."},
+        "m_1_11": {"destroy_biomass_vents": "Destroy 4 Nullborn Biomass Vents before they consume the resource nodes."},
+        "m_1_12": {"defend_hideout": "Protect the temporary Syndicate ally hideout from the infestation."},
+        "m_1_13": {"retrieve_sequence": "Retrieve the original biological sequence from the laboratory mainframe."},
+        "m_1_14": {"cleanse_relays": "Clear infection from 3 primary Communications Relays."},
+        "m_1_15": {"launch_transports": "Hold the checkpoints until 5 civilian transport ships launch."},
+        "m_1_16": {"establish_city_nexus": "Establish a Command Nexus in the infected city center."},
+        "m_1_17": {"defeat_fixer": "Defeat The Fixer before the biological payload launches."},
+        "m_1_18": {"escort_alloy_core": "Escort the Experimental Alloy Core to the hive epicenter."},
+        "m_1_19": {"destroy_reality_anchors": "Destroy 3 Reality Anchors guarding The Singularity."},
+        "m_1_20": {
+          "destroy_spore_heart": "Destroy the central Spore Heart.",
+          "evacuate_survivors": "Move surviving combat units to the safe transport zone before the orbital strike."
         }
       }
     },
