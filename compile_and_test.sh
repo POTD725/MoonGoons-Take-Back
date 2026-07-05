@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# MoonGoons Godot verification pipeline.
+# MoonGoons Take Back Godot verification pipeline.
 # Run locally after installing Godot 4.3+:
 #   chmod +x compile_and_test.sh
 #   ./compile_and_test.sh
@@ -19,19 +19,22 @@ if ! command -v "${GODOT_BIN}" >/dev/null 2>&1 && [[ ! -x "${GODOT_BIN}" ]]; the
 fi
 
 echo "==========================================================" | tee "${TEST_LOG}"
-echo "MOONGOONS: TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
+echo "MOONGOONS TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
 
-echo "[1/3] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
+echo "[1/4] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
 "${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}"
 
-echo "[2/3] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
+echo "[2/4] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
-echo "[3/3] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
+echo "[3/4] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
 "${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
 
+echo "[4/4] Running phase two RTS command and production smoke tests..." | tee -a "${TEST_LOG}"
+"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
+
 echo "==========================================================" | tee -a "${TEST_LOG}"
-echo "SUCCESS: MoonGoons smoke tests passed." | tee -a "${TEST_LOG}"
+echo "SUCCESS: MoonGoons Take Back smoke tests passed." | tee -a "${TEST_LOG}"
 echo "Logs: ${IMPORT_LOG} and ${TEST_LOG}" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
