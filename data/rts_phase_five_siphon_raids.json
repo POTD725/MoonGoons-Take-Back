@@ -1,0 +1,16 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.5.0",
+  "phase": "syndicate-siphon-raids-and-counter-operations",
+  "siphon_raids": {
+    "first_deployment_seconds": 24.0,
+    "deployment_interval_seconds": 34.0,
+    "integrity": 230.0,
+    "drain_interval_seconds": 3.5,
+    "node_drain_amount": 8,
+    "stockpile_drain_amount": 5,
+    "neutralize_intel_bonus": 3,
+    "warning_text": "Syndicate signal anomaly detected. Locate and neutralize the Siphon team.",
+    "description": "A stationary Syndicate extraction array drains a lunar resource site and steals from the matching Peacekeeper stockpile until destroyed."
+  }
+}
