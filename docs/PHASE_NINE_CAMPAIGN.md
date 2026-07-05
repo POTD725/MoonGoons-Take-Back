@@ -1,10 +1,10 @@
-# Phase Nine: Campaign Operations and Progression
+# Phase Nine: Story Campaign and Opponent Difficulty
 
-## Campaign Operations Board
+## Fixed story route
 
-Press `C` during a match, or click **Campaign Operations** in the sidebar, to open the campaign board.
+The campaign is not a selectable mission list.
 
-The board pauses the active RTS simulation while it is open. It lists the first five linked Act I operations:
+MoonGoons Take Back currently follows the **Lunar Peacekeepers** story route in a required narrative order. Every victory advances the player to the next dispatch automatically:
 
 1. **1.01 First Light Dispatch**
 2. **1.02 Cold Ledger**
@@ -12,7 +12,35 @@ The board pauses the active RTS simulation while it is open. It lists the first 
 4. **1.04 Glassline Stand**
 5. **1.05 Breakwater Zero**
 
-Select an unlocked card, then click **Start Operation** or press Enter.
+The game remembers the next unfinished chapter. Completed operations are not presented as alternate campaign choices.
+
+The Syndicate and Nullborn have route placeholders in the campaign data, but they are not selectable until those factions have playable bases, economies, units, and their own story campaigns.
+
+## Story Dispatch screen
+
+Press `C` during a match, or click **Story Dispatch** in the sidebar.
+
+The Story Dispatch screen pauses the active RTS simulation. It shows:
+
+- The current Act and required next operation
+- A story briefing
+- The primary objective
+- Clearance earned so far
+- The only player-facing choice: **Easy, Medium, or Hard** opponent difficulty
+
+Click a difficulty, then click **Begin Next Dispatch** or press Enter.
+
+## Opponent difficulty
+
+Difficulty changes enemy pressure without changing chapter order or story rewards.
+
+| Setting | Enemy response |
+|---|---|
+| **Easy** | Slower first raid, less Syndicate funding, weaker units, and longer wave intervals |
+| **Medium** | Intended story pressure and baseline enemy strength |
+| **Hard** | Faster raids, more War Chest funding, stronger units, and shorter wave intervals |
+
+The selected setting is stored in the local campaign profile and applies when the current story dispatch starts.
 
 ## Local progression
 
@@ -24,16 +52,18 @@ user://moongoons_campaign_profile.json
 
 The profile stores:
 
-- Selected operation
+- Active story route
+- Next story operation
+- Opponent difficulty
 - Completed operation IDs
 - Clearance earned from campaign victories
 - Intel Cache totals earned from campaign victories
 
-Clearing an operation unlocks the next linked dispatch. Replaying an already completed operation is allowed, but it does not award the same clearance twice.
+Clearing a new chapter grants its rewards and automatically advances the next required dispatch. Replaying the Act I finale after completion is allowed, but does not award duplicate Clearance.
 
 ## Operation profiles
 
-Each Act I dispatch uses the live RTS battlefield but applies distinct match conditions:
+Each dispatch uses the live RTS battlefield while applying its own story profile:
 
 - Starting Credits, Lunar Alloy, and Intel
 - Command Capacity
@@ -42,13 +72,13 @@ Each Act I dispatch uses the live RTS battlefield but applies distinct match con
 - Delay before the first Syndicate wave
 - Initial Syndicate War Chest value
 
-The later operations begin with stronger Syndicate funding and more immediate pressure, turning the campaign into a paced escalation instead of the same skirmish with a new hat.
+Difficulty then modifies the opponent’s funding, wave timing, durability, and damage. This lets a player choose how hard the enemy pushes without letting them skip the story’s spine.
 
 ## Current completion boundary
 
-The Phase Nine bridge currently uses the core RTS win condition, destroying the Syndicate Hideout, as the final completion event for each operation.
+The current Phase Nine bridge uses the core RTS victory condition, destroying the Syndicate Hideout, as the completion event for every Act I chapter.
 
-Mission cards can describe sector, relay, terrain, and Siphon priorities, and their profiles alter the actual match. Bespoke map scenes, scripted secondary objectives, cinematic briefings, and unique mission-only bosses are still the next continuation of Phase Nine.
+The chapters already change real match conditions, and the narrative order now persists. Dedicated campaign maps, scripted secondary objectives, cinematic briefings, unique mission-only bosses, and multi-profile save slots are the next continuation of Phase Nine.
 
 ## Troubleshooting
 
@@ -58,4 +88,4 @@ To reset local campaign progression during development, close the game and delet
 user://moongoons_campaign_profile.json
 ```
 
-This resets Act I to Operation 1.01. It does not change repository data or source files.
+This resets the Peacekeeper story route to Operation 1.01 and returns opponent difficulty to Medium. It does not change repository data or source files.
