@@ -4,7 +4,7 @@ extends RefCounted
 ## Feed only deterministic simulation data, never camera, VFX, audio, or UI state.
 
 static func hash_snapshot(snapshot: Dictionary) -> String:
-	var canonical := canonicalize(snapshot)
+	var canonical: String = canonicalize(snapshot)
 	var context := HashingContext.new()
 	context.start(HashingContext.HASH_SHA256)
 	context.update(canonical.to_utf8_buffer())
@@ -22,19 +22,20 @@ static func canonicalize(value: Variant) -> String:
 			parts.append("%s:%s" % [JSON.stringify(key), canonicalize(dictionary_value[key])])
 		return "{%s}" % ",".join(parts)
 	if value is Array:
-		var parts: Array[String] = []
-		for entry: Variant in value as Array:
-			parts.append(canonicalize(entry))
-		return "[%s]" % ",".join(parts)
+		var array_value: Array = value as Array
+		var array_parts: Array[String] = []
+		for entry: Variant in array_value:
+			array_parts.append(canonicalize(entry))
+		return "[%s]" % ",".join(array_parts)
 	return JSON.stringify(value)
 
 static func make_authoritative_snapshot(
 	turn_id: int,
 	simulation_tick: int,
-	resources_by_player: Dictionary,
+	resources_by_player: Array[Dictionary],
 	units: Array[Dictionary],
-	buildings: Array[Dictionary],
-	objectives: Dictionary,
+	combat_state: Dictionary,
+	mission_state: Dictionary,
 	random_seed_state: int
 ) -> Dictionary:
 	return {
@@ -42,7 +43,7 @@ static func make_authoritative_snapshot(
 		"simulation_tick": simulation_tick,
 		"resources_by_player": resources_by_player,
 		"units": units,
-		"buildings": buildings,
-		"objectives": objectives,
+		"combat_state": combat_state,
+		"mission_state": mission_state,
 		"random_seed_state": random_seed_state
 	}
