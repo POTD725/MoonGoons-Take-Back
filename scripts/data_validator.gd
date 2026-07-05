@@ -19,6 +19,7 @@ func validate(game_data: MoonGoonsGameData) -> Array[String]:
 	_validate_building_source(game_data.building_data, issues)
 	_validate_runtime_profiles(game_data.building_runtime_data, game_data.building_data, issues)
 	_validate_damage_rules(game_data.rules_data, issues)
+	_validate_campaign_missions(game_data.campaign_missions_data, issues)
 	_validate_localization(game_data.localization_data, issues)
 	_validate_achievements(game_data.achievements_data, issues)
 	_validate_fx_profiles(game_data.fx_profiles_data, issues)
@@ -82,6 +83,21 @@ func _validate_damage_rules(rules: Dictionary, issues: Array[String]) -> void:
 		for armor_class: String in ["light_infantry", "heavy_infantry", "heavy_mechanical"]:
 			if not row.has(armor_class):
 				issues.append("Damage rule %s is missing %s." % [damage_type, armor_class])
+
+func _validate_campaign_missions(campaign_data: Dictionary, issues: Array[String]) -> void:
+	var mission_ids: Dictionary = {}
+	var missions: Array = campaign_data.get("missions", [])
+	for entry: Variant in missions:
+		if not (entry is Dictionary):
+			issues.append("Campaign mission list contains a non-dictionary entry.")
+			continue
+		var mission: Dictionary = entry as Dictionary
+		var mission_id := String(mission.get("id", ""))
+		if mission_id.is_empty() or not mission.has("objectives") or not mission.has("triggers"):
+			issues.append("Campaign mission has incomplete schema: %s" % mission_id)
+		elif mission_ids.has(mission_id):
+			issues.append("Duplicate campaign mission id: %s" % mission_id)
+		mission_ids[mission_id] = true
 
 func _validate_localization(localization: Dictionary, issues: Array[String]) -> void:
 	var meta: Dictionary = localization.get("meta", {})
