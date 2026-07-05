@@ -9,22 +9,43 @@
 - **Phase 5:** Syndicate Siphon Raids and counter-intelligence response.
 - **Phase 6:** Player manual, debug developer console, and expanded test coverage.
 
-## Remaining core phases
+## Active development
 
 ### Phase 7: Navigation, terrain, and map control
 
-- Obstacle-aware movement and pathfinding.
-- Traversable terrain types, chokepoints, blockers, and lane design.
-- Camera movement and a tactical minimap.
+Implemented so far:
+
+- Terrain-aware steering around Impact Ridges, Collapsed Conduits, and Shardfields.
+- Glass Regolith slow zones and Lunar Transit Lane speed zones.
+- Terrain-based building exclusions.
+- Compact clickable tactical map.
+- Formation-aware queued move and attack-move routes.
+
+Still pending within Phase Seven:
+
+- Camera movement and zoom.
+- A larger/minimizable tactical map.
+- Full navmesh pathfinding and dynamic obstacle resolution.
 - More than one playable lunar map.
-- Improved selection feedback, formation movement, and squad behavior.
+- Improved formation behavior in narrow choke points.
 
 ### Phase 8: Faction expansion
 
-- Playable Syndicate economy, construction, and unit roster.
+Implemented so far:
+
+- Syndicate War Chest economy driven by Hideout income and active Siphon Arrays.
+- Ghost Protocol, Black Market Forge, and Relay Network doctrine progression.
+- Shade infiltrator variant, armored Bruiser upgrades, and accelerated post-doctrine waves.
+- Peacekeeper counterplay that reduces the War Chest by destroying Siphons and reclaiming sectors.
+
+Still pending within Phase Eight:
+
+- Player-selectable Syndicate base, construction menu, worker loop, and independent production queue.
 - First playable Nullborn economy using Corrupted Ground and Biomass Vents.
 - Initial faction-specific technologies and asymmetrical win pressure.
 - Matchup balancing for Peacekeeper versus Syndicate and Peacekeeper versus Nullborn.
+
+## Remaining core phases
 
 ### Phase 9: Campaign and progression
 
@@ -42,8 +63,8 @@
 
 ## Separate major milestone: Online multiplayer
 
-Online multiplayer is intentionally separate from the four core phases above. It needs deterministic simulation verification, authoritative networking decisions, lobbies, matchmaking, reconnect handling, anti-cheat planning, security review, and live operations support. It should begin only after the single-player RTS loop and pathfinding are stable.
+Online multiplayer is intentionally separate from the core phases above. It needs deterministic simulation verification, authoritative networking decisions, lobbies, matchmaking, reconnect handling, anti-cheat planning, security review, and live operations support. It should begin only after the single-player RTS loop and pathfinding are stable.
 
 ## Recommended order
 
-Finish Phase 7 before starting faction expansion. Strong terrain, movement, camera, and map controls make every later faction, mission, and piece of art more valuable.
+Finish the remaining Phase Seven camera and pathfinding work while stabilizing the current Syndicate director. Then build the player-selectable Syndicate and Nullborn economies on top of proven terrain, movement, and faction systems.
