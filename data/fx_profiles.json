@@ -1,0 +1,58 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "palette": {
+    "lunar_peacekeepers": {"primary": "#00E5FF", "secondary": "#FFFFFF"},
+    "the_syndicate": {"primary": "#FF9100", "secondary": "#424242"},
+    "the_nullborn": {"primary": "#00E676", "secondary": "#7C4DFF"}
+  },
+  "profiles": {
+    "fx_kinetic_tracer": {
+      "type": "projectile_tracer",
+      "color": "#FFF7D6",
+      "trail": "short_smoke",
+      "impact": "sharp_sparks",
+      "simulation_decoupled": true
+    },
+    "fx_pk_energy_beam": {
+      "type": "continuous_beam",
+      "color": "#00E5FF",
+      "impact": "heat_distortion_burn_mark",
+      "simulation_decoupled": true
+    },
+    "fx_syn_energy_beam": {
+      "type": "continuous_beam",
+      "color": "#FF9100",
+      "beam_jitter": true,
+      "impact": "heat_distortion_burn_mark",
+      "simulation_decoupled": true
+    },
+    "fx_bio_acid": {
+      "type": "corrosive_cone",
+      "color": "#00E676",
+      "puddle_lifetime_seconds": 6.0,
+      "impact": "boiling_puddle",
+      "simulation_decoupled": true
+    },
+    "fx_syn_cloak": {
+      "type": "refraction_shimmer",
+      "opacity": 0.05,
+      "detected_overlay": "#00E5FF",
+      "simulation_decoupled": true
+    },
+    "fx_pk_security_grid": {
+      "type": "ground_hex_aura",
+      "color": "#00E5FF",
+      "pulse_interval_seconds": 3.0,
+      "friendly_rim_light": true,
+      "simulation_decoupled": true
+    },
+    "fx_nb_corrupted_ground": {
+      "type": "terrain_surface_shader",
+      "base_color": "#7C4DFF",
+      "vein_color": "#00E676",
+      "edge_blending": "animated_noise_alpha",
+      "simulation_decoupled": true
+    }
+  }
+}
