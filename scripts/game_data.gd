@@ -1,39 +1,52 @@
 class_name MoonGoonsGameData
 extends RefCounted
 ## Central loader for MoonGoons data-driven content.
-## Unit, building, economy, balance, control, map, and campaign values belong in JSON, not scene scripts.
+## Unit, building, economy, balance, control, map, campaign, localization, achievement, and VFX values belong in JSON, not scene scripts.
 
 const UNIT_DATA_PATH := "res://data/unit_data.json"
 const UNIT_TIER_2_DATA_PATH := "res://data/unit_tier_2.json"
+const UNIT_TIER_3_DATA_PATH := "res://data/unit_tier_3.json"
 const BUILDING_DATA_PATH := "res://data/building_data.json"
 const BUILDING_RUNTIME_DATA_PATH := "res://data/building_runtime_profiles.json"
 const RULES_DATA_PATH := "res://data/gameplay_rules.json"
+const LOCALIZATION_DATA_PATH := "res://data/localization.json"
+const ACHIEVEMENTS_DATA_PATH := "res://data/achievements.json"
+const FX_PROFILES_DATA_PATH := "res://data/fx_profiles.json"
 
 var unit_data: Dictionary = {}
 var unit_tier_2_data: Dictionary = {}
+var unit_tier_3_data: Dictionary = {}
 var building_data: Dictionary = {}
 var building_runtime_data: Dictionary = {}
 var rules_data: Dictionary = {}
+var localization_data: Dictionary = {}
+var achievements_data: Dictionary = {}
+var fx_profiles_data: Dictionary = {}
 var errors: Array[String] = []
 
 func load_all() -> bool:
 	errors.clear()
 	unit_data = _load_json(UNIT_DATA_PATH)
 	unit_tier_2_data = _load_json(UNIT_TIER_2_DATA_PATH)
+	unit_tier_3_data = _load_json(UNIT_TIER_3_DATA_PATH)
 	building_data = _load_json(BUILDING_DATA_PATH)
 	building_runtime_data = _load_json(BUILDING_RUNTIME_DATA_PATH)
 	rules_data = _load_json(RULES_DATA_PATH)
+	localization_data = _load_json(LOCALIZATION_DATA_PATH)
+	achievements_data = _load_json(ACHIEVEMENTS_DATA_PATH)
+	fx_profiles_data = _load_json(FX_PROFILES_DATA_PATH)
 	return errors.is_empty()
 
 func get_unit(faction_id: String, unit_id: String) -> Dictionary:
-	var unit := _find_profile(unit_data, faction_id, "units", unit_id)
-	if not unit.is_empty():
-		return unit
-	return _find_profile(unit_tier_2_data, faction_id, "units", unit_id)
+	for source: Dictionary in [unit_data, unit_tier_2_data, unit_tier_3_data]:
+		var unit := _find_profile(source, faction_id, "units", unit_id)
+		if not unit.is_empty():
+			return unit
+	return {}
 
 func get_units_for_faction(faction_id: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for source: Dictionary in [unit_data, unit_tier_2_data]:
+	for source: Dictionary in [unit_data, unit_tier_2_data, unit_tier_3_data]:
 		var factions: Dictionary = source.get("factions", {})
 		var faction: Dictionary = factions.get(faction_id, {})
 		var units: Array = faction.get("units", [])
@@ -72,10 +85,33 @@ func get_campaign_act(act_id: String) -> Dictionary:
 	var acts: Array = campaign.get("acts", [])
 	for entry: Variant in acts:
 		if entry is Dictionary:
-			var act: Dictionary = entry
+			var act: Dictionary = entry as Dictionary
 			if String(act.get("id", "")) == act_id:
 				return act.duplicate(true)
 	return {}
+
+func get_achievement(achievement_id: String) -> Dictionary:
+	var achievements: Array = achievements_data.get("achievements", [])
+	for entry: Variant in achievements:
+		if entry is Dictionary:
+			var achievement: Dictionary = entry as Dictionary
+			if String(achievement.get("id", "")) == achievement_id:
+				return achievement.duplicate(true)
+	return {}
+
+func get_fx_profile(profile_id: String) -> Dictionary:
+	var profiles: Dictionary = fx_profiles_data.get("profiles", {})
+	var profile: Dictionary = profiles.get(profile_id, {})
+	return profile.duplicate(true)
+
+func get_translation(language_id: String, key_path: String) -> String:
+	var languages: Dictionary = localization_data.get("languages", {})
+	var node: Variant = languages.get(language_id, {})
+	for segment: String in key_path.split(".", false):
+		if not (node is Dictionary):
+			return ""
+		node = (node as Dictionary).get(segment)
+	return String(node) if node is String else ""
 
 func _find_profile(source: Dictionary, faction_id: String, collection_key: String, profile_id: String) -> Dictionary:
 	var factions: Dictionary = source.get("factions", {})
@@ -83,7 +119,7 @@ func _find_profile(source: Dictionary, faction_id: String, collection_key: Strin
 	var entries: Array = faction.get(collection_key, [])
 	for entry: Variant in entries:
 		if entry is Dictionary:
-			var profile: Dictionary = entry
+			var profile: Dictionary = entry as Dictionary
 			if String(profile.get("id", "")) == profile_id:
 				return profile.duplicate(true)
 	return {}
