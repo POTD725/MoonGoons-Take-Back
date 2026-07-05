@@ -32,21 +32,22 @@ func _process(delta: float) -> void:
 
 func _draw_world() -> void:
 	super._draw_world()
+	_draw_visible_siphon_markers()
 	_draw_siphon_status_panel()
 
-func _draw_enemy(enemy: EnemyUnit) -> void:
-	if String(enemy.unit_type) != "siphon":
-		super._draw_enemy(enemy)
-		return
-	var core_color: Color = Color("cf78ff")
-	draw_circle(enemy.pos, 30.0, Color(core_color, 0.10))
-	draw_circle(enemy.pos, 19.0, Color("31194b"))
-	draw_arc(enemy.pos, 19.0, 0.0, TAU, 20, core_color, 2.0)
-	draw_line(enemy.pos + Vector2(-12.0, -8.0), enemy.pos + Vector2(12.0, 8.0), core_color, 3.0)
-	draw_line(enemy.pos + Vector2(-12.0, 8.0), enemy.pos + Vector2(12.0, -8.0), core_color, 3.0)
-	draw_circle(enemy.pos, 6.0, Color("fff0ff"))
-	_draw_health_bar(enemy.pos + Vector2(-22.0, -31.0), enemy.hp / enemy.max_hp, core_color, 44.0)
-	draw_string(ThemeDB.fallback_font, enemy.pos + Vector2(-33.0, 35.0), "SIPHON ARRAY", HORIZONTAL_ALIGNMENT_CENTER, 66.0, 9, Color("f5d9ff"))
+func _draw_visible_siphon_markers() -> void:
+	for enemy: Variant in enemy_units:
+		if String(enemy.unit_type) != "siphon" or not _is_point_visible(enemy.pos):
+			continue
+		var core_color: Color = Color("cf78ff")
+		draw_circle(enemy.pos, 30.0, Color(core_color, 0.10))
+		draw_circle(enemy.pos, 19.0, Color("31194b"))
+		draw_arc(enemy.pos, 19.0, 0.0, TAU, 20, core_color, 2.0)
+		draw_line(enemy.pos + Vector2(-12.0, -8.0), enemy.pos + Vector2(12.0, 8.0), core_color, 3.0)
+		draw_line(enemy.pos + Vector2(-12.0, 8.0), enemy.pos + Vector2(12.0, -8.0), core_color, 3.0)
+		draw_circle(enemy.pos, 6.0, Color("fff0ff"))
+		_draw_health_bar(enemy.pos + Vector2(-22.0, -31.0), enemy.hp / enemy.max_hp, core_color, 44.0)
+		draw_string(ThemeDB.fallback_font, enemy.pos + Vector2(-33.0, 35.0), "SIPHON ARRAY", HORIZONTAL_ALIGNMENT_CENTER, 66.0, 9, Color("f5d9ff"))
 
 func _deploy_siphon_raid() -> void:
 	var candidate_indices: Array[int] = []
@@ -62,7 +63,7 @@ func _deploy_siphon_raid() -> void:
 	if carrier == null:
 		return
 	var target_node: Variant = resource_nodes[target_node_index]
-	var offset := Vector2(rng.randf_range(-18.0, 18.0), rng.randf_range(-18.0, 18.0))
+	var offset: Vector2 = Vector2(rng.randf_range(-18.0, 18.0), rng.randf_range(-18.0, 18.0))
 	carrier.unit_type = "siphon"
 	carrier.pos = target_node.pos + offset
 	carrier.hp = float(_siphon_config().get("integrity", 230.0))
@@ -83,11 +84,11 @@ func _deploy_siphon_raid() -> void:
 	_log_event("Counter-intelligence alert: a Siphon Raid has entered the lunar field.")
 
 func _find_or_create_siphon_carrier() -> Variant:
-	for enemy: EnemyUnit in enemy_units:
+	for enemy: Variant in enemy_units:
 		if String(enemy.unit_type) == "runner":
 			return enemy
 	super._spawn_enemy_wave()
-	for enemy: EnemyUnit in enemy_units:
+	for enemy: Variant in enemy_units:
 		if String(enemy.unit_type) == "runner":
 			return enemy
 	return null
