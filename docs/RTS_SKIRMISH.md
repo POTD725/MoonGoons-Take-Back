@@ -1,51 +1,71 @@
 # MoonGoons Take Back: RTS Skirmish
 
-`scenes/Main.tscn` now runs the MoonGoons Take Back real-time strategy skirmish. It is a code-drawn Peacekeeper versus Syndicate match designed around a classic RTS rhythm: establish an economy, expand capacity, unlock technology, field an army, defend your resource line, and break the enemy command structure.
+`scenes/Main.tscn` runs the MoonGoons Take Back real-time strategy skirmish. It is a code-drawn Peacekeeper versus Syndicate match built around a tactical rhythm: establish an economy, expand Command Capacity, unlock production, capture territory, fortify forward positions, and break the enemy command structure.
 
 ## Current playable loop
 
 1. Select **Survey Drones** with left-click or a drag-selection box.
 2. Right-click a **Credits** or **Lunar Alloy** node to begin harvesting.
 3. Drones return cargo to the Command Nexus, funding production and construction.
-4. Train more Survey Drones and Patrol Deputies at the Command Nexus.
+4. Train Survey Drones and Patrol Deputies at the Command Nexus.
 5. Use Survey Drones to build Communications Relays, Tactical Armories, and Security Turrets.
 6. Build Communications Relays to increase **Command Capacity**, the MoonGoons supply limit.
 7. Complete a Tactical Armory to produce Riot Vanguards.
-8. Set production rally points, assign control groups, and use attack-move or hold-position orders to control the fight.
+8. Secure hostile sectors with combat units, then build Communications Relays inside them to turn them into Forward Relay outposts.
 9. Defend the Command Nexus from escalating Syndicate pressure and destroy the Syndicate Hideout to win.
 
 ## Phase Two command systems
 
 ### Data-driven production
 
-Patrol Deputy and Riot Vanguard costs now resolve from the committed Peacekeeper unit catalog, with safe local defaults if the catalog cannot load. This ties playable production to the same unit-data foundation used by the larger project.
+Patrol Deputy and Riot Vanguard costs resolve from the Peacekeeper unit catalog, with safe local defaults if a catalog cannot load.
 
-### Control groups
+### Control groups and rally points
 
-- Select any mixture of Survey Drones and combat units.
-- Press **Shift + 1** through **Shift + 5** to assign the selected units to a group.
+- Select Survey Drones and combat units.
+- Press **Shift + 1** through **Shift + 5** to assign a control group.
 - Press **1** through **5** to recall that group.
-
-### Production rally points
-
-Hold **Shift** and right-click any position in the lunar field to set the rally marker. New Command Nexus units move toward the Nexus rally marker; new Armory units move toward the Armory rally marker.
+- Hold **Shift** and right-click the lunar field to set Nexus and Armory production rally points.
 
 ### Smart worker assignment
 
-Idle Survey Drones automatically seek a nearby working resource node. They favor Lunar Alloy while the stockpile is low, then return to Credits. Manual right-click harvesting always remains available.
+Idle Survey Drones seek working resource nodes automatically. They favor Lunar Alloy while the stockpile is low, then return to Credits. Manual right-click harvesting remains available.
 
 ### Riot Vanguard: Shield Wall
 
-Select one or more ready Riot Vanguards and press **S**.
+Select ready Riot Vanguards and press **S**.
 
 - Shield Wall lasts six seconds.
 - The Vanguard holds position and slows down while braced.
 - A temporary barrier absorbs a large share of incoming damage.
-- The ability then enters a cooldown before it can be used again.
+- The ability enters cooldown after use.
 
 ### Enemy adaptation
 
-As your army and Communications Relay network grow, the Syndicate detects the expansion and accelerates pressure against the lunar resource line.
+As your army and Communications Relay network grow, the Syndicate accelerates pressure against your resource line.
+
+## Phase Three: Territory Control and Forward Operations
+
+Three hostile lunar sectors now sit on the battlefield:
+
+- **Aurora Exchange:** provides Credits.
+- **Gravity Foundry:** provides Lunar Alloy.
+- **Eclipse Signal Tower:** provides Credits and creates pressure near the Syndicate Hideout.
+
+### Capture sectors
+
+Move one or more combat units into a sector’s glowing control ring. Your Peacekeepers capture it while no Syndicate unit contests the zone. Enemy units can take an abandoned sector back.
+
+### Establish Forward Relays
+
+After securing a sector, build a completed **Communications Relay** inside its control ring.
+
+- The sector becomes a Forward Relay outpost.
+- Its recurring Credits or Lunar Alloy income doubles.
+- The Relay still contributes its normal Command Capacity bonus.
+- Each capture pulls the next Syndicate wave closer, so an exposed frontier can become a neon dinner bell.
+
+The lower-left territory panel reports controlled sectors and active Forward Relays during play.
 
 ## Hotkeys
 
@@ -70,12 +90,12 @@ As your army and Communications Relay network grow, the Syndicate detects the ex
 
 The live prototype remains Peacekeeper versus Syndicate. The eventual three playable factions are deliberately asymmetric:
 
-- **Lunar Peacekeepers:** combined arms, Security Grids, patrol discipline, capacity-based expansion, and defensive tactical abilities.
+- **Lunar Peacekeepers:** combined arms, Security Grids, patrol discipline, capacity-based expansion, territorial reclamation, and defensive tactical abilities.
 - **The Syndicate:** mobility, stealth, mobile Credit Siphons, air-drop raids, and economic sabotage.
 - **The Nullborn:** Corrupted Ground, Biomass Vents, rapid swarm production, and territorial attrition.
 
 ## Current boundary
 
-This is now a richer RTS slice, not a complete competitive RTS. Still pending are obstacle-aware pathfinding, worker repair, production rallies for every building, fog of war, full unit abilities, playable Syndicate and Nullborn economies, advanced build trees, map variety, campaign-scene integration, multiplayer transport, original art and audio, accessibility options, and Android controls.
+This is a growing RTS slice, not a complete competitive RTS. Still pending are obstacle-aware pathfinding, worker repair, production rallies for every building, fog of war, full unit abilities, playable Syndicate and Nullborn economies, advanced build trees, map variety, campaign-scene integration, multiplayer transport, original art and audio, accessibility options, and Android controls.
 
 MoonGoons Take Back borrows the *shape* of a real-time strategy match, not another game’s names, story, maps, art, or implementation.
