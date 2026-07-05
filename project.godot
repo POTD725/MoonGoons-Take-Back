@@ -1,9 +1,9 @@
-; MoonGoons: Take Back
+; MoonGoons Take Back
 ; Godot 4 project configuration
 config_version=5
 
 [application]
-config/name="MoonGoons: Take Back"
+config/name="MoonGoons Take Back"
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
