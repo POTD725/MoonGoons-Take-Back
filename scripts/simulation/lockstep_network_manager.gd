@@ -4,6 +4,7 @@ extends RefCounted
 ## A future ENet/WebSocket adapter should submit validated packets to this class.
 
 signal synchronization_waiting_changed(is_waiting: bool)
+signal simulation_tick_executed(simulation_tick: int)
 signal turn_executed(turn_id: int, simulation_tick: int)
 
 const INPUT_DELAY_TURNS: int = 2
@@ -32,7 +33,7 @@ func make_input_packet(turn_id: int, player_id: int, commands: Array[Dictionary]
 	}
 
 func receive_input_packet(packet: Dictionary) -> bool:
-	var validation := validate_input_packet(packet)
+	var validation: Dictionary = validate_input_packet(packet)
 	if not bool(validation.get("ok", false)):
 		push_warning("Lockstep packet rejected: %s" % String(validation.get("error", "unknown validation error")))
 		return false
@@ -59,6 +60,7 @@ func update_network_turn_loop() -> Dictionary:
 	for _step: int in range(SIMULATION_TICKS_PER_NETWORK_TURN):
 		_movement_controller.process_simulation_tick()
 		current_simulation_tick += 1
+		simulation_tick_executed.emit(current_simulation_tick)
 	_input_buffer.erase(current_network_turn)
 	var executed_turn := current_network_turn
 	current_network_turn += 1
@@ -77,7 +79,7 @@ func validate_input_packet(packet: Dictionary) -> Dictionary:
 	for command: Variant in packet.get("commands", []):
 		if not (command is Dictionary):
 			return {"ok": false, "error": "Packet contains a non-dictionary command."}
-		var command_validation := _validate_command(command as Dictionary)
+		var command_validation: Dictionary = _validate_command(command as Dictionary)
 		if not bool(command_validation.get("ok", false)):
 			return command_validation
 	return {"ok": true}
