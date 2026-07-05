@@ -1,0 +1,55 @@
+{
+  "game": "MoonGoons: Crime Wars",
+  "version": "1.0.0",
+  "data_type": "building_runtime_profiles",
+  "notes": "This supplements building_data.json with health, armor, construction time, and runtime aura details for currently specified structures.",
+  "factions": {
+    "lunar_peacekeepers": {
+      "structures": [
+        {
+          "id": "pk_command_nexus",
+          "stats": {"max_hp": 2500, "armor": 5, "construction_time_seconds": 60.0},
+          "logistics": {"command_capacity_provided": 20, "provides_resource_processing": true},
+          "aura": {"type": "security_grid", "radius": 30.0, "friendly_armor_modifier": 1.1, "passive_hp_regen_per_second": 2.0},
+          "upgrades": [
+            {"id": "pk_up_sector_lockdown", "name": "Sector Lockdown", "cost": {"credits": 200, "lunar_alloy": 50}, "unlocks_weapon": {"type": "kinetic_turret", "damage": 25, "fire_rate_seconds": 1.0}}
+          ]
+        },
+        {
+          "id": "pk_tactical_armory",
+          "stats": {"max_hp": 1200, "armor": 3, "construction_time_seconds": 30.0},
+          "requirements": {"structure_prerequisite": "pk_command_nexus"},
+          "unlocks_production": ["pk_patrol_deputy"]
+        },
+        {
+          "id": "pk_communications_relay",
+          "stats": {"max_hp": 1000, "armor": 2, "construction_time_seconds": 45.0},
+          "requirements": {"any_of_structures": ["pk_tactical_armory", "pk_drone_bay"]},
+          "logistics": {"passive_intel_generation_per_second": 1.0, "radar_range_multiplier": 1.5}
+        }
+      ]
+    },
+    "the_syndicate": {
+      "structures": [
+        {
+          "id": "syn_hideout_core",
+          "stats": {"max_hp": 1800, "armor": 3, "construction_time_seconds": 50.0},
+          "logistics": {"command_capacity_provided": 15, "provides_resource_processing": true},
+          "traits": {"stealth_enabled": true, "requires_power_grid": false}
+        },
+        {
+          "id": "syn_scrap_workshop",
+          "stats": {"max_hp": 900, "armor": 2, "construction_time_seconds": 25.0},
+          "requirements": {"structure_prerequisite": "syn_hideout_core"},
+          "unlocks_production": ["syn_black_market_runner"]
+        },
+        {
+          "id": "syn_signal_jammer",
+          "stats": {"max_hp": 800, "armor": 1, "construction_time_seconds": 20.0},
+          "requirements": {"structure_prerequisite": "syn_hideout_core"},
+          "aura": {"type": "radar_shroud", "radius": 40.0, "hide_friendly_units": true, "hide_adjacent_structures": true}
+        }
+      ]
+    }
+  }
+}
