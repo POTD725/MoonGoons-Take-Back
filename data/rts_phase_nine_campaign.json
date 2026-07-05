@@ -1,0 +1,122 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.9.0",
+  "phase": "campaign-and-progression",
+  "profile": {
+    "path": "user://moongoons_campaign_profile.json",
+    "profile_version": 1,
+    "default_operation_id": "1.01"
+  },
+  "operations": [
+    {
+      "id": "1.01",
+      "act": "ACT I // BREAKWATER",
+      "title": "First Light Dispatch",
+      "briefing": "Reopen the lunar precinct after a Syndicate blackout. Establish a working economy and dismantle the first hidden command relay.",
+      "objective": "Destroy the Syndicate Hideout before the Command Nexus falls.",
+      "unlock_after": "",
+      "match_profile": {
+        "credits": 230,
+        "lunar_alloy": 20,
+        "intel": 0,
+        "command_max": 16,
+        "nexus_integrity": 1500.0,
+        "hideout_integrity": 900.0,
+        "first_enemy_wave_seconds": 18.0,
+        "syndicate_war_chest": 0.0
+      },
+      "rewards": {
+        "clearance": 1,
+        "intel_cache": 2
+      }
+    },
+    {
+      "id": "1.02",
+      "act": "ACT I // BREAKWATER",
+      "title": "Cold Ledger",
+      "briefing": "Trace missing resource allocations through a fractured mining district. Secure Alloy flows before the Syndicate can fund a heavier assault.",
+      "objective": "Secure Gravity Foundry, establish a Forward Relay, then destroy the Hideout.",
+      "unlock_after": "1.01",
+      "match_profile": {
+        "credits": 200,
+        "lunar_alloy": 35,
+        "intel": 2,
+        "command_max": 17,
+        "nexus_integrity": 1450.0,
+        "hideout_integrity": 1080.0,
+        "first_enemy_wave_seconds": 15.0,
+        "syndicate_war_chest": 18.0
+      },
+      "rewards": {
+        "clearance": 1,
+        "intel_cache": 3
+      }
+    },
+    {
+      "id": "1.03",
+      "act": "ACT I // BREAKWATER",
+      "title": "Signal Theft",
+      "briefing": "Syndicate crews are spoofing Peacekeeper dispatch channels. Use relays and patrol routes to expose the false signal lattice.",
+      "objective": "Capture two sectors, disrupt Siphon funding, then destroy the Hideout.",
+      "unlock_after": "1.02",
+      "match_profile": {
+        "credits": 190,
+        "lunar_alloy": 45,
+        "intel": 4,
+        "command_max": 18,
+        "nexus_integrity": 1450.0,
+        "hideout_integrity": 1200.0,
+        "first_enemy_wave_seconds": 13.0,
+        "syndicate_war_chest": 45.0
+      },
+      "rewards": {
+        "clearance": 1,
+        "intel_cache": 4
+      }
+    },
+    {
+      "id": "1.04",
+      "act": "ACT I // BREAKWATER",
+      "title": "Glassline Stand",
+      "briefing": "A breach column is moving along the Transit Lane. Hold the choke points long enough to reclaim the district’s communications spine.",
+      "objective": "Use terrain and Forward Relays to contain the Syndicate, then dismantle the Hideout.",
+      "unlock_after": "1.03",
+      "match_profile": {
+        "credits": 215,
+        "lunar_alloy": 30,
+        "intel": 5,
+        "command_max": 18,
+        "nexus_integrity": 1350.0,
+        "hideout_integrity": 1320.0,
+        "first_enemy_wave_seconds": 11.0,
+        "syndicate_war_chest": 70.0
+      },
+      "rewards": {
+        "clearance": 1,
+        "intel_cache": 5
+      }
+    },
+    {
+      "id": "1.05",
+      "act": "ACT I // BREAKWATER",
+      "title": "Breakwater Zero",
+      "briefing": "The first Syndicate command pocket is about to harden into a permanent lunar fortress. Break its relay network before Ghost Protocol reaches full deployment.",
+      "objective": "Survive the escalated doctrine pressure and destroy the fortified Hideout.",
+      "unlock_after": "1.04",
+      "match_profile": {
+        "credits": 210,
+        "lunar_alloy": 55,
+        "intel": 6,
+        "command_max": 20,
+        "nexus_integrity": 1300.0,
+        "hideout_integrity": 1500.0,
+        "first_enemy_wave_seconds": 9.0,
+        "syndicate_war_chest": 110.0
+      },
+      "rewards": {
+        "clearance": 2,
+        "intel_cache": 8
+      }
+    }
+  ]
+}
