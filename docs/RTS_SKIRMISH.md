@@ -1,6 +1,6 @@
 # MoonGoons Take Back: RTS Skirmish
 
-`scenes/Main.tscn` runs the MoonGoons Take Back real-time strategy skirmish. It is a code-drawn Peacekeeper versus Syndicate match built around a tactical rhythm: establish an economy, expand Command Capacity, unlock production, reclaim territory, establish forward operations, reveal the lunar frontier, and break the enemy command structure.
+`scenes/Main.tscn` runs the MoonGoons Take Back real-time strategy skirmish. It is a code-drawn Peacekeeper versus Syndicate match built around a tactical rhythm: establish an economy, expand Command Capacity, unlock production, reclaim territory, establish forward operations, reveal the lunar frontier, counter Syndicate extraction, and break the enemy command structure.
 
 ## Current playable loop
 
@@ -12,7 +12,7 @@
 6. Build Communications Relays to increase **Command Capacity**, the MoonGoons supply limit.
 7. Complete a Tactical Armory to produce Riot Vanguards.
 8. Secure hostile sectors with combat units, then build Communications Relays inside them to turn them into Forward Relay outposts.
-9. Scout beyond current sight, spend Intel on Tactical Scans, and destroy the Syndicate Hideout before its waves destroy your Command Nexus.
+9. Scout beyond current sight, spend Intel on Tactical Scans, respond to Siphon Raid alerts, and destroy the Syndicate Hideout before its waves destroy your Command Nexus.
 
 ## Phase Two: Command and Production
 
@@ -94,6 +94,25 @@ Use **X** or click the **TACTICAL SCAN** console entry.
 
 Tactical Scan is designed for checking contested sectors, revealing pressure near the Hideout, or deciding whether a route through the fog is a shortcut or a trap with good posture.
 
+## Phase Five: Syndicate Siphon Raids and Counter-Operations
+
+At intervals, the Syndicate deploys a hidden **Siphon Array** to an active Credits or Lunar Alloy node.
+
+- The array is a stationary hostile target and can be attacked with existing combat-unit orders.
+- It remains concealed by unexplored fog until a patrol, Forward Relay, or Tactical Scan reveals it.
+- Every drain cycle removes resource material from the occupied node and steals from the matching Peacekeeper stockpile.
+- The Counter-Intelligence panel warns that an array is active without broadcasting its exact location.
+- Destroying the array grants the normal combat reward plus additional Intel, creating a scouting-and-response loop.
+
+### Recommended response
+
+1. Read the Counter-Intelligence alert.
+2. Use a patrol squad to sweep likely mining routes or spend Intel on a Tactical Scan.
+3. Focus the visible Siphon Array with deputies, Vanguards, or a nearby Security Turret.
+4. Reclaim the bonus Intel after neutralization, then decide whether to save it for the next scan or use it immediately.
+
+Siphon Raids are deliberately resource pressure rather than base damage. Ignoring them quietly thins the economy, which is the Syndicate’s preferred sort of applause.
+
 ## Hotkeys
 
 | Key | Action |
@@ -119,7 +138,7 @@ Tactical Scan is designed for checking contested sectors, revealing pressure nea
 The live prototype remains Peacekeeper versus Syndicate. The eventual three playable factions are deliberately asymmetric:
 
 - **Lunar Peacekeepers:** combined arms, Security Grids, patrol discipline, capacity-based expansion, territorial reclamation, visibility infrastructure, and defensive tactical abilities.
-- **The Syndicate:** mobility, stealth, mobile Credit Siphons, air-drop raids, sensor disruption, and economic sabotage.
+- **The Syndicate:** mobility, stealth, mobile Credit Siphons, air-drop raids, sensor disruption, economic sabotage, and counter-intelligence pressure.
 - **The Nullborn:** Corrupted Ground, Biomass Vents, rapid swarm production, hidden growth, and territorial attrition.
 
 ## Current boundary
