@@ -1,0 +1,72 @@
+{
+  "game_title": "MoonGoons: Crime Wars",
+  "meta": {
+    "version": "1.0.0",
+    "default_language": "en",
+    "supported_languages": ["en", "es"]
+  },
+  "languages": {
+    "en": {
+      "ui_menu": {
+        "start_game": "Start Game",
+        "campaign_mode": "Campaign Mode",
+        "skirmish_mode": "Skirmish Mode",
+        "multiplayer_mode": "Multiplayer Mode",
+        "options_settings": "Options",
+        "quit_game": "Exit to Desktop"
+      },
+      "resources": {
+        "credits_label": "Credits",
+        "alloy_label": "Lunar Alloy",
+        "intel_label": "Intel",
+        "evidence_label": "Evidence",
+        "capacity_label": "Command Capacity"
+      },
+      "system_alerts": {
+        "base_under_attack": "Alert: Primary Base is under attack!",
+        "insufficient_resources": "Error: Insufficient resources available.",
+        "capacity_reached": "Warning: Command Capacity maxed out. Build Relays.",
+        "game_desynced": "Synchronizing Game State... Please wait."
+      },
+      "abilities": {
+        "suppressive_fire_name": "Suppressive Fire",
+        "suppressive_fire_desc": "Slows targeted enemy movement speed by 30% and reduces accuracy for 5 seconds.",
+        "siphon_name": "Siphon",
+        "siphon_desc": "Passively drains Credits directly from an uncaptured resource node.",
+        "phase_shift_name": "Phase Shift",
+        "phase_shift_desc": "Renders the unit completely invulnerable but unable to attack for 3 seconds."
+      }
+    },
+    "es": {
+      "ui_menu": {
+        "start_game": "Iniciar juego",
+        "campaign_mode": "Modo campaña",
+        "skirmish_mode": "Modo escaramuza",
+        "multiplayer_mode": "Modo multijugador",
+        "options_settings": "Opciones",
+        "quit_game": "Salir al escritorio"
+      },
+      "resources": {
+        "credits_label": "Créditos",
+        "alloy_label": "Aleación lunar",
+        "intel_label": "Inteligencia",
+        "evidence_label": "Evidencia",
+        "capacity_label": "Capacidad de mando"
+      },
+      "system_alerts": {
+        "base_under_attack": "¡Alerta: La base principal está bajo ataque!",
+        "insufficient_resources": "Error: Recursos insuficientes disponibles.",
+        "capacity_reached": "Aviso: Capacidad de mando al máximo. Construye repetidores.",
+        "game_desynced": "Sincronizando el estado del juego... Por favor, espere."
+      },
+      "abilities": {
+        "suppressive_fire_name": "Fuego de supresión",
+        "suppressive_fire_desc": "Reduce la velocidad de movimiento del enemigo en un 30% y baja su precisión durante 5 segundos.",
+        "siphon_name": "Sifón",
+        "siphon_desc": "Extrae créditos de forma pasiva directamente de un nodo de recursos no capturado.",
+        "phase_shift_name": "Cambio de fase",
+        "phase_shift_desc": "Vuelve a la unidad completamente invulnerable, pero incapaz de atacar durante 3 segundos."
+      }
+    }
+  }
+}
