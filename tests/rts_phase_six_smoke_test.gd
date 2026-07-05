@@ -1,6 +1,4 @@
 extends SceneTree
-## Run with:
-## godot --headless --path . --script res://tests/rts_phase_six_smoke_test.gd
 
 var failures: Array[String] = []
 
@@ -10,9 +8,10 @@ func _init() -> void:
 	if failures.is_empty():
 		print("MoonGoons Take Back Phase Six developer console smoke test passed.")
 		quit(0)
-	for failure: String in failures:
-		push_error(failure)
-	quit(1)
+	else:
+		for failure: String in failures:
+			push_error(failure)
+		quit(1)
 
 func _validate_devtool_rules() -> void:
 	var file: FileAccess = FileAccess.open("res://data/rts_phase_six_devtools.json", FileAccess.READ)
