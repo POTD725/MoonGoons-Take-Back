@@ -1,0 +1,68 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.8.0",
+  "phase": "syndicate-faction-expansion",
+  "syndicate_economy": {
+    "base_war_chest_income_per_second": 1.1,
+    "active_siphon_income_per_second": 2.2,
+    "sector_recapture_loss": 18.0,
+    "siphon_neutralization_loss": 24.0,
+    "hideout_label": "Syndicate War Chest"
+  },
+  "doctrines": [
+    {
+      "id": "ghost_protocol",
+      "war_chest_required": 65.0,
+      "label": "GHOST PROTOCOL",
+      "description": "Some Runner units become fast Shade infiltrators.",
+      "runner_variant": {
+        "unit_type": "shade",
+        "integrity": 52.0,
+        "speed": 92.0,
+        "attack_range": 62.0,
+        "damage": 13.0,
+        "cooldown_seconds": 0.5
+      }
+    },
+    {
+      "id": "black_market_forge",
+      "war_chest_required": 155.0,
+      "label": "BLACK MARKET FORGE",
+      "description": "Bruisers receive armored plates and heavier breach charges.",
+      "bruiser_bonus": {
+        "integrity_multiplier": 1.28,
+        "damage_multiplier": 1.25
+      }
+    },
+    {
+      "id": "relay_network",
+      "war_chest_required": 280.0,
+      "label": "RELAY NETWORK",
+      "description": "Syndicate routing accelerates future attack-wave deployments.",
+      "wave_timer_reduction_seconds": 2.0,
+      "minimum_wave_interval_seconds": 5.0
+    }
+  ],
+  "roster": [
+    {
+      "id": "runner",
+      "role": "fast_raider",
+      "counterplay": "Patrol Deputies, Turrets, and open-field kiting"
+    },
+    {
+      "id": "shade",
+      "role": "infiltrator",
+      "counterplay": "Forward Relay sight, Tactical Scan, focused fire"
+    },
+    {
+      "id": "bruiser",
+      "role": "breach_unit",
+      "counterplay": "Riot Vanguard Shield Wall, Turret chokepoints, combined fire"
+    },
+    {
+      "id": "siphon_array",
+      "role": "economic_sabotage",
+      "counterplay": "Patrol routes and Tactical Scan"
+    }
+  ]
+}
