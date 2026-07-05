@@ -22,6 +22,13 @@ The current scene uses code-drawn neon visuals, so it runs without external spri
 3. In Godot Project Manager, choose **Import** and select `project.godot`.
 4. Open the project and press **F6** or the Play button.
 
+For headless validation after Godot is installed:
+
+```bash
+chmod +x compile_and_test.sh
+./compile_and_test.sh
+```
+
 ## What is implemented in the repository
 
 ### Game data
@@ -29,33 +36,38 @@ The current scene uses code-drawn neon visuals, so it runs without external spri
 - Tier 1, Tier 2, and Tier 3 unit catalogs for the specified Peacekeeper and Syndicate units.
 - Tier 1 Nullborn unit data and a documented advanced-roster roadmap.
 - Three-faction building technology trees and runtime building profiles.
-- Economy, damage matrix, map, campaign, controls, achievement, localization, and VFX data.
-- English and Spanish localization catalog.
+- Economy, damage matrix, map, campaign, controls, achievement, localization, VFX, and mission-event data.
+- English and Spanish localization catalog, including Mission 1.01 and 1.02 objectives.
 
 ### Godot systems and scaffolding
 
-- `MoonGoonsGameData` unified data registry.
-- Data schema validation for units, buildings, translations, achievements, and VFX profiles.
-- Skirmish AI commander with bootstrap, macro, harassment, defense, and assault states.
-- Audio director that routes dynamic music and faction sound events.
-- Developer-only debug command parser.
-- Achievement tracker and local profile persistence layer.
-- Godot-native fixed-point movement, seeded match RNG, lockstep turn buffer, and state-hash helpers for future deterministic multiplayer.
+- `MoonGoonsGameData` unified data registry and schema validator.
+- Skirmish AI commander, audio director, localization manager, achievement tracker, and developer-only debug parser.
+- Fixed-point movement, seeded match RNG, lockstep turn buffer, canonical state hashing, and composed simulation loop.
+- Resource Bank with Credits, Lunar Alloy, Intel cap, Evidence, and Command Capacity management.
+- Combat damage and ability controllers with armor modifiers, arrests, Evidence rewards, cooldowns, durations, and Siphon income.
+- Data-driven Mission 1.01 and Mission 1.02 trigger runner.
+- Checksum-protected local profile and mission snapshot save system with backup recovery.
+- Headless Godot smoke tests and GitHub Actions verification workflow.
 
 ### Important multiplayer note
 
-The repository contains **multiplayer architecture and local simulation scaffolding only**. It does **not** yet provide a shipping online multiplayer service, dedicated server, matchmaking, authentication, encryption, anti-cheat, NAT traversal, or snapshot-recovery transport. See `docs/NETWORKING.md` before attempting multiplayer work.
+The repository contains **multiplayer architecture and local deterministic simulation scaffolding only**. It does **not** yet provide a shipping online multiplayer service, dedicated server, matchmaking, authentication, encryption, anti-cheat, NAT traversal, or snapshot-recovery transport. See `docs/NETWORKING.md` before attempting multiplayer work.
 
 ## Directory map
 
 ```text
 project.godot
 scenes/Main.tscn
+compile_and_test.sh
+.github/workflows/godot-ci.yml
 
 scripts/
   moongoons_game.gd                 Current playable mission
   game_data.gd                      Unified game-data registry
   data_validator.gd                 Schema checks for data assets
+  mission_controller.gd             Data-driven campaign trigger runner
+  save_system.gd                    Profile and mission snapshot save manager
   ai_commander.gd                   High-level skirmish AI
   audio_director.gd                 Dynamic music and audio-event routing
   debug_console.gd                  Developer-only command parser
@@ -66,6 +78,10 @@ scripts/
     fixed_vector2.gd                Fixed-point ground-plane vectors
     simulation_unit.gd              Authoritative unit simulation state
     fixed_point_movement_controller.gd
+    resource_bank.gd                Fixed-point economy and Command Capacity
+    combat_damage_processor.gd      Armor damage and arrest processing
+    combat_ability_controller.gd    Cooldowns, durations, and Siphon channels
+    main_simulation_loop.gd         Authoritative subsystem composition
     ability_data_parser.gd          Unit/ability catalog parser
     lockstep_network_manager.gd     Future-turn command buffer
     game_state_hash.gd              Canonical SHA-256 state hashes
@@ -78,12 +94,18 @@ data/
   building_data.json                Faction building progression
   building_runtime_profiles.json    HP, armor, construction, aura data
   gameplay_rules.json               Economy, balance, controls, maps, campaign
+  campaign_missions.json            Mission 1.01 and 1.02 event definitions
   localization.json                 English and Spanish strings
   achievements.json                 Event-driven progression definitions
   fx_profiles.json                  Visual effects profile definitions
 
 docs/
   DESIGN_BIBLE.md
+  MISSION_01_SCRIPT.md
+  MISSION_02_SCRIPT.md
+  SAVE_SYSTEM.md
+  BUILD_AUTOMATION.md
+  CREDITS.md
   AI_BEHAVIOR.md
   AUDIO_DESIGN.md
   FX_GUIDE.md
@@ -91,24 +113,25 @@ docs/
   ACHIEVEMENTS.md
   TESTING_QA.md
 
+tests/data_and_simulation_smoke_test.gd
 CONTRIBUTING.md
 ```
 
 ## Development rules
 
-- Balance values live in `data/`, not duplicated in scenes.
+- Balance and authored content live in `data/`, not duplicated in scenes.
 - Future authoritative simulation uses fixed-point values and seeded randomness.
 - VFX, audio, camera, and UI are read-only observers of gameplay state.
 - Debug commands remain disabled outside local development builds.
-- Use `CONTRIBUTING.md` and `docs/TESTING_QA.md` for change and verification rules.
+- Use `CONTRIBUTING.md`, `docs/TESTING_QA.md`, and `docs/BUILD_AUTOMATION.md` for change and verification rules.
 
 ## Immediate build priorities
 
-1. Wire `MoonGoonsGameData` into the active mission so costs, unit stats, capacity, buildings, and damage resolve from JSON at runtime.
-2. Add box selection, attack orders, control groups, QWER actions, and build-placement flow.
-3. Implement production buildings, Command Capacity, and the Peacekeeper Tier 2 roster in the live scene.
-4. Add playable Syndicate and Nullborn skirmish factions.
-5. Connect the simulation scaffolding to an actual mission controller, then test deterministic replays before online transport work begins.
+1. Wire the Resource Bank, unit data, Command Capacity, buildings, combat, and abilities into `moongoons_game.gd` so the playable relay mission uses the new systems at runtime.
+2. Add box selection, attack orders, control groups, QWER actions, build placement, worker harvesting, and production queues.
+3. Build the Mission 1.01 and Mission 1.02 scenes around the authored campaign trigger data.
+4. Implement selectable Syndicate and Nullborn skirmish factions, including their structures and missing numeric Nullborn Tier 2/3 profiles.
+5. Add deterministic replay/state-hash tests before any online transport work begins.
 6. Replace prototype shapes with MoonGoons art, VFX, audio assets, accessibility settings, and Android controls.
 
 ## Design north star
