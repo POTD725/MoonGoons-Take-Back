@@ -1,111 +1,96 @@
 # MoonGoons: Take Back 🌙
 
-**MoonGoons: Take Back** is a playable Godot 4 prototype and the growing RTS foundation for **MoonGoons: Crime Wars**: a sci-fi noir struggle for lunar territory, Evidence, resources, and survival.
+**MoonGoons: Take Back** is a Godot 4 real-time strategy prototype and the growing foundation for **MoonGoons: Crime Wars**. Build a lunar precinct economy, control territory, assemble squads, and dismantle the Syndicate before the Nullborn crisis consumes the Moon.
 
-## Playable prototype status
+## Playable RTS prototype
 
-`Main.tscn` is currently a **single-player Peacekeeper relay-reclamation prototype**.
+`scenes/Main.tscn` now launches a code-drawn **Peacekeeper versus Syndicate RTS skirmish**.
 
-- Left-click a deputy to select them.
-- Right-click in the lunar field to move them.
-- Recruit deputies and build Lunar Beacons from the Tactical Console.
-- Secure three hostile relays before escalating Syndicate raids destroy the Command Nexus.
+- Select individual units with left-click or drag a selection box around a squad.
+- Send **Survey Drones** to Credits or Lunar Alloy nodes with right-click.
+- Drones harvest, return cargo to the Command Nexus, and fund your build order.
+- Train more Drones and Patrol Deputies from the Command Nexus.
+- Use selected Drones to build Communications Relays, Tactical Armories, and Security Turrets.
+- Communications Relays increase **Command Capacity**, MoonGoons’ supply limit.
+- Tactical Armories unlock durable Riot Vanguards.
+- Press `A`, then right-click to attack-move; right-click enemies for focused attacks.
+- Destroy the Syndicate Hideout before its Runner and Bruiser waves destroy your Command Nexus.
 
-The main scene uses code-drawn visuals, so it launches without external texture, sprite, or font dependencies.
+The live scene is still an early skirmish slice, not a complete commercial RTS. It uses code-drawn visuals and has no external texture or font dependency.
 
-## Run and verify
+## Run it
 
 1. Install **Godot 4.3 or newer**.
-2. Clone or download the repository.
+2. Clone or download this repository.
 3. Import `project.godot` through Godot Project Manager.
-4. Press **F6** or the Play button.
+4. Open the project and press **F6** or the Play button.
 
-For headless validation:
+For headless verification:
 
 ```bash
 chmod +x compile_and_test.sh
 ./compile_and_test.sh
 ```
 
-See `INSTALL.md` for Windows, macOS, Linux, Godot path, test, and troubleshooting instructions.
+See [`INSTALL.md`](INSTALL.md) for Windows, macOS, Linux, Godot path, testing, and troubleshooting details.
 
-## Implemented foundations
+## RTS controls
 
-- Tier 1–3 unit catalogs, faction building trees, economy, damage, map, VFX, achievement, and localization data.
-- A 20-mission campaign catalog: Mission 1.01 through the Mission 1.20 finale, including Act II routes, the Nullborn escalation, bosses, hazards, defense events, and finale evacuation hooks.
-- `MoonGoonsGameData`, a data validator, and a focused campaign catalog validator.
-- Skirmish AI, dynamic audio event routing, localization, achievements, debug tooling, checksum saves, and CI smoke tests.
-- Fixed-point movement, seeded RNG, lockstep turn buffering, canonical state hashing, resource banking, combat/arrest resolution, ability cooldowns, and an authoritative simulation loop.
-- GitHub Actions checks that import the Godot project and run core plus campaign smoke tests.
+| Key | Action |
+|---|---|
+| `Q` | Queue Survey Drone |
+| `W` | Queue Patrol Deputy |
+| `E` | Place Communications Relay |
+| `R` | Place Tactical Armory |
+| `F` | Queue Riot Vanguard after Armory completion |
+| `T` | Place Security Turret |
+| `A` | Arm attack-move, then right-click |
+| `G` | Send selected Drones to nearest resource node |
+| `B` | Cancel building placement |
 
-## Reality check
+## Current foundations
 
-The repository includes **campaign definitions and simulation scaffolding**, not twenty finished playable levels or online multiplayer. Individual mission scenes, map geometry, hazards, production/UI integration, boss behavior, enemy AI execution, art, sound, Android controls, and network transport still need implementation.
+- Tier 1–3 unit catalogs, faction building trees, economy, damage, VFX, achievements, and localization data.
+- A 20-mission campaign catalog: Mission 1.01 through the Mission 1.20 finale.
+- Fixed-point simulation helpers, seeded RNG, lockstep turn buffering, state hashing, Resource Bank, combat/arrest resolution, and ability cooldowns.
+- Data-driven campaign trigger runner, local checksummed profile/snapshot saves, and GitHub Actions smoke-test automation.
+- A playable RTS economy with two resources, workers, capacity, production, structures, defense, attack-move, and enemy waves.
 
-The multiplayer layer is not a shipping online service. It has no matchmaking, dedicated server, authentication, encryption, NAT traversal, anti-cheat, or snapshot-recovery transport.
+## Three-faction destination
+
+- **Lunar Peacekeepers:** combined arms, defensive grids, lawful territory control, and capacity-based expansion.
+- **The Syndicate:** mobility, stealth, air-drop raiding, and mobile Credit Siphons.
+- **The Nullborn:** Corrupted Ground, Biomass Vents, swarm pressure, and territorial attrition.
+
+The current playable skirmish is Peacekeeper versus Syndicate. Playable Syndicate and Nullborn economies, pathfinding, worker repair, production rallies, control groups, fog of war, advanced abilities, map variety, boss fights, campaign scenes, original art/audio, Android controls, and online network transport remain future development work.
 
 ## Project map
 
 ```text
-LICENSE                             MIT license for repository code/docs
-INSTALL.md                          Godot installation and test guide
-compile_and_test.sh                 Local headless Godot verification
+LICENSE                             MIT license for repository code and documentation
+INSTALL.md                          Godot installation and testing guide
+compile_and_test.sh                 Local headless verification
 .github/workflows/godot-ci.yml      GitHub Actions verification
 
-scenes/Main.tscn                    Current playable prototype
-scripts/
-  moongoons_game.gd                 Prototype gameplay loop
-  game_data.gd                      Unified data registry
-  mission_controller.gd             Multi-catalog campaign trigger runner
-  campaign_catalog_validator.gd     Validates all 20 campaign records
-  save_system.gd                    Profile and mission snapshot saves
-  simulation/                       Fixed-point, resource, combat, ability, and lockstep systems
+scenes/Main.tscn                    Current RTS skirmish scene
+scripts/moongoons_rts_match.gd      Playable economy, build, combat, and enemy loop
+scripts/moongoons_rts_match_launch.gd
+scripts/mission_controller.gd       Multi-catalog campaign trigger runner
+scripts/simulation/                 Fixed-point, combat, resource, and lockstep systems
 
-data/
-  campaign_missions.json            Missions 1.01–1.02
-  campaign_missions_act_2_to_4.json Missions 1.03–1.20
-  unit_data.json                    Tier 1 units
-  unit_tier_2.json                  Tier 2 units
-  unit_tier_3.json                  Tier 3 specified units
-  building_data.json                Faction tech progression
-  gameplay_rules.json               Economy, balance, controls, maps, campaign
-  localization.json                 English/Spanish UI plus English campaign objectives
+data/rts_skirmish_rules.json        RTS loop and faction-direction data
+data/campaign_missions.json         Missions 1.01–1.02
+data/campaign_missions_act_2_to_4.json
+                                    Missions 1.03–1.20
+docs/RTS_SKIRMISH.md                Full RTS control and scope guide
 
-docs/
-  MISSION_01_SCRIPT.md
-  MISSION_02_SCRIPT.md
-  MISSION_03_TO_05_SCRIPT.md
-  MISSION_06_TO_20_SCRIPT.md
-  INSTALL.md                        Additional architecture docs remain here
-  SAVE_SYSTEM.md
-  BUILD_AUTOMATION.md
-  CREDITS.md
-  LICENSING.md
-  NETWORKING.md
-  TESTING_QA.md
-
-tests/
-  data_and_simulation_smoke_test.gd
-  campaign_catalog_smoke_test.gd
+tests/                              Data, simulation, and campaign smoke tests
 ```
 
-## Development rules
+## Licensing
 
-- Balance and authored content live in `data/`, not duplicated in scene scripts.
-- Authoritative simulation uses fixed-point values and seeded randomness.
-- VFX, audio, camera, and UI observe simulation state but do not alter it.
-- Debug commands remain disabled outside local development builds.
-- `LICENSE` covers the repository code/docs; see `docs/LICENSING.md` and `docs/CREDITS.md` for asset and attribution boundaries.
-
-## Immediate build priorities
-
-1. Wire Resource Bank, unit data, Command Capacity, buildings, combat, and abilities into `moongoons_game.gd`.
-2. Add box selection, attack orders, control groups, QWER actions, build placement, workers, harvesting, and production queues.
-3. Build Mission 1.01 and 1.02 as real Godot scenes, then proceed through the authored campaign.
-4. Add playable Syndicate and Nullborn factions, including missing numeric Nullborn Tier 2/3 profiles.
-5. Add deterministic replay/state-hash tests before any network transport work.
-6. Replace prototype shapes with original MoonGoons art, VFX, audio, accessibility options, and Android controls.
+The root `LICENSE` covers original repository code and documentation. See `docs/LICENSING.md` and `docs/CREDITS.md` before adding art, audio, fonts, packages, or other third-party material.
 
 ## Design north star
 
-Every reclaimed district should change the war. MoonGoons is not only about turning hostile structures into moon gravel. It is about restoring order, exploiting chaos, or feeding the corruption one hard-won sector at a time.
+Every reclaimed lunar district should change the war. MoonGoons is about restoring order, exploiting chaos, or feeding corruption one hard-won sector at a time.
