@@ -15,7 +15,9 @@ func remove_unit(unit_id: String) -> void:
 
 func get_unit(unit_id: String) -> MoonGoonsSimulationUnit:
 	var unit: Variant = _units_by_id.get(unit_id)
-	return unit as MoonGoonsSimulationUnit if unit is MoonGoonsSimulationUnit else null
+	if unit is MoonGoonsSimulationUnit:
+		return unit as MoonGoonsSimulationUnit
+	return null
 
 func get_units() -> Array[MoonGoonsSimulationUnit]:
 	var result: Array[MoonGoonsSimulationUnit] = []
