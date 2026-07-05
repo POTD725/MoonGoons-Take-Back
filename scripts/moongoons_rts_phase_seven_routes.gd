@@ -100,7 +100,9 @@ func _advance_route_if_arrived(unit_id: String, agent: Variant) -> void:
 
 func _route_for(unit_id: String) -> Array:
 	var stored: Variant = route_queues.get(unit_id, [])
-	return stored.duplicate() as Array if stored is Array else []
+	if stored is Array:
+		return (stored as Array).duplicate()
+	return []
 
 func _route_formation_offset(index: int) -> Vector2:
 	var column: int = index % 4
