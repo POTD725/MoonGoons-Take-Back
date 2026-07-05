@@ -10,43 +10,60 @@ LOG_DIR="logs"
 IMPORT_LOG="${LOG_DIR}/godot_import.log"
 TEST_LOG="${LOG_DIR}/latest_simulation_run.log"
 GODOT_BIN="${GODOT_BIN:-godot}"
+FAILURES=0
 
 mkdir -p "${LOG_DIR}"
+: > "${IMPORT_LOG}"
+: > "${TEST_LOG}"
 
 if ! command -v "${GODOT_BIN}" >/dev/null 2>&1 && [[ ! -x "${GODOT_BIN}" ]]; then
   echo "Godot executable not found. Set GODOT_BIN to a Godot 4.3+ binary path." | tee "${TEST_LOG}"
   exit 1
 fi
 
+run_check() {
+  local step_label="$1"
+  shift
+  echo "${step_label}" | tee -a "${TEST_LOG}"
+  set +e
+  "$@" 2>&1 | tee -a "${TEST_LOG}"
+  local exit_code=${PIPESTATUS[0]}
+  set -e
+  if [[ ${exit_code} -ne 0 ]]; then
+    echo "CHECK FAILED: ${step_label} (exit ${exit_code})" | tee -a "${TEST_LOG}"
+    FAILURES=1
+  fi
+}
+
 echo "==========================================================" | tee "${TEST_LOG}"
 echo "MOONGOONS TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
 
-echo "[1/8] Importing and parsing project scripts..." | tee "${IMPORT_LOG}"
-"${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}"
+echo "[1/8] Importing and parsing project scripts..." | tee "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
+set +e
+"${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
+IMPORT_EXIT=${PIPESTATUS[0]}
+set -e
+if [[ ${IMPORT_EXIT} -ne 0 ]]; then
+  echo "CHECK FAILED: [1/8] Importing and parsing project scripts... (exit ${IMPORT_EXIT})" | tee -a "${TEST_LOG}"
+  FAILURES=1
+fi
 
-echo "[2/8] Running core data and deterministic simulation smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[3/8] Running complete campaign catalog smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[4/8] Running Phase Two RTS command and production smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[5/8] Running Phase Three territory and forward-operations smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_three_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[6/8] Running Phase Four recon, fog, and Tactical Scan smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_four_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[7/8] Running Phase Five Syndicate Siphon Raid smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_five_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
-
-echo "[8/8] Running Phase Six developer console smoke tests..." | tee -a "${TEST_LOG}"
-"${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_six_smoke_test.gd 2>&1 | tee -a "${TEST_LOG}"
+run_check "[2/8] Running core data and deterministic simulation smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd
+run_check "[3/8] Running complete campaign catalog smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd
+run_check "[4/8] Running Phase Two RTS command and production smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd
+run_check "[5/8] Running Phase Three territory and forward-operations smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_three_smoke_test.gd
+run_check "[6/8] Running Phase Four recon, fog, and Tactical Scan smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_four_smoke_test.gd
+run_check "[7/8] Running Phase Five Syndicate Siphon Raid smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_five_smoke_test.gd
+run_check "[8/8] Running Phase Six developer console smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_six_smoke_test.gd
 
 echo "==========================================================" | tee -a "${TEST_LOG}"
-echo "SUCCESS: MoonGoons Take Back smoke tests passed." | tee -a "${TEST_LOG}"
+if [[ ${FAILURES} -eq 0 ]]; then
+  echo "SUCCESS: MoonGoons Take Back smoke tests passed." | tee -a "${TEST_LOG}"
+else
+  echo "FAILED: One or more Godot checks failed. Review the labeled output above." | tee -a "${TEST_LOG}"
+fi
 echo "Logs: ${IMPORT_LOG} and ${TEST_LOG}" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
+
+exit ${FAILURES}
