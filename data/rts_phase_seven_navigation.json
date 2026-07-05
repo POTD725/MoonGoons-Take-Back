@@ -1,10 +1,16 @@
 {
   "game": "MoonGoons Take Back",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "phase": "navigation-terrain-and-map-control",
   "navigation": {
     "unit_clearance": 18.0,
     "detour_clearance": 30.0,
+    "route_queue": {
+      "max_waypoints": 6,
+      "arrival_radius": 14.0,
+      "queue_modifier": "Ctrl + right-click",
+      "queued_attack_move_modifier": "Ctrl + Shift + right-click"
+    },
     "features": [
       {
         "id": "glass_regolith_basin",
