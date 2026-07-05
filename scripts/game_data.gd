@@ -10,6 +10,7 @@ const BUILDING_DATA_PATH := "res://data/building_data.json"
 const BUILDING_RUNTIME_DATA_PATH := "res://data/building_runtime_profiles.json"
 const RULES_DATA_PATH := "res://data/gameplay_rules.json"
 const CAMPAIGN_MISSIONS_DATA_PATH := "res://data/campaign_missions.json"
+const CAMPAIGN_MISSIONS_EXTENDED_DATA_PATH := "res://data/campaign_missions_act_2_to_4.json"
 const LOCALIZATION_DATA_PATH := "res://data/localization.json"
 const ACHIEVEMENTS_DATA_PATH := "res://data/achievements.json"
 const FX_PROFILES_DATA_PATH := "res://data/fx_profiles.json"
@@ -21,6 +22,7 @@ var building_data: Dictionary = {}
 var building_runtime_data: Dictionary = {}
 var rules_data: Dictionary = {}
 var campaign_missions_data: Dictionary = {}
+var campaign_missions_extended_data: Dictionary = {}
 var localization_data: Dictionary = {}
 var achievements_data: Dictionary = {}
 var fx_profiles_data: Dictionary = {}
@@ -35,6 +37,7 @@ func load_all() -> bool:
 	building_runtime_data = _load_json(BUILDING_RUNTIME_DATA_PATH)
 	rules_data = _load_json(RULES_DATA_PATH)
 	campaign_missions_data = _load_json(CAMPAIGN_MISSIONS_DATA_PATH)
+	campaign_missions_extended_data = _load_json(CAMPAIGN_MISSIONS_EXTENDED_DATA_PATH)
 	localization_data = _load_json(LOCALIZATION_DATA_PATH)
 	achievements_data = _load_json(ACHIEVEMENTS_DATA_PATH)
 	fx_profiles_data = _load_json(FX_PROFILES_DATA_PATH)
@@ -42,7 +45,7 @@ func load_all() -> bool:
 
 func get_unit(faction_id: String, unit_id: String) -> Dictionary:
 	for source: Dictionary in [unit_data, unit_tier_2_data, unit_tier_3_data]:
-		var unit := _find_profile(source, faction_id, "units", unit_id)
+		var unit: Dictionary = _find_profile(source, faction_id, "units", unit_id)
 		if not unit.is_empty():
 			return unit
 	return {}
@@ -59,8 +62,8 @@ func get_units_for_faction(faction_id: String) -> Array[Dictionary]:
 	return result
 
 func get_building(faction_id: String, building_id: String) -> Dictionary:
-	var base_building := _find_profile(building_data, faction_id, "buildings", building_id)
-	var runtime_profile := _find_profile(building_runtime_data, faction_id, "structures", building_id)
+	var base_building: Dictionary = _find_profile(building_data, faction_id, "buildings", building_id)
+	var runtime_profile: Dictionary = _find_profile(building_runtime_data, faction_id, "structures", building_id)
 	if base_building.is_empty():
 		return runtime_profile
 	return _deep_merge(base_building, runtime_profile)
@@ -94,13 +97,23 @@ func get_campaign_act(act_id: String) -> Dictionary:
 	return {}
 
 func get_mission(mission_id: String) -> Dictionary:
-	var missions: Array = campaign_missions_data.get("missions", [])
-	for entry: Variant in missions:
-		if entry is Dictionary:
-			var mission: Dictionary = entry as Dictionary
-			if String(mission.get("id", "")) == mission_id:
-				return mission.duplicate(true)
+	for source: Dictionary in [campaign_missions_data, campaign_missions_extended_data]:
+		var missions: Array = source.get("missions", [])
+		for entry: Variant in missions:
+			if entry is Dictionary:
+				var mission: Dictionary = entry as Dictionary
+				if String(mission.get("id", "")) == mission_id:
+					return mission.duplicate(true)
 	return {}
+
+func get_all_missions() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for source: Dictionary in [campaign_missions_data, campaign_missions_extended_data]:
+		var missions: Array = source.get("missions", [])
+		for entry: Variant in missions:
+			if entry is Dictionary:
+				result.append((entry as Dictionary).duplicate(true))
+	return result
 
 func get_achievement(achievement_id: String) -> Dictionary:
 	var achievements: Array = achievements_data.get("achievements", [])
