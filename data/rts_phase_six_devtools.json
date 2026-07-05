@@ -1,0 +1,31 @@
+{
+  "game": "MoonGoons Take Back",
+  "version": "0.6.0",
+  "phase": "command-interface-and-developer-tools",
+  "developer_console": {
+    "enabled": true,
+    "allow_release": false,
+    "toggle_hotkey": "F1",
+    "max_history_lines": 8,
+    "max_command_length": 96,
+    "commands": [
+      "help",
+      "status",
+      "credits <amount>",
+      "alloy <amount>",
+      "intel <amount>",
+      "capacity <amount>",
+      "spawn <worker|deputy|vanguard> [count]",
+      "wave",
+      "siphon",
+      "capture all",
+      "reveal [seconds]",
+      "heal",
+      "clear",
+      "win",
+      "lose",
+      "restart",
+      "close"
+    ]
+  }
+}
