@@ -9,6 +9,7 @@ const UNIT_TIER_3_DATA_PATH := "res://data/unit_tier_3.json"
 const BUILDING_DATA_PATH := "res://data/building_data.json"
 const BUILDING_RUNTIME_DATA_PATH := "res://data/building_runtime_profiles.json"
 const RULES_DATA_PATH := "res://data/gameplay_rules.json"
+const CAMPAIGN_MISSIONS_DATA_PATH := "res://data/campaign_missions.json"
 const LOCALIZATION_DATA_PATH := "res://data/localization.json"
 const ACHIEVEMENTS_DATA_PATH := "res://data/achievements.json"
 const FX_PROFILES_DATA_PATH := "res://data/fx_profiles.json"
@@ -19,6 +20,7 @@ var unit_tier_3_data: Dictionary = {}
 var building_data: Dictionary = {}
 var building_runtime_data: Dictionary = {}
 var rules_data: Dictionary = {}
+var campaign_missions_data: Dictionary = {}
 var localization_data: Dictionary = {}
 var achievements_data: Dictionary = {}
 var fx_profiles_data: Dictionary = {}
@@ -32,6 +34,7 @@ func load_all() -> bool:
 	building_data = _load_json(BUILDING_DATA_PATH)
 	building_runtime_data = _load_json(BUILDING_RUNTIME_DATA_PATH)
 	rules_data = _load_json(RULES_DATA_PATH)
+	campaign_missions_data = _load_json(CAMPAIGN_MISSIONS_DATA_PATH)
 	localization_data = _load_json(LOCALIZATION_DATA_PATH)
 	achievements_data = _load_json(ACHIEVEMENTS_DATA_PATH)
 	fx_profiles_data = _load_json(FX_PROFILES_DATA_PATH)
@@ -90,6 +93,15 @@ func get_campaign_act(act_id: String) -> Dictionary:
 				return act.duplicate(true)
 	return {}
 
+func get_mission(mission_id: String) -> Dictionary:
+	var missions: Array = campaign_missions_data.get("missions", [])
+	for entry: Variant in missions:
+		if entry is Dictionary:
+			var mission: Dictionary = entry as Dictionary
+			if String(mission.get("id", "")) == mission_id:
+				return mission.duplicate(true)
+	return {}
+
 func get_achievement(achievement_id: String) -> Dictionary:
 	var achievements: Array = achievements_data.get("achievements", [])
 	for entry: Variant in achievements:
@@ -125,7 +137,7 @@ func _find_profile(source: Dictionary, faction_id: String, collection_key: Strin
 	return {}
 
 func _deep_merge(base: Dictionary, overlay: Dictionary) -> Dictionary:
-	var result := base.duplicate(true)
+	var result: Dictionary = base.duplicate(true)
 	for key: Variant in overlay:
 		var overlay_value: Variant = overlay[key]
 		if result.has(key) and result[key] is Dictionary and overlay_value is Dictionary:
