@@ -56,7 +56,7 @@ func update_network_turn_loop() -> Dictionary:
 	for player_id: int in expected_player_ids:
 		var packet: Dictionary = packets[player_id]
 		_execute_packet(packet)
-	for step: int in SIMULATION_TICKS_PER_NETWORK_TURN:
+	for _step: int in range(SIMULATION_TICKS_PER_NETWORK_TURN):
 		_movement_controller.process_simulation_tick()
 		current_simulation_tick += 1
 	_input_buffer.erase(current_network_turn)
