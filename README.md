@@ -1,10 +1,10 @@
 # MoonGoons Take Back 🌙
 
-**MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish Forward Relays, scout unknown sectors, counter Syndicate extraction, complete campaign dispatches, and dismantle hostile command networks before the Nullborn crisis consumes the Moon.
+**MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish Forward Relays, scout unknown sectors, counter Syndicate extraction, and follow the Peacekeeper story campaign chapter by chapter before the Nullborn crisis consumes the Moon.
 
 ## Playable RTS prototype: Phase Nine
 
-`scenes/Main.tscn` launches a code-drawn Lunar Peacekeepers versus Syndicate RTS campaign-skirmish build.
+`scenes/Main.tscn` launches a code-drawn Lunar Peacekeepers versus Syndicate RTS story-campaign build.
 
 - Survey Drones harvest Credits and Lunar Alloy, returning cargo to the Command Nexus.
 - Communications Relays expand Command Capacity; Tactical Armories unlock Riot Vanguards.
@@ -15,7 +15,7 @@
 - Spend Intel on Tactical Scan to expose fog-covered threats.
 - Respond to hidden Siphon Raids before their extraction arrays drain resources and fund the Syndicate War Chest.
 - Counter Syndicate doctrines: fast Shades, armored Bruisers, and accelerated relay-network raids.
-- Press `C` to open Campaign Operations, choose Act I dispatches, and persist operation clearance locally.
+- Press `C` to open **Story Dispatch**. The next chapter follows the campaign sequence automatically; choose only Easy, Medium, or Hard opponent difficulty before beginning.
 
 The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn visuals and does not require external textures or fonts to run.
 
@@ -55,24 +55,30 @@ You can also manually start the GitHub Actions workflow from **Actions → MoonG
 | `Shift + right-click` | Set production rally point |
 | Tactical-map click | Move selected units or workers |
 | Tactical-map Shift-click | Attack-move selected combat units |
-| `C` | Campaign Operations Board |
+| `C` | Story Dispatch and opponent difficulty |
 | `F1` | Developer console in debug/editor builds |
 
-## Campaign Operations
+## Story campaign
 
-Campaign progression currently begins with five linked Act I operations, `1.01` through `1.05`.
+The current playable campaign route is **Lunar Peacekeepers**. The first five Act I chapters, `1.01` through `1.05`, are required story dispatches that advance in order. A victory records local progress, applies its rewards once, and makes the following chapter the next required operation.
 
-Each operation applies its own live-match profile for starting resources, Command Capacity, Command Nexus integrity, Hideout integrity, first-wave timing, and Syndicate War Chest strength. Completing an operation records local progress and unlocks the next dispatch.
+No campaign chapter picker is used. The player-facing campaign choice is opponent difficulty:
 
-See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for campaign and profile details.
+- **Easy:** slower, weaker, less-funded Syndicate pressure.
+- **Medium:** intended story balance.
+- **Hard:** faster, stronger, better-funded Syndicate pressure.
+
+Syndicate and Nullborn story routes are data placeholders until those factions are genuinely playable. They are not exposed as selectable campaigns yet.
+
+See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for story-dispatch and profile details.
 
 ## Current foundations
 
 - Tier 1–3 unit catalogs, building trees, economy, damage, VFX, achievements, and localization data.
-- A 20-mission campaign catalog, plus the first playable Act I campaign-operation bridge.
+- A 20-mission campaign catalog, plus a persistent Act I story-dispatch bridge for missions `1.01` through `1.05`.
 - Fixed-point helpers, seeded RNG, lockstep buffering, state hashing, local saves, Resource Bank, combat/arrest resolution, and ability cooldowns.
 - GitHub Actions import and smoke-test automation with a manual workflow trigger.
-- A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, Siphon Raids, terrain steering, tactical-map orders, queued routes, Syndicate doctrine pressure, and persistent Act I campaign progression.
+- A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, Siphon Raids, terrain steering, tactical-map orders, queued routes, Syndicate doctrine pressure, and fixed-route Act I progression.
 
 ## Three-faction destination
 
@@ -85,16 +91,16 @@ The current playable scenario is Peacekeepers versus a live Syndicate director. 
 ## Key project files
 
 ```text
-scenes/Main.tscn                                      Current Phase Nine campaign RTS scene
-scripts/moongoons_rts_phase_nine_campaign.gd          Campaign board and local progression layer
-data/rts_phase_nine_campaign.json                     Act I operation profiles and rewards
+scenes/Main.tscn                                      Current Phase Nine story-campaign RTS scene
+scripts/moongoons_rts_phase_nine_campaign.gd          Fixed story route and difficulty layer
+data/rts_phase_nine_campaign.json                     Route, story chapter, and difficulty rules
 scripts/moongoons_rts_phase_eight_syndicate.gd         Syndicate War Chest and doctrine director
 data/rts_phase_eight_syndicate.json                    Syndicate doctrine rules
 docs/USER_MANUAL.md                                   Full player and debug-console guide
-docs/PHASE_NINE_CAMPAIGN.md                            Campaign operations guide
+docs/PHASE_NINE_CAMPAIGN.md                            Story campaign and difficulty guide
 docs/PHASE_EIGHT_SYNDICATE.md                          Syndicate counterplay guide
 docs/DEVELOPMENT_ROADMAP.md                            Current development roadmap
-tests/rts_phase_nine_campaign_smoke_test.gd            Phase Nine campaign smoke test
+tests/rts_phase_nine_campaign_smoke_test.gd            Phase Nine story-campaign smoke test
 compile_and_test.sh                                    Twelve-step local verification pipeline
 .github/workflows/godot-ci.yml                         GitHub Actions verification
 ```
