@@ -8,7 +8,7 @@ The browser-playable test build is published through GitHub Pages:
 
 **https://potd725.github.io/MoonGoons-Take-Back/**
 
-If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/PLAY_NOW.md`](docs/PLAY_NOW.md) for the fastest play link, or [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps.
+If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/PLAY_NOW.md`](docs/PLAY_NOW.md) for the fastest play link, [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps, or [`docs/PLAYABLE_STATUS.md`](docs/PLAYABLE_STATUS.md) for the current deployment note.
 
 ## Playable RTS prototype: Phase Nine + Android testbed
 
@@ -194,6 +194,7 @@ assets/android/                                       Android launcher icon SVG 
 web/shell.html                                        Custom browser playable shell
 docs/PLAY_NOW.md                                     Fast playable link
 docs/WEB_PLAYABLE_LINK.md                             Browser playable link and deployment guide
+docs/PLAYABLE_STATUS.md                               Current browser deployment status
 docs/ANDROID_TEST_BUILD.md                            Android APK build and phone-testing guide
 docs/USER_MANUAL.md                                   Full player and debug-console guide
 docs/PHASE_NINE_CAMPAIGN.md                            Story campaign and difficulty guide
