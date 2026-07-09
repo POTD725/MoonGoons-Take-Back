@@ -2,14 +2,22 @@
 
 **MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish Forward Relays, scout unknown sectors, counter Syndicate extraction, and follow the Peacekeeper story campaign chapter by chapter before the Nullborn crisis consumes the Moon.
 
+## Playable link
+
+The browser-playable test build is published through GitHub Pages:
+
+**https://potd725.github.io/MoonGoons-Take-Back/**
+
+If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages.
+
 ## Playable RTS prototype: Phase Nine + Android testbed
 
-`scenes/Main.tscn` launches a touch-ready Android testbed shell that extends the Phase Nine Lunar Peacekeepers versus Syndicate RTS story-campaign build.
+`scenes/Main.tscn` launches a touch-ready Android/browser testbed shell that extends the Phase Nine Lunar Peacekeepers versus Syndicate RTS story-campaign build.
 
 - Survey Drones harvest Credits and Lunar Alloy, returning cargo to the Command Nexus.
 - Communications Relays expand Command Capacity; Tactical Armories unlock Riot Vanguards.
 - Use control groups, production rally points, attack-move, hold position, Riot Vanguard Shield Wall, and queued route commands on desktop.
-- Use the Android touch command deck for tap selection, drag selection, move, attack, gather, Shield Wall, Tactical Scan, Story Dispatch, and cancel.
+- Use the Android/browser touch command deck for tap selection, drag selection, move, attack, gather, Shield Wall, Tactical Scan, Story Dispatch, and cancel.
 - Capture Aurora Exchange, Gravity Foundry, and Eclipse Signal Tower.
 - Build a completed Relay in a secured sector to create a Forward Relay, doubling sector income and extending vision.
 - Explore through unit and structure vision. Unknown terrain is hidden by lunar fog.
@@ -18,7 +26,7 @@
 - Counter Syndicate doctrines: fast Shades, armored Bruisers, and accelerated relay-network raids.
 - Press `C` or tap **STORY** to open **Story Dispatch**. The next chapter follows the campaign sequence automatically; choose only Easy, Medium, or Hard opponent difficulty before beginning.
 
-The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn gameplay visuals plus checked-in Android launcher SVGs, so it does not require external textures or fonts to run.
+The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn gameplay visuals plus checked-in Android launcher SVGs and a custom web shell, so it does not require external textures or fonts to run.
 
 ## Run it on desktop
 
@@ -35,6 +43,42 @@ chmod +x compile_and_test.sh
 ```
 
 You can also manually start the GitHub Actions workflow from **Actions → MoonGoons Godot Verification → Run workflow**.
+
+## Build the browser playable version
+
+The web export preset is named **Web Playable** and writes this build:
+
+```text
+builds/web/index.html
+```
+
+### GitHub Pages build
+
+1. Open **Actions** in this repository.
+2. Run **Browser Playable Build**.
+3. Open **https://potd725.github.io/MoonGoons-Take-Back/** after the deployment completes.
+
+### Local Windows web build
+
+```powershell
+$env:GODOT_BIN="C:\Godot\godot.exe"
+.\tools\build_web_playable.ps1
+python -m http.server 8000 --directory .\builds\web
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+### Local Linux/macOS web build
+
+```bash
+chmod +x tools/build_web_playable.sh
+GODOT_BIN=/path/to/godot ./tools/build_web_playable.sh
+python -m http.server 8000 --directory builds/web
+```
 
 ## Build the Android test APK
 
@@ -65,7 +109,7 @@ chmod +x tools/build_android_test_apk.sh
 GODOT_BIN=/path/to/godot ./tools/build_android_test_apk.sh
 ```
 
-See [`docs/ANDROID_TEST_BUILD.md`](docs/ANDROID_TEST_BUILD.md) for prerequisites, phone controls, and test limits.
+See [`docs/ANDROID_TEST_BUILD.md`](docs/ANDROID_TEST_BUILD.md) for Android prerequisites, phone controls, and test limits.
 
 ## Core desktop controls
 
@@ -90,7 +134,7 @@ See [`docs/ANDROID_TEST_BUILD.md`](docs/ANDROID_TEST_BUILD.md) for prerequisites
 | `C` | Story Dispatch and opponent difficulty |
 | `F1` | Developer console in debug/editor builds |
 
-## Android touch controls
+## Android/browser touch controls
 
 | Touch control | Action |
 |---|---|
@@ -125,8 +169,8 @@ See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for story-dispa
 - Tier 1–3 unit catalogs, building trees, economy, damage, VFX, achievements, and localization data.
 - A 20-mission campaign catalog, plus a persistent Act I story-dispatch bridge for missions `1.01` through `1.05`.
 - Fixed-point helpers, seeded RNG, lockstep buffering, state hashing, local saves, Resource Bank, combat/arrest resolution, and ability cooldowns.
-- GitHub Actions import, smoke-test, and Android debug APK automation with manual workflow triggers.
-- Android touch command deck, checked-in launcher icon SVGs, export preset, local build helpers, and Android testbed smoke test.
+- GitHub Actions import, smoke-test, browser playable deployment, and Android debug APK automation with manual workflow triggers.
+- Android/browser touch command deck, checked-in launcher icon SVGs, custom web shell, export presets, local build helpers, and smoke tests.
 - A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, Siphon Raids, terrain steering, tactical-map orders, queued routes, Syndicate doctrine pressure, and fixed-route Act I progression.
 
 ## Three-faction destination
@@ -140,13 +184,14 @@ The current playable scenario is Peacekeepers versus a live Syndicate director. 
 ## Key project files
 
 ```text
-scenes/Main.tscn                                      Current Android testbed RTS scene
-scripts/moongoons_rts_android_testbed.gd             Touch controls and code-drawn Android visual pass
+scenes/Main.tscn                                      Current Android/browser testbed RTS scene
+scripts/moongoons_rts_android_testbed.gd             Touch controls and code-drawn Android/browser visual pass
 scripts/moongoons_rts_phase_nine_campaign.gd          Fixed story route and difficulty layer
 data/rts_phase_nine_campaign.json                     Route, story chapter, and difficulty rules
 scripts/moongoons_rts_phase_eight_syndicate.gd         Syndicate War Chest and doctrine director
 data/rts_phase_eight_syndicate.json                    Syndicate doctrine rules
 assets/android/                                       Android launcher icon SVG artwork
+web/shell.html                                        Custom browser playable shell
 docs/ANDROID_TEST_BUILD.md                            Android APK build and phone-testing guide
 docs/USER_MANUAL.md                                   Full player and debug-console guide
 docs/PHASE_NINE_CAMPAIGN.md                            Story campaign and difficulty guide
@@ -154,10 +199,12 @@ docs/PHASE_EIGHT_SYNDICATE.md                          Syndicate counterplay gui
 docs/DEVELOPMENT_ROADMAP.md                            Current development roadmap
 tests/rts_phase_nine_campaign_smoke_test.gd            Phase Nine story-campaign smoke test
 tests/rts_android_testbed_smoke_test.gd                Android testbed smoke test
-compile_and_test.sh                                    Thirteen-step local verification pipeline
-export_presets.cfg                                    Android Test APK export preset
+tests/rts_web_playable_smoke_test.gd                   Browser playable smoke test
+compile_and_test.sh                                    Fourteen-step local verification pipeline
+export_presets.cfg                                    Android Test APK and Web Playable export presets
 .github/workflows/godot-ci.yml                         Godot import and smoke-test verification
 .github/workflows/android-apk.yml                      Android debug APK artifact build
+.github/workflows/pages-playable.yml                   Browser playable GitHub Pages deployment
 ```
 
 ## Licensing
