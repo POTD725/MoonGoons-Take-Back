@@ -8,7 +8,7 @@ The browser-playable test build is published through GitHub Pages:
 
 **https://potd725.github.io/MoonGoons-Take-Back/**
 
-If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps.
+If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/PLAY_NOW.md`](docs/PLAY_NOW.md) for the fastest play link, or [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps.
 
 ## Playable RTS prototype: Phase Nine + Android testbed
 
@@ -192,6 +192,7 @@ scripts/moongoons_rts_phase_eight_syndicate.gd         Syndicate War Chest and d
 data/rts_phase_eight_syndicate.json                    Syndicate doctrine rules
 assets/android/                                       Android launcher icon SVG artwork
 web/shell.html                                        Custom browser playable shell
+docs/PLAY_NOW.md                                     Fast playable link
 docs/WEB_PLAYABLE_LINK.md                             Browser playable link and deployment guide
 docs/ANDROID_TEST_BUILD.md                            Android APK build and phone-testing guide
 docs/USER_MANUAL.md                                   Full player and debug-console guide
