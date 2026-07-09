@@ -1,0 +1,85 @@
+name: Browser Playable Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets/**"
+      - "data/**"
+      - "docs/**"
+      - "scenes/**"
+      - "scripts/**"
+      - "tests/**"
+      - "web/**"
+      - "project.godot"
+      - "export_presets.cfg"
+      - ".github/workflows/pages-playable.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  export-web-playable:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.3-stable"
+      GODOT_TEMPLATE_VERSION: "4.3.stable"
+      GODOT_BINARY: "Godot_v4.3-stable_linux.x86_64"
+      WEB_PRESET: "Web Playable"
+      WEB_OUTPUT: "builds/web/index.html"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Godot and web export templates
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .ci/godot
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip" \
+            --output ".ci/godot/godot.zip"
+          unzip -q ".ci/godot/godot.zip" -d .ci/godot
+          chmod +x ".ci/godot/${GODOT_BINARY}"
+
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_export_templates.tpz" \
+            --output ".ci/godot/export_templates.tpz"
+          unzip -q ".ci/godot/export_templates.tpz" -d .ci/godot/export_templates
+          mkdir -p "${HOME}/.local/share/godot/export_templates/${GODOT_TEMPLATE_VERSION}"
+          cp .ci/godot/export_templates/templates/* "${HOME}/.local/share/godot/export_templates/${GODOT_TEMPLATE_VERSION}/"
+
+      - name: Import project and run smoke tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          chmod +x compile_and_test.sh
+          GODOT_BIN="${GITHUB_WORKSPACE}/.ci/godot/${GODOT_BINARY}" ./compile_and_test.sh
+
+      - name: Export browser playable build
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$(dirname "${WEB_OUTPUT}")"
+          ".ci/godot/${GODOT_BINARY}" --headless --path . --export-release "${WEB_PRESET}" "${WEB_OUTPUT}"
+          touch builds/web/.nojekyll
+          ls -lh builds/web
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: builds/web
+
+      - name: Deploy playable build to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
