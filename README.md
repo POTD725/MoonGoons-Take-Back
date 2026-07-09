@@ -8,7 +8,7 @@ The browser-playable test build is published through GitHub Pages:
 
 **https://potd725.github.io/MoonGoons-Take-Back/**
 
-If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/PLAY_NOW.md`](docs/PLAY_NOW.md) for the fastest play link, [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps, or [`docs/PLAYABLE_STATUS.md`](docs/PLAYABLE_STATUS.md) for the current deployment note.
+If the page is not live yet, open **Actions → Browser Playable Build → Run workflow**. The workflow exports the Godot web build and deploys it to GitHub Pages. See [`docs/PLAY_NOW.md`](docs/PLAY_NOW.md) for the fastest play link, [`docs/WEB_PLAYABLE_LINK.md`](docs/WEB_PLAYABLE_LINK.md) for the playable-link workflow and local preview steps, [`docs/PLAYABLE_STATUS.md`](docs/PLAYABLE_STATUS.md) for the current deployment note, or [`docs/DEPLOYMENT_URLS.md`](docs/DEPLOYMENT_URLS.md) for deployment URL references.
 
 ## Playable RTS prototype: Phase Nine + Android testbed
 
@@ -195,6 +195,7 @@ web/shell.html                                        Custom browser playable sh
 docs/PLAY_NOW.md                                     Fast playable link
 docs/WEB_PLAYABLE_LINK.md                             Browser playable link and deployment guide
 docs/PLAYABLE_STATUS.md                               Current browser deployment status
+docs/DEPLOYMENT_URLS.md                               Deployment URL references
 docs/ANDROID_TEST_BUILD.md                            Android APK build and phone-testing guide
 docs/USER_MANUAL.md                                   Full player and debug-console guide
 docs/PHASE_NINE_CAMPAIGN.md                            Story campaign and difficulty guide
