@@ -2,24 +2,25 @@
 
 **MoonGoons Take Back** is a Godot 4 real-time strategy prototype set in the MoonGoons universe. Build a lunar precinct economy, reclaim territory, establish Forward Relays, scout unknown sectors, counter Syndicate extraction, and follow the Peacekeeper story campaign chapter by chapter before the Nullborn crisis consumes the Moon.
 
-## Playable RTS prototype: Phase Nine
+## Playable RTS prototype: Phase Nine + Android testbed
 
-`scenes/Main.tscn` launches a code-drawn Lunar Peacekeepers versus Syndicate RTS story-campaign build.
+`scenes/Main.tscn` launches a touch-ready Android testbed shell that extends the Phase Nine Lunar Peacekeepers versus Syndicate RTS story-campaign build.
 
 - Survey Drones harvest Credits and Lunar Alloy, returning cargo to the Command Nexus.
 - Communications Relays expand Command Capacity; Tactical Armories unlock Riot Vanguards.
-- Use control groups, production rally points, attack-move, hold position, Riot Vanguard Shield Wall, and queued route commands.
+- Use control groups, production rally points, attack-move, hold position, Riot Vanguard Shield Wall, and queued route commands on desktop.
+- Use the Android touch command deck for tap selection, drag selection, move, attack, gather, Shield Wall, Tactical Scan, Story Dispatch, and cancel.
 - Capture Aurora Exchange, Gravity Foundry, and Eclipse Signal Tower.
 - Build a completed Relay in a secured sector to create a Forward Relay, doubling sector income and extending vision.
 - Explore through unit and structure vision. Unknown terrain is hidden by lunar fog.
 - Spend Intel on Tactical Scan to expose fog-covered threats.
 - Respond to hidden Siphon Raids before their extraction arrays drain resources and fund the Syndicate War Chest.
 - Counter Syndicate doctrines: fast Shades, armored Bruisers, and accelerated relay-network raids.
-- Press `C` to open **Story Dispatch**. The next chapter follows the campaign sequence automatically; choose only Easy, Medium, or Hard opponent difficulty before beginning.
+- Press `C` or tap **STORY** to open **Story Dispatch**. The next chapter follows the campaign sequence automatically; choose only Easy, Medium, or Hard opponent difficulty before beginning.
 
-The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn visuals and does not require external textures or fonts to run.
+The active build is an early RTS and campaign slice, not a complete commercial RTS. It uses code-drawn gameplay visuals plus checked-in Android launcher SVGs, so it does not require external textures or fonts to run.
 
-## Run it
+## Run it on desktop
 
 1. Install **Godot 4.3 or newer**.
 2. Clone or download this repository.
@@ -35,7 +36,38 @@ chmod +x compile_and_test.sh
 
 You can also manually start the GitHub Actions workflow from **Actions → MoonGoons Godot Verification → Run workflow**.
 
-## Core controls
+## Build the Android test APK
+
+The Android export preset is named **Android Test APK** and writes this debug build:
+
+```text
+builds/android/MoonGoonsTakeBack-debug.apk
+```
+
+### GitHub Actions build
+
+1. Open **Actions** in this repository.
+2. Run **Android APK Test Build**.
+3. Download the artifact named **MoonGoons-Take-Back-Android-Test-APK**.
+4. Install the APK on an Android phone or tablet with sideloading enabled.
+
+### Local Windows build
+
+```powershell
+$env:GODOT_BIN="C:\Godot\godot.exe"
+.\tools\build_android_test_apk.ps1
+```
+
+### Local Linux/macOS build
+
+```bash
+chmod +x tools/build_android_test_apk.sh
+GODOT_BIN=/path/to/godot ./tools/build_android_test_apk.sh
+```
+
+See [`docs/ANDROID_TEST_BUILD.md`](docs/ANDROID_TEST_BUILD.md) for prerequisites, phone controls, and test limits.
+
+## Core desktop controls
 
 | Control | Action |
 |---|---|
@@ -58,6 +90,22 @@ You can also manually start the GitHub Actions workflow from **Actions → MoonG
 | `C` | Story Dispatch and opponent difficulty |
 | `F1` | Developer console in debug/editor builds |
 
+## Android touch controls
+
+| Touch control | Action |
+|---|---|
+| Tap a unit | Select one unit |
+| Drag across battlefield | Select a squad |
+| Tap battlefield with units selected | Move selected units |
+| ALL | Select all playable units |
+| GATHER | Send selected Survey Drones to the nearest resource |
+| MOVE | Arm tap-to-move |
+| ATTACK | Arm attack-move or target attack |
+| SHIELD | Activate selected Riot Vanguard Shield Wall |
+| SCAN | Arm Tactical Scan placement |
+| STORY | Open or close Story Dispatch |
+| CANCEL | Clear touch order, attack mode, build mode, and Story Dispatch |
+
 ## Story campaign
 
 The current playable campaign route is **Lunar Peacekeepers**. The first five Act I chapters, `1.01` through `1.05`, are required story dispatches that advance in order. A victory records local progress, applies its rewards once, and makes the following chapter the next required operation.
@@ -77,7 +125,8 @@ See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for story-dispa
 - Tier 1–3 unit catalogs, building trees, economy, damage, VFX, achievements, and localization data.
 - A 20-mission campaign catalog, plus a persistent Act I story-dispatch bridge for missions `1.01` through `1.05`.
 - Fixed-point helpers, seeded RNG, lockstep buffering, state hashing, local saves, Resource Bank, combat/arrest resolution, and ability cooldowns.
-- GitHub Actions import and smoke-test automation with a manual workflow trigger.
+- GitHub Actions import, smoke-test, and Android debug APK automation with manual workflow triggers.
+- Android touch command deck, checked-in launcher icon SVGs, export preset, local build helpers, and Android testbed smoke test.
 - A playable RTS with resources, capacity, construction, production, territory capture, Forward Relay bonuses, fog of war, Tactical Scan, Siphon Raids, terrain steering, tactical-map orders, queued routes, Syndicate doctrine pressure, and fixed-route Act I progression.
 
 ## Three-faction destination
@@ -86,23 +135,29 @@ See [`docs/PHASE_NINE_CAMPAIGN.md`](docs/PHASE_NINE_CAMPAIGN.md) for story-dispa
 - **The Syndicate:** mobility, stealth, sensor disruption, air-drop raids, Credit Siphons, War Chest doctrine escalation, counter-intelligence, and sabotage.
 - **The Nullborn:** Corrupted Ground, Biomass Vents, hidden growth, swarm pressure, and territorial attrition.
 
-The current playable scenario is Peacekeepers versus a live Syndicate director. Player-selectable Syndicate and Nullborn economies, full navmesh pathfinding, camera scrolling, zoomable minimap, dedicated campaign maps, scripted mission objectives, final art/audio, Android controls, and online multiplayer remain future work.
+The current playable scenario is Peacekeepers versus a live Syndicate director. Player-selectable Syndicate and Nullborn economies, full navmesh pathfinding, camera scrolling, zoomable minimap, dedicated campaign maps, scripted mission objectives, final production art/audio, full native mobile UX polish, release signing, and online multiplayer remain future work.
 
 ## Key project files
 
 ```text
-scenes/Main.tscn                                      Current Phase Nine story-campaign RTS scene
+scenes/Main.tscn                                      Current Android testbed RTS scene
+scripts/moongoons_rts_android_testbed.gd             Touch controls and code-drawn Android visual pass
 scripts/moongoons_rts_phase_nine_campaign.gd          Fixed story route and difficulty layer
 data/rts_phase_nine_campaign.json                     Route, story chapter, and difficulty rules
 scripts/moongoons_rts_phase_eight_syndicate.gd         Syndicate War Chest and doctrine director
 data/rts_phase_eight_syndicate.json                    Syndicate doctrine rules
+assets/android/                                       Android launcher icon SVG artwork
+docs/ANDROID_TEST_BUILD.md                            Android APK build and phone-testing guide
 docs/USER_MANUAL.md                                   Full player and debug-console guide
 docs/PHASE_NINE_CAMPAIGN.md                            Story campaign and difficulty guide
 docs/PHASE_EIGHT_SYNDICATE.md                          Syndicate counterplay guide
 docs/DEVELOPMENT_ROADMAP.md                            Current development roadmap
 tests/rts_phase_nine_campaign_smoke_test.gd            Phase Nine story-campaign smoke test
-compile_and_test.sh                                    Twelve-step local verification pipeline
-.github/workflows/godot-ci.yml                         GitHub Actions verification
+tests/rts_android_testbed_smoke_test.gd                Android testbed smoke test
+compile_and_test.sh                                    Thirteen-step local verification pipeline
+export_presets.cfg                                    Android Test APK export preset
+.github/workflows/godot-ci.yml                         Godot import and smoke-test verification
+.github/workflows/android-apk.yml                      Android debug APK artifact build
 ```
 
 ## Licensing
