@@ -14,6 +14,7 @@ func _run() -> void:
 	var polish_script:Script = load("res://scripts/living_precinct_ui_polish.gd") as Script
 	var input_script:Script = load("res://scripts/living_precinct_input_bridge.gd") as Script
 	var campaign_script:Script = load("res://scripts/peacekeeper_campaign_mode.gd") as Script
+	var cleanup_script:Script = load("res://scripts/living_precinct_view_cleanup.gd") as Script
 	_expect(room_factory != null,"3D room factory loads")
 	_expect(officer_factory != null,"Officer visual factory loads")
 	_expect(agent_script != null,"Walking agent AI loads")
@@ -22,6 +23,7 @@ func _run() -> void:
 	_expect(polish_script != null,"Responsive precinct graphics layer loads")
 	_expect(input_script != null,"Camera input bridge loads")
 	_expect(campaign_script != null,"Peacekeeper counter-Syndicate identity layer loads")
+	_expect(cleanup_script != null,"Unobstructed precinct view cleanup loads")
 
 	var art_paths:Array[String] = [
 		"res://assets/precinct/rooms/ops_center.svg",
@@ -34,7 +36,7 @@ func _run() -> void:
 		"res://assets/precinct/rooms/transfer_hall.svg"
 	]
 	for art_path:String in art_paths:
-		_expect(load(art_path) is Texture2D,"Illustrated room art imports: %s" % art_path.get_file())
+		_expect(load(art_path) is Texture2D,"Room reference art imports: %s" % art_path.get_file())
 
 	var room_data:Dictionary = {"name":"Operations Center","repaired":true,"level":2}
 	var room:Node3D = PrecinctRoomFactory.build_room("ops",room_data)
@@ -43,12 +45,8 @@ func _run() -> void:
 	_expect(room.get_node_or_null("Door") is Marker3D,"Room exposes a corridor door marker")
 	_expect(room.get_node_or_null("Job0") is Marker3D,"Room exposes worker job markers")
 	_expect(room.get_node_or_null("ClickArea") is StaticBody3D,"Room exposes a 3D click collider")
-	_expect(room.get_node_or_null("RoomArt") is MeshInstance3D,"Room mounts an illustrated interior backdrop")
 	var room_label:Label3D = room.get_node_or_null("RoomLabel") as Label3D
 	_expect(room_label != null and not room_label.text.contains("\n"),"Room signage is compact and single-line")
-	var skin_service:Node = root.get_node_or_null("MoonGoonsSkins")
-	if skin_service != null and bool(skin_service.call("assets_ready")):
-		_expect(room.get_node_or_null("EstablishedMoonGoonsArt") is MeshInstance3D,"Room mounts established MoonGoons artwork")
 	room.queue_free()
 
 	var officer:Node3D = OfficerVisualFactory.build_authority_officer({"name":"Test Officer","division":"Tactical","rank":2})
@@ -69,25 +67,33 @@ func _run() -> void:
 	if scene != null:
 		var instance:Node = scene.instantiate()
 		root.add_child(instance)
-		await process_frame
-		await process_frame
-		await process_frame
-		await process_frame
-		await process_frame
-		await process_frame
+		for _frame in range(9):
+			await process_frame
 		_expect(instance.get_node_or_null("LivingPrecinctWorld") is Node3D,"Full city world builds at runtime")
 		_expect(instance.get_node_or_null("CityCamera") is Camera3D,"Runtime camera is active")
 		_expect(instance.get_node_or_null("Interface") is CanvasLayer,"Runtime management interface builds")
 		_expect(instance.get_node_or_null("VisualPolish") is Node,"Responsive art and HUD polish layer is attached")
 		_expect(instance.get_node_or_null("PeacekeeperCampaignMode") is Node,"Peacekeeper campaign mode is attached")
+		_expect(instance.get_node_or_null("UnobstructedViewCleanup") is Node,"Unobstructed city cleanup is attached")
 		var input_bridge:Node = instance.get_node_or_null("CameraInputBridge")
 		_expect(input_bridge != null,"Camera input bridge is attached")
 		var rooms_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Rooms")
 		var personnel_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Personnel")
 		_expect(rooms_node != null and rooms_node.get_child_count() == 8,"All eight room interiors build at runtime")
 		_expect(personnel_node != null and personnel_node.get_child_count() >= 10,"Walking officer and worker population builds at runtime")
-		var preview:TextureRect = _find_by_name(instance,"SelectedRoomArtwork") as TextureRect
-		_expect(preview != null and preview.texture != null,"Selected-room inspector displays illustrated artwork")
+		var billboard_count:int = 0
+		if rooms_node != null:
+			for room_node:Node in rooms_node.get_children():
+				if room_node.get_node_or_null("RoomArt") != null:
+					billboard_count += 1
+				if room_node.get_node_or_null("EstablishedMoonGoonsArt") != null:
+					billboard_count += 1
+		_expect(billboard_count == 0,"No wall-sized schematic billboards obstruct the 3D precinct")
+		_expect(_find_by_name(instance,"SelectedRoomArtwork") == null,"Generic selected-room illustration is removed from the inspector")
+		var room_toggle:Button = _find_by_name(instance,"RoomDetailsToggle") as Button
+		_expect(room_toggle != null,"Compact room-details toggle builds at runtime")
+		var city_panel_value:Variant = instance.get("city_panel")
+		_expect(city_panel_value is Control and not (city_panel_value as Control).visible,"Room inspector starts collapsed so the city stays visible")
 		var title_label:Label = _find_label(instance,"LUNAR PEACEKEEPER PRECINCT")
 		var resource_value:Variant = instance.get("resource_label")
 		_expect(title_label != null,"Header identifies Take Back as the Peacekeeper precinct")
@@ -115,7 +121,7 @@ func _run() -> void:
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Living Peacekeeper precinct graphics, input, and campaign integration passed.")
+		print("SUCCESS: Living Peacekeeper precinct graphics, unobstructed view, input, and campaign integration passed.")
 	else:
 		push_error("FAILED: %d living precinct smoke test(s) failed." % failures)
 	quit(failures)
