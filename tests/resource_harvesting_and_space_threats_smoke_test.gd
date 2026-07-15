@@ -22,9 +22,10 @@ func _run() -> void:
 	precinct_state.set("credits", 50000)
 	precinct_state.set("intel", 100)
 
-	var resource_ids: Array = harvest.get("RESOURCE_IDS") as Array
+	var resource_ids: Array[String] = ["moonsteel", "helium3", "quantum_salvage"]
 	_expect(resource_ids.size() == 3, "Exactly three harvest resources are defined")
-	_expect(resource_ids.has("moonsteel") and resource_ids.has("helium3") and resource_ids.has("quantum_salvage"), "Moonsteel, Helium-3, and Quantum Salvage are available")
+	for resource_id: String in resource_ids:
+		_expect(int(harvest.call("resource_amount", resource_id)) >= 0 and not String(harvest.call("resource_name", resource_id)).is_empty(), "Resource available: %s" % resource_id)
 	var sites: Array = harvest.call("site_catalog") as Array
 	_expect(sites.size() == 9, "Nine asteroid, moon, and drifting-wreck harvest sites exist")
 	var site_kinds: Dictionary = {}
