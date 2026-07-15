@@ -1,5 +1,5 @@
 extends SceneTree
-## Verifies the imported-art catalog and that both playable scenes carry skin overlays.
+## Verifies the imported-art catalog, multi-view hub wiring, and battle skin layer.
 
 var failures: int = 0
 
@@ -19,11 +19,22 @@ func _run_checks() -> void:
 			_expect((catalog_value as Dictionary).size() == 14, "Skin catalog contains all 14 established PNG assets")
 		skin_node.queue_free()
 
+	var meta_script: Script = load("res://scripts/precinct_meta_state.gd") as Script
+	_expect(meta_script != null, "Layered precinct progression script loads")
+	if meta_script != null:
+		var meta_node: Node = meta_script.new() as Node
+		var tasks_value: Variant = meta_node.call("task_catalog")
+		_expect(tasks_value is Array and (tasks_value as Array).size() == 6, "Chapter and daily task catalog contains six objectives")
+		meta_node.queue_free()
+
 	var precinct_scene: PackedScene = load("res://scenes/PrecinctVerticalSlice.tscn") as PackedScene
-	_expect(precinct_scene != null, "Skinned precinct scene parses")
+	_expect(precinct_scene != null, "Skinned multi-view precinct scene parses")
 	if precinct_scene != null:
 		var precinct: Node = precinct_scene.instantiate()
-		_expect(precinct.has_node("MoonGoonsSkinOverlay"), "Precinct scene includes its imported-art overlay")
+		_expect(precinct.name == "MoonGoonsPrecinctHub", "Precinct scene launches the multi-view hub")
+		_expect(precinct.has_node("CommandQueueShortcuts"), "City command cards have clickable shortcut routing")
+		var view_value: Variant = precinct.get("VIEWS")
+		_expect(view_value is Array and (view_value as Array).size() == 6, "Hub exposes six primary gameplay views")
 		precinct.queue_free()
 
 	var battle_scene: PackedScene = load("res://scenes/PrecinctBattle.tscn") as PackedScene
@@ -38,9 +49,9 @@ func _run_checks() -> void:
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: MoonGoons skin overlay smoke tests passed.")
+		print("SUCCESS: MoonGoons skinned precinct hub smoke tests passed.")
 	else:
-		push_error("FAILED: %d skin overlay smoke test(s) failed." % failures)
+		push_error("FAILED: %d skinned precinct hub smoke test(s) failed." % failures)
 	quit(failures)
 
 func _expect(condition: bool, label: String) -> void:
