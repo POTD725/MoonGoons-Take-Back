@@ -33,7 +33,7 @@ func _run_checks() -> void:
 		var precinct: Node = precinct_scene.instantiate()
 		_expect(precinct.name == "MoonGoonsPrecinctHub", "Precinct scene launches the multi-view hub")
 		_expect(precinct.has_node("CommandQueueShortcuts"), "City command cards have clickable shortcut routing")
-		var view_value: Variant = precinct.get("VIEWS")
+		var view_value: Variant = precinct.get("primary_views")
 		_expect(view_value is Array and (view_value as Array).size() == 6, "Hub exposes six primary gameplay views")
 		precinct.queue_free()
 
