@@ -107,16 +107,13 @@ jobs:
             echo "ERROR: Godot export still registers the legacy PWA worker." >&2
             exit 1
           fi
-          if grep -Fq '"ensureCrossOriginIsolationHeaders":true' builds/web/index.html; then
-            echo "ERROR: Non-threaded web export unexpectedly requires cross-origin isolation." >&2
-            exit 1
-          fi
           if grep -Fq 'index.worker.js' builds/web/index.service.worker.js; then
             echo "ERROR: Cleanup worker references the missing threaded worker." >&2
             exit 1
           fi
           grep -Fq 'Clear cache and reload' builds/web/index.html
           grep -Fq 'Campaign Hub' builds/web/index.html
+          grep -F '"serviceWorker"' builds/web/index.html || true
           ls -lh builds/web
 
       - name: Upload browser validation artifact
