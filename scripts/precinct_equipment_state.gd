@@ -1,5 +1,6 @@
 extends Node
-## Individual room equipment upgrades, capped by the Chief's Office level.
+## Individual room equipment upgrades. Upgrade requests are delegated to
+## StationProgression so every item obeys station, Chief, and room caps.
 
 signal equipment_changed
 
@@ -73,7 +74,7 @@ func room_items(room_id: String) -> Array[Dictionary]:
 			var item_id: String = String(item.get("id", ""))
 			var level: int = item_level(room_id, item_id)
 			item["level"] = level
-			item["cap"] = chief_level()
+			item["cap"] = int(PrecinctState.get_room(room_id).get("level", 1))
 			item["upgrade_cost"] = upgrade_cost(room_id, item_id)
 			result.append(item)
 	return result
@@ -82,8 +83,7 @@ func item_level(room_id: String, item_id: String) -> int:
 	return int(item_levels.get(_key(room_id, item_id), 1))
 
 func chief_level() -> int:
-	var chief_room: Dictionary = PrecinctState.get_room("chief")
-	return maxi(1, int(chief_room.get("level", 1)))
+	return maxi(1, int(PrecinctState.get_room("chief").get("level", 1)))
 
 func upgrade_cost(room_id: String, item_id: String) -> int:
 	var item: Dictionary = _catalog_item(room_id, item_id)
@@ -93,30 +93,22 @@ func upgrade_cost(room_id: String, item_id: String) -> int:
 	return int(item.get("base_cost", 70)) + current_level * 40
 
 func upgrade_item(room_id: String, item_id: String) -> Dictionary:
-	var room: Dictionary = PrecinctState.get_room(room_id)
-	if room.is_empty():
-		return _result(false, "Room not found.")
-	if not bool(room.get("repaired", false)):
-		return _result(false, "Restore this room before upgrading its equipment.")
+	var progression: Node = get_node_or_null("/root/StationProgression")
+	if progression != null and progression.has_method("begin_item_upgrade"):
+		return progression.call("begin_item_upgrade", room_id, item_id) as Dictionary
+	return _result(false, "Station progression service is unavailable.")
+
+func complete_item_upgrade(room_id: String, item_id: String, target_level: int) -> void:
 	var item: Dictionary = _catalog_item(room_id, item_id)
 	if item.is_empty():
-		return _result(false, "Equipment item not found.")
+		return
 	var current_level: int = item_level(room_id, item_id)
-	var cap: int = chief_level()
-	if current_level >= cap:
-		return _result(false, "%s is capped at level %d. Upgrade the Chief's Office first." % [String(item.get("name", "Equipment")), cap])
-	var cost: int = upgrade_cost(room_id, item_id)
-	if PrecinctState.credits < cost:
-		return _result(false, "Equipment upgrade requires %d credits." % cost)
-	PrecinctState.credits -= cost
-	var next_level: int = current_level + 1
-	item_levels[_key(room_id, item_id)] = next_level
+	var resolved_level: int = maxi(current_level, target_level)
+	item_levels[_key(room_id, item_id)] = resolved_level
 	total_upgrades += 1
-	PrecinctState.last_event = "%s upgraded to level %d of %d." % [String(item.get("name", "Equipment")), next_level, cap]
+	PrecinctState.last_event = "%s reached level %d." % [String(item.get("name", "Equipment")), resolved_level]
 	save_state()
-	PrecinctState.state_changed.emit()
 	equipment_changed.emit()
-	return _result(true, PrecinctState.last_event)
 
 func total_item_count() -> int:
 	var total: int = 0
