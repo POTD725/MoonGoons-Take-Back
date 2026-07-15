@@ -48,7 +48,7 @@ func _validate_web_playable_files() -> void:
 		return
 	var shell_text: String = shell.get_as_text()
 	for required_shell_text: String in [
-		"MoonGoons Take Back",
+		"MOONGOONS TAKE BACK",
 		"$GODOT_URL",
 		"$GODOT_CONFIG",
 		"__MOONGOONS_BUILD_TOKEN__",
@@ -95,5 +95,9 @@ func _validate_criminal_web_entry() -> void:
 		failures.append("Syndicate web entry scene does not parse.")
 	if entry_script == null:
 		failures.append("Syndicate web entry controller does not load.")
-	elif not entry_script.new().has_method("_route_to_criminal_campaign"):
-		failures.append("Syndicate web entry does not route returning and new players.")
+	else:
+		var entry_node: Node = entry_script.new() as Node
+		if entry_node == null or not entry_node.has_method("_route_to_criminal_campaign"):
+			failures.append("Syndicate web entry does not route returning and new players.")
+		if entry_node != null:
+			entry_node.free()
