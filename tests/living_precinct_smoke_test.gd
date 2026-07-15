@@ -13,6 +13,7 @@ func _run() -> void:
 	var living_script:Script = load("res://scripts/living_precinct.gd") as Script
 	var polish_script:Script = load("res://scripts/living_precinct_ui_polish.gd") as Script
 	var input_script:Script = load("res://scripts/living_precinct_input_bridge.gd") as Script
+	var campaign_script:Script = load("res://scripts/peacekeeper_campaign_mode.gd") as Script
 	_expect(room_factory != null,"3D room factory loads")
 	_expect(officer_factory != null,"Officer visual factory loads")
 	_expect(agent_script != null,"Walking agent AI loads")
@@ -20,6 +21,7 @@ func _run() -> void:
 	_expect(living_script != null,"Living precinct controller loads")
 	_expect(polish_script != null,"Responsive precinct graphics layer loads")
 	_expect(input_script != null,"Camera input bridge loads")
+	_expect(campaign_script != null,"Peacekeeper counter-Syndicate identity layer loads")
 
 	var art_paths:Array[String] = [
 		"res://assets/precinct/rooms/ops_center.svg",
@@ -77,6 +79,7 @@ func _run() -> void:
 		_expect(instance.get_node_or_null("CityCamera") is Camera3D,"Runtime camera is active")
 		_expect(instance.get_node_or_null("Interface") is CanvasLayer,"Runtime management interface builds")
 		_expect(instance.get_node_or_null("VisualPolish") is Node,"Responsive art and HUD polish layer is attached")
+		_expect(instance.get_node_or_null("PeacekeeperCampaignMode") is Node,"Peacekeeper campaign mode is attached")
 		var input_bridge:Node = instance.get_node_or_null("CameraInputBridge")
 		_expect(input_bridge != null,"Camera input bridge is attached")
 		var rooms_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Rooms")
@@ -85,10 +88,13 @@ func _run() -> void:
 		_expect(personnel_node != null and personnel_node.get_child_count() >= 10,"Walking officer and worker population builds at runtime")
 		var preview:TextureRect = _find_by_name(instance,"SelectedRoomArtwork") as TextureRect
 		_expect(preview != null and preview.texture != null,"Selected-room inspector displays illustrated artwork")
-		var title_label:Label = _find_label(instance,"LIVING LUNAR PRECINCT")
+		var title_label:Label = _find_label(instance,"LUNAR PEACEKEEPER PRECINCT")
 		var resource_value:Variant = instance.get("resource_label")
-		_expect(title_label != null,"Responsive header preserves the precinct title")
+		_expect(title_label != null,"Header identifies Take Back as the Peacekeeper precinct")
 		_expect(resource_value is Label and title_label != null and (resource_value as Label).get_parent() != title_label.get_parent(),"Title and economy telemetry use separate header rows")
+		var threat_button:Button = _find_button(instance,"SYNDICATE THREAT MAP")
+		_expect(threat_button != null,"Navigation opens a cops-side Syndicate threat map instead of a campaign selector")
+		_expect(_find_button(instance,"CAMPAIGN ROUTER") == null,"Criminal campaign router is removed from normal Take Back play")
 		if input_bridge != null:
 			_expect(input_bridge.get_node_or_null("CameraControlsLayer") is CanvasLayer,"On-screen camera controls build at runtime")
 			var target_before:Vector3 = instance.get("camera_target")
@@ -103,18 +109,13 @@ func _run() -> void:
 	var project_file:ConfigFile = ConfigFile.new()
 	var config_error:Error = project_file.load("res://project.godot")
 	_expect(config_error == OK,"Project configuration loads")
-	_expect(String(project_file.get_value("application","run/main_scene","")) == "res://scenes/CampaignRouter.tscn","Campaign router remains the startup scene")
+	_expect(String(project_file.get_value("application","run/main_scene","")) == "res://scenes/LivingPrecinct.tscn","Take Back starts directly in the cops-side precinct")
 	_expect(String(project_file.get_value("autoload","MoonGoonsAudio","")) == "*res://scripts/moongoons_audio.gd","Precinct audio service is registered")
-	_expect(String(project_file.get_value("autoload","SyndicateAudio","")) == "*res://scripts/syndicate_audio.gd","Syndicate audio service remains registered")
-	var router_file:FileAccess = FileAccess.open("res://scripts/campaign_router.gd",FileAccess.READ)
-	_expect(router_file != null,"Campaign router script can be read")
-	if router_file != null:
-		var router_text:String = router_file.get_as_text()
-		_expect(router_text.contains("res://scenes/LivingPrecinct.tscn"),"Peacekeeper campaign routes to the living precinct")
+	_expect(String(project_file.get_value("autoload","CounterSyndicate","")) == "*res://scripts/counter_syndicate_state.gd","Counter-Syndicate campaign service is registered")
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Living precinct graphics, input, and integration smoke tests passed.")
+		print("SUCCESS: Living Peacekeeper precinct graphics, input, and campaign integration passed.")
 	else:
 		push_error("FAILED: %d living precinct smoke test(s) failed." % failures)
 	quit(failures)
@@ -133,6 +134,15 @@ func _find_label(root_node:Node,needle:String) -> Label:
 		return root_node as Label
 	for child:Node in root_node.get_children():
 		var found:Label = _find_label(child,needle)
+		if found != null:
+			return found
+	return null
+
+func _find_button(root_node:Node,text_value:String) -> Button:
+	if root_node is Button and (root_node as Button).text == text_value:
+		return root_node as Button
+	for child:Node in root_node.get_children():
+		var found:Button = _find_button(child,text_value)
 		if found != null:
 			return found
 	return null
