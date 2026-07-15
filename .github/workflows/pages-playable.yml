@@ -102,7 +102,22 @@ jobs:
           # cache, unregister, and reload into the plain single-threaded export.
           cp web/legacy-service-worker-reset.js builds/web/index.service.worker.js
           test -f builds/web/index.service.worker.js
+          ls -lh builds/web
 
+      - name: Upload browser validation artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoonGoons-Take-Back-Web-Playable
+          path: builds/web
+          retention-days: 14
+
+      - name: Validate browser boot package
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f builds/web/index.html
+          test -f builds/web/index.service.worker.js
           if grep -Fq '"serviceWorker":"index.service.worker.js"' builds/web/index.html; then
             echo "ERROR: Godot export still registers the legacy PWA worker." >&2
             exit 1
@@ -114,14 +129,6 @@ jobs:
           grep -Fq 'Clear cache and reload' builds/web/index.html
           grep -Fq 'Campaign Hub' builds/web/index.html
           grep -F '"serviceWorker"' builds/web/index.html || true
-          ls -lh builds/web
-
-      - name: Upload browser validation artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MoonGoons-Take-Back-Web-Playable
-          path: builds/web
-          retention-days: 14
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
