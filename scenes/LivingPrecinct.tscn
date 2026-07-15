@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -15,12 +15,13 @@
 [ext_resource type="Script" path="res://scripts/space_syndicate_threats_ui.gd" id="13_threats"]
 [ext_resource type="Script" path="res://scripts/living_precinct_web_backdrop.gd" id="14_web_backdrop"]
 [ext_resource type="Script" path="res://scripts/living_precinct_web_layout_fix.gd" id="15_web_layout"]
+[ext_resource type="Script" path="res://scripts/precinct_compact_action_cards.gd" id="16_action_cards"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
 
 [node name="PrecinctWebBackdropLayer" type="CanvasLayer" parent="."]
-layer = -20
+layer = 0
 
 [node name="PrecinctWebBackdrop" type="Control" parent="PrecinctWebBackdropLayer"]
 layout_mode = 3
@@ -71,3 +72,6 @@ script = ExtResource("13_threats")
 
 [node name="WebLayoutRepair" type="Node" parent="."]
 script = ExtResource("15_web_layout")
+
+[node name="CompactActionCards" type="Node" parent="."]
+script = ExtResource("16_action_cards")
