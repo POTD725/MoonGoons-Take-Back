@@ -20,11 +20,11 @@ func _run() -> void:
 	if hull != null:
 		_expect(bool(hull.get_meta("shared_walls", false)), "Hull declares shared-wall architecture")
 		_expect(int(hull.get_meta("automatic_doors", 0)) == 8, "Hull declares eight room doors")
-		_expect(_count_prefixed(hull, "SharedPartition") == 6, "Six shared partitions divide adjacent rooms")
+		_expect(_count_box_size(hull, Vector3(0.24, 3.8, 7.2)) == 6, "Six shared partitions divide adjacent rooms")
 		_expect(_count_prefixed(hull, "Door_") >= 9, "Eight room doors and patrol airlock exist")
-		_expect(_count_prefixed(hull, "CorridorBulkhead") == 16, "Corridor-facing bulkhead segments seal room fronts")
-		_expect(_count_prefixed(hull, "HullRib") >= 9, "Station ceiling ribs connect the hull")
-		_expect(_count_prefixed(hull, "UtilityPipe") >= 6, "Utility piping details the station interior")
+		_expect(_count_box_size(hull, Vector3(3.12, 3.8, 0.26)) == 16, "Corridor-facing bulkhead segments seal room fronts")
+		_expect(_count_box_size(hull, Vector3(0.24, 0.28, 18.4)) >= 9, "Station ceiling ribs connect the hull")
+		_expect(_count_cylinder_height(hull, 33.5) >= 6, "Utility piping details the station interior")
 		_expect(hull.get_node_or_null("Door_PATROL AIRLOCK") is StationDoor, "Patrol airlock uses an automatic station door")
 	var rooms: Node3D = instance.get_node_or_null("LivingPrecinctWorld/Rooms") as Node3D
 	_expect(rooms != null and rooms.get_child_count() == 8, "All eight rooms remain playable")
@@ -50,6 +50,28 @@ func _run() -> void:
 	else:
 		push_error("FAILED: %d station architecture check(s) failed." % failures)
 	quit(failures)
+
+func _count_box_size(root_node: Node, expected: Vector3, tolerance: float = 0.06) -> int:
+	var total: int = 0
+	if root_node is MeshInstance3D:
+		var mesh_instance := root_node as MeshInstance3D
+		if mesh_instance.mesh is BoxMesh:
+			var size: Vector3 = (mesh_instance.mesh as BoxMesh).size
+			if absf(size.x - expected.x) <= tolerance and absf(size.y - expected.y) <= tolerance and absf(size.z - expected.z) <= tolerance:
+				total = 1
+	for child: Node in root_node.get_children():
+		total += _count_box_size(child, expected, tolerance)
+	return total
+
+func _count_cylinder_height(root_node: Node, expected_height: float, tolerance: float = 0.06) -> int:
+	var total: int = 0
+	if root_node is MeshInstance3D:
+		var mesh_instance := root_node as MeshInstance3D
+		if mesh_instance.mesh is CylinderMesh and absf((mesh_instance.mesh as CylinderMesh).height - expected_height) <= tolerance:
+			total = 1
+	for child: Node in root_node.get_children():
+		total += _count_cylinder_height(child, expected_height, tolerance)
+	return total
 
 func _count_prefixed(root_node: Node, prefix: String) -> int:
 	var total: int = 1 if String(root_node.name).begins_with(prefix) else 0
