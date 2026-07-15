@@ -36,36 +36,37 @@ echo "==========================================================" | tee "${TEST_
 echo "MOONGOONS TAKE BACK - GODOT VERIFICATION PIPELINE" | tee -a "${TEST_LOG}"
 echo "==========================================================" | tee -a "${TEST_LOG}"
 
-echo "[1/21] Importing and parsing project scripts..." | tee "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
+echo "[1/22] Importing and parsing project scripts..." | tee "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
 set +e
 "${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
 IMPORT_EXIT=${PIPESTATUS[0]}
 set -e
 if [[ ${IMPORT_EXIT} -ne 0 ]]; then
-  echo "CHECK FAILED: [1/21] Importing and parsing project scripts... (exit ${IMPORT_EXIT})" | tee -a "${TEST_LOG}"
+  echo "CHECK FAILED: [1/22] Importing and parsing project scripts... (exit ${IMPORT_EXIT})" | tee -a "${TEST_LOG}"
   FAILURES=1
 fi
 
-run_check "[2/21] Running core data and deterministic simulation smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd
-run_check "[3/21] Running complete campaign catalog smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd
-run_check "[4/21] Running Phase Two RTS command and production smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd
-run_check "[5/21] Running Phase Three territory and forward-operations smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_three_smoke_test.gd
-run_check "[6/21] Running Phase Four recon, fog, and Tactical Scan smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_four_smoke_test.gd
-run_check "[7/21] Running Phase Five Syndicate Siphon Raid smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_five_smoke_test.gd
-run_check "[8/21] Running Phase Six developer console smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_six_smoke_test.gd
-run_check "[9/21] Running Phase Seven terrain and tactical-map smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_smoke_test.gd
-run_check "[10/21] Running Phase Seven queued-route smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_routes_smoke_test.gd
-run_check "[11/21] Running Phase Eight Syndicate economy smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_eight_smoke_test.gd
-run_check "[12/21] Running Phase Nine fixed-story campaign and difficulty smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_nine_campaign_smoke_test.gd
-run_check "[13/21] Running Android touch testbed and export-preset smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_android_testbed_smoke_test.gd
-run_check "[14/21] Running web playable export smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_web_playable_smoke_test.gd
-run_check "[15/21] Running precinct management and patrol battle smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/precinct_vertical_slice_smoke_test.gd
-run_check "[16/21] Running MoonGoons imported-skin overlay smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/moongoons_skin_overlay_smoke_test.gd
-run_check "[17/21] Running separate Syndicate reference-content smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/syndicate_campaign_smoke_test.gd
-run_check "[18/21] Running living 3D Peacekeeper precinct integration smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/living_precinct_smoke_test.gd
-run_check "[19/21] Running cops-side counter-Syndicate campaign smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/counter_syndicate_campaign_smoke_test.gd
-run_check "[20/21] Running shared space-station hull and automatic door smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/space_station_hull_smoke_test.gd
-run_check "[21/21] Running individual room equipment and mission-board smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/precinct_equipment_and_missions_smoke_test.gd
+run_check "[2/22] Running core data and deterministic simulation smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/data_and_simulation_smoke_test.gd
+run_check "[3/22] Running complete campaign catalog smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/campaign_catalog_smoke_test.gd
+run_check "[4/22] Running Phase Two RTS command and production smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_two_smoke_test.gd
+run_check "[5/22] Running Phase Three territory and forward-operations smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_three_smoke_test.gd
+run_check "[6/22] Running Phase Four recon, fog, and Tactical Scan smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_four_smoke_test.gd
+run_check "[7/22] Running Phase Five Syndicate Siphon Raid smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_five_smoke_test.gd
+run_check "[8/22] Running Phase Six developer console smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_six_smoke_test.gd
+run_check "[9/22] Running Phase Seven terrain and tactical-map smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_smoke_test.gd
+run_check "[10/22] Running Phase Seven queued-route smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_seven_routes_smoke_test.gd
+run_check "[11/22] Running Phase Eight Syndicate economy smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_eight_smoke_test.gd
+run_check "[12/22] Running Phase Nine fixed-story campaign and difficulty smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_phase_nine_campaign_smoke_test.gd
+run_check "[13/22] Running Android touch testbed and export-preset smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_android_testbed_smoke_test.gd
+run_check "[14/22] Running web playable export smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/rts_web_playable_smoke_test.gd
+run_check "[15/22] Running precinct management and patrol battle smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/precinct_vertical_slice_smoke_test.gd
+run_check "[16/22] Running MoonGoons imported-skin overlay smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/moongoons_skin_overlay_smoke_test.gd
+run_check "[17/22] Running separate Syndicate reference-content smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/syndicate_campaign_smoke_test.gd
+run_check "[18/22] Running living 3D Peacekeeper precinct integration smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/living_precinct_smoke_test.gd
+run_check "[19/22] Running cops-side counter-Syndicate campaign smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/counter_syndicate_campaign_smoke_test.gd
+run_check "[20/22] Running shared space-station hull and automatic door smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/space_station_hull_smoke_test.gd
+run_check "[21/22] Running individual room equipment and mission-board smoke tests..." "${GODOT_BIN}" --headless --path . --script res://tests/precinct_equipment_and_missions_smoke_test.gd
+run_check "[22/22] Running engine, weapons, medical, and interrogation side-operation puzzles..." "${GODOT_BIN}" --headless --path . --script res://tests/side_operations_smoke_test.gd
 
 echo "==========================================================" | tee -a "${TEST_LOG}"
 if [[ ${FAILURES} -eq 0 ]]; then
