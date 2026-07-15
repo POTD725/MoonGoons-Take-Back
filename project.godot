@@ -12,6 +12,7 @@ config/icon="res://assets/android/icon.svg"
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
 PrecinctEquipment="*res://scripts/precinct_equipment_state.gd"
+SideOperations="*res://scripts/side_operations_state.gd"
 PrecinctMeta="*res://scripts/precinct_meta_state.gd"
 CounterSyndicate="*res://scripts/counter_syndicate_state.gd"
 MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"
