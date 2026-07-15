@@ -46,8 +46,6 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          # sdkmanager closes stdin after accepting the final license. Under
-          # pipefail that gives `yes` SIGPIPE/141 even when acceptance worked.
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager \
             "platform-tools" \
@@ -114,16 +112,51 @@ jobs:
           GODOT_BIN="${GITHUB_WORKSPACE}/.ci/godot/${GODOT_BINARY}" ./compile_and_test.sh
 
       - name: Export Android debug APK
+        id: export_apk
+        continue-on-error: true
         shell: bash
         run: |
-          set -Eeuo pipefail
-          mkdir -p "$(dirname "${APK_OUTPUT}")"
-          ".ci/godot/${GODOT_BINARY}" --headless --path . --export-debug "${ANDROID_PRESET}" "${APK_OUTPUT}"
-          ls -lh "${APK_OUTPUT}"
+          set +e
+          mkdir -p "$(dirname "${APK_OUTPUT}")" logs
+          ".ci/godot/${GODOT_BINARY}" \
+            --headless \
+            --verbose \
+            --path . \
+            --export-debug "${ANDROID_PRESET}" "${APK_OUTPUT}" \
+            2>&1 | tee logs/android_export.log
+          export_exit=${PIPESTATUS[0]}
+          echo "exit_code=${export_exit}" >> "${GITHUB_OUTPUT}"
+          tail -n 160 logs/android_export.log > logs/android_export_tail.log
+          if [[ -f "${APK_OUTPUT}" ]]; then
+            ls -lh "${APK_OUTPUT}" | tee logs/android_apk_status.txt
+          else
+            echo "APK was not created." | tee logs/android_apk_status.txt
+          fi
+          exit 0
+
+      - name: Upload Android export diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoonGoons-Android-Export-Diagnostics
+          path: |
+            logs/android_export.log
+            logs/android_export_tail.log
+            logs/android_apk_status.txt
+          retention-days: 14
 
       - name: Upload Android APK artifact
+        if: steps.export_apk.outputs.exit_code == '0'
         uses: actions/upload-artifact@v4
         with:
           name: MoonGoons-Take-Back-Android-Test-APK
           path: builds/android/*.apk
           retention-days: 14
+
+      - name: Fail when Android export failed
+        if: steps.export_apk.outputs.exit_code != '0'
+        shell: bash
+        run: |
+          echo "Godot Android export failed with exit code ${{ steps.export_apk.outputs.exit_code }}."
+          cat logs/android_export_tail.log
+          exit 1
