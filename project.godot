@@ -11,6 +11,8 @@ config/icon="res://assets/android/icon.svg"
 
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
+PrecinctMeta="*res://scripts/precinct_meta_state.gd"
+MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"
 SyndicateState="*res://scripts/syndicate_state.gd"
 SyndicateAudio="*res://scripts/syndicate_audio.gd"
 
