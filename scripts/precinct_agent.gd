@@ -21,6 +21,7 @@ var rng := RandomNumberGenerator.new()
 var step_clock:float = 0.0
 
 func configure(data:Dictionary, start_position:Vector3) -> void:
+	add_to_group("precinct_personnel")
 	officer_id = str(data.get("id", "worker"))
 	display_name = str(data.get("name", "Worker"))
 	role = str(data.get("class", data.get("role", "Authority")))
