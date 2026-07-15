@@ -46,7 +46,9 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          yes | sdkmanager --licenses >/dev/null
+          # sdkmanager closes stdin after accepting the final license. Under
+          # pipefail that gives `yes` SIGPIPE/141 even when acceptance worked.
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager \
             "platform-tools" \
             "build-tools;35.0.1" \
