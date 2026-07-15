@@ -18,7 +18,9 @@ func _run() -> void:
 		return
 
 	campaign.call("reset_campaign")
-	var origin_slides: Array = campaign.get("ORIGIN_SLIDES") as Array
+	campaign.set("cinematic_kind", "origin")
+	campaign.set("cinematic_slide_index", 0)
+	var origin_slides: Array = campaign.call("cinematic_slides") as Array
 	var chapters: Array = campaign.call("chapter_catalog") as Array
 	_expect(origin_slides.size() >= 5, "Origin story contains at least five illustrated beats")
 	_expect(chapters.size() >= 6, "Shared campaign contains origin and five Take Back chapters")
@@ -38,8 +40,6 @@ func _run() -> void:
 	var cinematic_scene: PackedScene = load("res://scenes/TakeBackCinematic.tscn") as PackedScene
 	_expect(cinematic_scene != null, "Origin and attack cinematic scene parses")
 	if cinematic_scene != null:
-		campaign.set("cinematic_kind", "origin")
-		campaign.set("cinematic_slide_index", 0)
 		var cinematic: Node = cinematic_scene.instantiate()
 		root.add_child(cinematic)
 		await process_frame
