@@ -97,9 +97,8 @@ jobs:
           test -f builds/web/index.wasm
           test -f builds/web/index.pck
 
-          # Give the game data package an immutable release filename. GitHub Pages
-          # and browsers may retain an older index.pck even after index.html changes.
-          # The unique SHA filename guarantees that the shell and game content match.
+          # Give the game package an immutable name and explicitly tell Godot's
+          # loader to use it. Custom shells do not always emit a mainPack field.
           VERSIONED_PCK="index-${GITHUB_SHA}.pck"
           mv builds/web/index.pck "builds/web/${VERSIONED_PCK}"
           python3 - "builds/web/index.html" "${VERSIONED_PCK}" <<'PY'
@@ -109,22 +108,54 @@ jobs:
           html_path = pathlib.Path(sys.argv[1])
           versioned_pck = sys.argv[2]
           html = html_path.read_text(encoding="utf-8")
-          old = '"mainPack":"index.pck"'
-          new = f'"mainPack":"{versioned_pck}"'
-          if old not in html:
-              raise SystemExit("Godot mainPack entry was not found in exported HTML")
-          html_path.write_text(html.replace(old, new, 1), encoding="utf-8")
+
+          # Keep loading progress accurate after renaming the data package.
+          file_size_key = '"index.pck":'
+          if file_size_key not in html:
+              raise SystemExit("Godot fileSizes entry for index.pck was not found")
+          html = html.replace(file_size_key, f'"{versioned_pck}":', 1)
+
+          # Godot 4.3 custom shells may omit mainPack. Inject it beside the
+          # executable value so Engine.startGame loads the immutable package.
+          if '"mainPack":"index.pck"' in html:
+              html = html.replace('"mainPack":"index.pck"', f'"mainPack":"{versioned_pck}"', 1)
+          elif '"mainPack":null' in html:
+              html = html.replace('"mainPack":null', f'"mainPack":"{versioned_pck}"', 1)
+          elif '"executable":"index"' in html:
+              html = html.replace(
+                  '"executable":"index"',
+                  f'"executable":"index","mainPack":"{versioned_pck}"',
+                  1,
+              )
+          else:
+              raise SystemExit("Godot executable configuration was not found")
+
+          # The outer browser frame must describe Take Back as the cops-side
+          # game, not a multi-campaign launcher or the criminal-side game.
+          replacements = {
+              'Campaign Hub': 'Peacekeeper Command',
+              'Preparing the MoonGoons campaign hub...': 'Preparing the Lunar Peacekeeper precinct...',
+              'Loading MoonGoons campaign systems...': 'Loading Peacekeeper command systems...',
+              'Downloading the game engine and campaign data.': 'Downloading the precinct, threat map, and patrol systems.',
+              '<span><strong>Syndicate Rising:</strong> rebuild the hideout and run criminal scores</span>': '<span><strong>Peacekeeper Precinct:</strong> build divisions, assign officers, and process arrests</span>',
+              '<span><strong>Campaign Hub:</strong> criminal, precinct, and RTS routes</span>': '<span><strong>Syndicate Threat Map:</strong> investigate districts, intercept scores, and reclaim the Moon</span>',
+              "const WEB_FIX_VERSION = '2';": "const WEB_FIX_VERSION = '3';",
+          }
+          for old, new in replacements.items():
+              html = html.replace(old, new)
+
+          html_path.write_text(html, encoding="utf-8")
           PY
+
           test -f "builds/web/${VERSIONED_PCK}"
           grep -Fq "\"mainPack\":\"${VERSIONED_PCK}\"" builds/web/index.html
-          if grep -Fq '"mainPack":"index.pck"' builds/web/index.html; then
+          grep -Fq "\"${VERSIONED_PCK}\":" builds/web/index.html
+          if grep -Fq '"index.pck"' builds/web/index.html; then
             echo "ERROR: Export still references the cache-prone index.pck filename." >&2
             exit 1
           fi
 
-          # Keep this one-release cleanup script at the former worker URL. Browsers
-          # controlled by the broken PWA worker will update to it, clear the old
-          # cache, unregister, and reload into the plain single-threaded export.
+          # Keep this one-release cleanup script at the former worker URL.
           cp web/legacy-service-worker-reset.js builds/web/index.service.worker.js
           test -f builds/web/index.service.worker.js
           ls -lh builds/web
@@ -146,7 +177,8 @@ jobs:
           VERSIONED_PCK="index-${GITHUB_SHA}.pck"
           test -f "builds/web/${VERSIONED_PCK}"
           grep -Fq "\"mainPack\":\"${VERSIONED_PCK}\"" builds/web/index.html
-          if grep -Fq '"mainPack":"index.pck"' builds/web/index.html; then
+          grep -Fq "\"${VERSIONED_PCK}\":" builds/web/index.html
+          if grep -Fq '"index.pck"' builds/web/index.html; then
             echo "ERROR: Browser package still references stale index.pck." >&2
             exit 1
           fi
@@ -159,7 +191,12 @@ jobs:
             exit 1
           fi
           grep -Fq 'Clear cache and reload' builds/web/index.html
-          grep -Fq 'Campaign Hub' builds/web/index.html
+          grep -Fq 'Peacekeeper Command' builds/web/index.html
+          grep -Fq 'Lunar Peacekeeper precinct' builds/web/index.html
+          if grep -Fq 'rebuild the hideout and run criminal scores' builds/web/index.html; then
+            echo "ERROR: Criminal-campaign language remains in the Take Back shell." >&2
+            exit 1
+          fi
           grep -F '"serviceWorker"' builds/web/index.html || true
 
       - name: Configure GitHub Pages
