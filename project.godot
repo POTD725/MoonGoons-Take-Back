@@ -4,7 +4,7 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="1.1.0-shared-origin"
+config/version="1.2.0-alliance-research"
 run/main_scene="res://scenes/LivingPrecinct.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
@@ -13,8 +13,9 @@ config/icon="res://assets/android/icon.svg"
 PrecinctState="*res://scripts/precinct_state.gd"
 PrecinctEquipment="*res://scripts/precinct_equipment_state.gd"
 SideOperations="*res://scripts/side_operations_state.gd"
-StationProgression="*res://scripts/station_progression_state.gd"
-ResourceHarvest="*res://scripts/resource_harvest_state.gd"
+ResourceHarvest="*res://scripts/resource_harvest_alliance.gd"
+AllianceResearch="*res://scripts/alliance_research_state.gd"
+StationProgression="*res://scripts/station_progression_alliance.gd"
 SpaceThreats="*res://scripts/space_syndicate_threats_cinematic.gd"
 PrecinctMeta="*res://scripts/precinct_meta_state.gd"
 CounterSyndicate="*res://scripts/counter_syndicate_state.gd"
@@ -23,6 +24,7 @@ MoonGoonsAudio="*res://scripts/moongoons_audio.gd"
 SyndicateState="*res://scripts/syndicate_state.gd"
 SyndicateAudio="*res://scripts/syndicate_audio.gd"
 TakeBackCampaign="*res://scripts/take_back_campaign_state.gd"
+AllianceResearchOverlay="*res://scripts/alliance_research_overlay.gd"
 
 [display/window]
 size/viewport_width=1280
