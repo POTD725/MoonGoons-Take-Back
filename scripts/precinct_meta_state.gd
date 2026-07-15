@@ -175,7 +175,14 @@ func task_catalog() -> Array[Dictionary]:
 		_mission("side_interrogation", "SIDE OPS", "Reliable Confession", "Obtain one reliable confession without excessive stress.", 1, SideOperations.confessions, 180, 8),
 		_mission("defense_upgrade", "DEFENSE", "Harden the Perimeter", "Raise any station defense system to level 2.", 2, _highest_defense_level(), 240, 8),
 		_mission("defense_wave", "DEFENSE", "Repel Marauders", "Survive one marauder attack.", 1, StationProgression.attacks_survived, 260, 10),
-		_mission("defense_veteran", "DEFENSE", "Hold the Line", "Destroy ten marauder ships.", 10, StationProgression.marauders_defeated, 420, 16)
+		_mission("defense_veteran", "DEFENSE", "Hold the Line", "Destroy ten marauder ships.", 10, StationProgression.marauders_defeated, 420, 16),
+		_mission("resource_first", "RESOURCE", "First Extraction", "Clear a Syndicate-held lane and complete one resource harvest.", 1, ResourceHarvest.total_harvests, 180, 6),
+		_mission("resource_stockpile", "RESOURCE", "Fill the Cargo Holds", "Collect 250 total units of Moonsteel, Helium-3, and Quantum Salvage.", 250, _total_resources_collected(), 320, 10),
+		_mission("resource_balance", "RESOURCE", "Balanced Supply Chain", "Hold at least 50 units of all three resources at once.", 50, _lowest_resource_balance(), 300, 10),
+		_mission("resource_upgrade", "RESOURCE", "Industrial Expansion", "Raise three extraction sites above level 1.", 3, _upgraded_harvest_sites(), 360, 12),
+		_mission("space_first", "SPACE COMBAT", "Clear the Lane", "Defeat one Syndicate Rising fleet in space.", 1, SpaceThreats.targets_defeated, 220, 8),
+		_mission("space_hunter", "SPACE COMBAT", "Fleet Hunter", "Defeat five Syndicate fleets guarding resource lanes.", 5, SpaceThreats.total_space_wins, 480, 16),
+		_mission("space_boss", "SPACE COMBAT", "Break the Crater Crown", "Defeat one level-10 Syndicate command carrier.", 1, SpaceThreats.boss_fleets_defeated, 750, 25)
 	]
 
 func claim_task(task_id: String) -> Dictionary:
@@ -279,6 +286,25 @@ func _highest_defense_level() -> int:
 	for defense_value: Variant in StationProgression.DEFENSE_CATALOG.keys():
 		highest = maxi(highest, StationProgression.defense_level(String(defense_value)))
 	return highest
+
+func _total_resources_collected() -> int:
+	var total: int = 0
+	for resource_id: String in ResourceHarvest.RESOURCE_IDS:
+		total += int(ResourceHarvest.total_collected.get(resource_id, 0))
+	return total
+
+func _lowest_resource_balance() -> int:
+	var lowest: int = 999999
+	for resource_id: String in ResourceHarvest.RESOURCE_IDS:
+		lowest = mini(lowest, ResourceHarvest.resource_amount(resource_id))
+	return lowest if lowest < 999999 else 0
+
+func _upgraded_harvest_sites() -> int:
+	var total: int = 0
+	for site: Dictionary in ResourceHarvest.site_catalog():
+		if int(site.get("level", 1)) > 1:
+			total += 1
+	return total
 
 func _result(ok: bool, message: String) -> Dictionary:
 	return {"ok": ok, "message": message}
