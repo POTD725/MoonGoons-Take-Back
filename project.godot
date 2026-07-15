@@ -4,13 +4,14 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="0.2.0-precinct-slice"
-run/main_scene="res://scenes/PrecinctVerticalSlice.tscn"
+config/version="0.3.0-syndicate-rising"
+run/main_scene="res://scenes/CampaignRouter.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
 
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
+SyndicateState="*res://scripts/syndicate_state.gd"
 
 [display/window]
 size/viewport_width=1280
