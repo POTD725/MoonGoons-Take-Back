@@ -43,21 +43,9 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_web_backdrop")
 
-[node name="ApprovedStationArtLayer" type="CanvasLayer" parent="."]
-layer = 1
-
-[node name="ApprovedStationArt" type="Control" parent="ApprovedStationArtLayer"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-script = ExtResource("26_approved_art")
-
 [node name="StationBoardFrameLayer" type="CanvasLayer" parent="."]
 layer = 4
+visible = false
 
 [node name="StationBoardFrame" type="Control" parent="StationBoardFrameLayer"]
 layout_mode = 3
@@ -68,6 +56,19 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("23_station_board")
+
+[node name="ApprovedStationArtLayer" type="CanvasLayer" parent="."]
+layer = 12
+
+[node name="ApprovedStationArt" type="Control" parent="ApprovedStationArtLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("26_approved_art")
 
 [node name="VisualPolish" type="Node" parent="."]
 script = ExtResource("2_polish")
