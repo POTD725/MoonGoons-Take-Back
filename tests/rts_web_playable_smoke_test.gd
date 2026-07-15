@@ -48,15 +48,20 @@ func _validate_web_playable_files() -> void:
 		"MoonGoons Take Back",
 		"$GODOT_URL",
 		"$GODOT_CONFIG",
-		"Campaign Hub",
-		"Preparing the MoonGoons campaign hub",
+		"Peacekeeper Station",
+		"Preparing the MoonGoons Peacekeeper station",
 		"clearLegacyWebState",
 		"Clear cache and reload",
 		"75000",
-		"Syndicate Rising"
+		"FIT WIDTH",
+		"FULLSCREEN",
+		"zoom-in-button",
+		"zoom-out-button",
+		"canvasStage.style.width",
+		"ZOOM_STORAGE_KEY"
 	]:
 		if not shell_text.contains(required_shell_text):
-			failures.append("Web shell missing token or recovery label: %s" % required_shell_text)
+			failures.append("Web shell missing token, scaler, or recovery label: %s" % required_shell_text)
 	var reset_file: FileAccess = FileAccess.open("res://web/legacy-service-worker-reset.js", FileAccess.READ)
 	if reset_file == null:
 		failures.append("Legacy service-worker reset script could not be opened.")
