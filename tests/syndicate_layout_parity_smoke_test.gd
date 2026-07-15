@@ -22,6 +22,9 @@ func _run() -> void:
 		_expect(shell.contains("canvasStage.style.width") and shell.contains("canvasStage.style.height"), "Web zoom resizes the actual Godot canvas stage")
 		_expect(shell.contains("displayMode = window.matchMedia") and shell.contains("'width'"), "Desktop browsers default to a larger Fit Width presentation")
 
+	var patrol_icon: Texture2D = load("res://assets/ui/patrol_spacecraft.svg") as Texture2D
+	_expect(patrol_icon != null, "Patrol uses a Peacekeeper spacecraft icon asset")
+
 	var packed: PackedScene = load("res://scenes/PeacekeeperStationDeck.tscn") as PackedScene
 	_expect(packed != null, "Syndicate-style Peacekeeper station scene loads")
 	if packed == null:
@@ -29,7 +32,7 @@ func _run() -> void:
 		return
 	var instance: Node = packed.instantiate()
 	root.add_child(instance)
-	for _frame: int in range(86):
+	for _frame: int in range(96):
 		await process_frame
 
 	var precinct: Node = instance.get_node_or_null("LivingPrecinct")
@@ -57,22 +60,72 @@ func _run() -> void:
 			_expect(is_equal_approx(room_action.position.y, 1062.0), "Room action occupies Syndicate Rising's inspector action band")
 		var drawer: PanelContainer = hud.get_node_or_null("CommandSystemsDrawer") as PanelContainer
 		_expect(drawer != null, "Command Systems drawer groups equipment, defense, threats, side ops, and research")
+
 		if precinct != null:
 			precinct.set("selected_room_id", "armory")
 			for _frame: int in range(3):
 				await process_frame
 			_expect(String(hud.get("selected_room_id")) == "armory", "HUD inspector follows room selection from the live station")
 
+		# Press every large navigation link and verify it reaches a real live destination.
+		var nav_audit: Array[Dictionary] = [
+			{"button":station, "id":"station", "panel":""},
+			{"button":missions, "id":"missions", "panel":"tasks_panel"},
+			{"button":operations, "id":"operations", "panel":"resource"},
+			{"button":officers, "id":"officers", "panel":"officer_panel"},
+			{"button":command, "id":"command", "panel":"drawer"}
+		]
+		for audit: Dictionary in nav_audit:
+			var button: Button = audit.get("button") as Button
+			if button == null:
+				continue
+			button.pressed.emit()
+			for _frame: int in range(3):
+				await process_frame
+			var id: String = String(audit.get("id", ""))
+			_expect(String(hud.get("active_nav")) == id, "%s navigation link reaches its controller" % id.capitalize())
+			var panel_key: String = String(audit.get("panel", ""))
+			if panel_key == "tasks_panel":
+				var tasks_value: Variant = precinct.get("tasks_panel")
+				_expect(tasks_value is Control and (tasks_value as Control).visible, "Missions link opens the live mission board")
+			elif panel_key == "resource":
+				var resource_controller: Node = precinct.get_node_or_null("ResourceHarvestController")
+				var resource_panel: Variant = resource_controller.get("panel") if resource_controller != null else null
+				_expect(resource_panel is Control and (resource_panel as Control).visible, "Operations link opens the live orbital resource map")
+			elif panel_key == "officer_panel":
+				var officer_value: Variant = precinct.get("officer_panel")
+				_expect(officer_value is Control and (officer_value as Control).visible, "Officers link opens the live roster")
+			elif panel_key == "drawer":
+				_expect(drawer != null and drawer.visible, "Command link opens the grouped command systems")
+
 	if precinct != null:
 		var old_ribbon: Control = precinct.get_node_or_null("CompactCommandRibbonLayer/CompactCommandRibbon") as Control
 		var old_camera: Control = precinct.get_node_or_null("HybridViewControlsLayer/HybridViewControls") as Control
 		_expect(old_ribbon == null or not old_ribbon.visible, "Legacy landscape command ribbon is hidden")
 		_expect(old_camera == null or not old_camera.visible, "Legacy landscape camera bar is hidden")
+		var personnel: Node = precinct.get_node_or_null("LivingPrecinctWorld/Personnel")
+		_expect(personnel != null and personnel.get_child_count() >= 10, "Station screen contains a populated NPC crew")
+		if personnel != null and personnel.get_child_count() > 0:
+			var animated_count: int = 0
+			var moving_count: int = 0
+			var starts: Dictionary = {}
+			for npc: Node in personnel.get_children():
+				if npc.is_in_group("animated_station_npcs"):
+					animated_count += 1
+				starts[npc.get_instance_id()] = (npc as Node3D).position
+			for _frame: int in range(45):
+				await process_frame
+			for npc: Node in personnel.get_children():
+				var old_position: Vector3 = starts.get(npc.get_instance_id(), (npc as Node3D).position)
+				if (npc as Node3D).position.distance_to(old_position) > 0.015:
+					moving_count += 1
+			_expect(animated_count == personnel.get_child_count(), "Every visible NPC uses the articulated animation rig")
+			_expect(moving_count > 0, "NPCs visibly walk and work on the station screen")
 
 	instance.queue_free()
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Syndicate Rising layout parity and web zoom passed.")
+		print("SUCCESS: Syndicate GUI parity, working links, web zoom, Patrol spacecraft, and animated NPCs passed.")
 	else:
 		push_error("FAILED: %d Syndicate layout parity check(s) failed." % failures)
 	quit(failures)
