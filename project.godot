@@ -4,8 +4,8 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="0.3.0-precinct-hub"
-run/main_scene="res://scenes/PrecinctVerticalSlice.tscn"
+config/version="0.4.0-living-precinct"
+run/main_scene="res://scenes/LivingPrecinct.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
 
@@ -13,6 +13,7 @@ config/icon="res://assets/android/icon.svg"
 PrecinctState="*res://scripts/precinct_state.gd"
 PrecinctMeta="*res://scripts/precinct_meta_state.gd"
 MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"
+MoonGoonsAudio="*res://scripts/moongoons_audio.gd"
 
 [display/window]
 size/viewport_width=1280
