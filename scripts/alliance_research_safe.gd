@@ -9,3 +9,9 @@ func active_job(branch: String) -> Dictionary:
 		return {}
 	var job: Dictionary = active_jobs[branch] as Dictionary
 	return job.duplicate(true)
+
+func construction_time_multiplier() -> float:
+	var reduction: float = float(level("modular_foundry") - 1) * 0.0025
+	reduction += float(level("rapid_assembly") - 1) * 0.0015
+	reduction += float(level("autonomous_builders") - 1) * 0.0011
+	return clampf(1.0 - reduction, 0.50, 1.0)
