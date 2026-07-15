@@ -25,15 +25,20 @@ func _validate_web_export_preset() -> void:
 		"export_path=\"builds/web/index.html\"",
 		"custom_features=\"web,html5,playable,touch\"",
 		"html/custom_html_shell=\"res://web/shell.html\"",
-		"progressive_web_app/enabled=true"
+		"variant/thread_support=false",
+		"progressive_web_app/enabled=false"
 	]:
 		if not text.contains(required_text):
 			failures.append("Web export preset missing: %s" % required_text)
+	if text.contains("progressive_web_app/enabled=true"):
+		failures.append("PWA mode must remain disabled until the deployment provides every worker dependency.")
 
 func _validate_web_playable_files() -> void:
 	if not FileAccess.file_exists("res://web/shell.html"):
 		failures.append("Missing custom web playable shell.")
 		return
+	if not FileAccess.file_exists("res://web/legacy-service-worker-reset.js"):
+		failures.append("Missing one-release legacy service-worker reset script.")
 	var shell: FileAccess = FileAccess.open("res://web/shell.html", FileAccess.READ)
 	if shell == null:
 		failures.append("Custom web playable shell could not be opened.")
@@ -43,9 +48,25 @@ func _validate_web_playable_files() -> void:
 		"MoonGoons Take Back",
 		"$GODOT_URL",
 		"$GODOT_CONFIG",
-		"Precinct Vertical Slice",
-		"Loading lunar precinct command systems",
-		"attack, cover, use specials"
+		"Campaign Hub",
+		"Preparing the MoonGoons campaign hub",
+		"clearLegacyWebState",
+		"Clear cache and reload",
+		"75000",
+		"Syndicate Rising"
 	]:
 		if not shell_text.contains(required_shell_text):
-			failures.append("Web shell missing token or label: %s" % required_shell_text)
+			failures.append("Web shell missing token or recovery label: %s" % required_shell_text)
+	var reset_file: FileAccess = FileAccess.open("res://web/legacy-service-worker-reset.js", FileAccess.READ)
+	if reset_file == null:
+		failures.append("Legacy service-worker reset script could not be opened.")
+		return
+	var reset_text: String = reset_file.get_as_text()
+	for required_reset_text: String in [
+		"MoonGoons Take B-sw-cache-",
+		"self.registration.unregister()",
+		"cache: 'no-store'",
+		"webfix"
+	]:
+		if not reset_text.contains(required_reset_text):
+			failures.append("Legacy service-worker reset missing: %s" % required_reset_text)
