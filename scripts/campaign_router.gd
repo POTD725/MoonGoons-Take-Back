@@ -1,5 +1,5 @@
 extends Node2D
-## Front door for the three current MoonGoons Take Back play surfaces.
+## Front door for the current MoonGoons Take Back play surfaces.
 
 const VIEWPORT_SIZE: Vector2 = Vector2(1280.0, 720.0)
 const SYNDICATE_EMBLEM: Texture2D = preload("res://assets/syndicate/syndicate_emblem.svg")
@@ -9,8 +9,12 @@ var card_rects: Dictionary = {
 	"precinct": Rect2(460.0, 190.0, 360.0, 420.0),
 	"rts": Rect2(862.0, 190.0, 360.0, 420.0)
 }
+var sound_rect: Rect2 = Rect2(1090.0, 105.0, 132.0, 34.0)
 var pulse: float = 0.0
 var status_message: String = "Choose whose boots hit the lunar dust first."
+
+func _ready() -> void:
+	SyndicateAudio.play_music("hideout")
 
 func _process(delta: float) -> void:
 	pulse += delta
@@ -29,17 +33,26 @@ func _input(event: InputEvent) -> void:
 		pressed = touch_event.pressed
 	if not pressed:
 		return
+	if sound_rect.has_point(position):
+		var muted: bool = SyndicateAudio.toggle_muted()
+		status_message = "Audio muted." if muted else "Audio restored."
+		queue_redraw()
+		return
 	for route_value: Variant in card_rects.keys():
 		var route: String = String(route_value)
 		var rect: Rect2 = card_rects[route] as Rect2
 		if rect.has_point(position):
+			SyndicateAudio.play_sfx("accept")
 			_open_route(route)
 			return
 
 func _open_route(route: String) -> void:
 	match route:
 		"syndicate":
-			get_tree().change_scene_to_file("res://scenes/SyndicateHideout.tscn")
+			if not SyndicateState.intro_seen or not SyndicateState.pending_cutscene.is_empty():
+				get_tree().change_scene_to_file("res://scenes/SyndicateCutscene.tscn")
+			else:
+				get_tree().change_scene_to_file("res://scenes/SyndicateHideout.tscn")
 		"precinct":
 			get_tree().change_scene_to_file("res://scenes/PrecinctVerticalSlice.tscn")
 		"rts":
@@ -50,9 +63,12 @@ func _open_route(route: String) -> void:
 func _draw() -> void:
 	_draw_backdrop()
 	_draw_header()
-	_draw_card("syndicate", "SYNDICATE RISING", "CRIMINAL CAMPAIGN", ["Rebuild a hidden lunar den", "Run scores and fence contraband", "Balance Heat against Notoriety"], Color("ff5d8f"), Color("9f46ff"))
+	_draw_card("syndicate", "SYNDICATE RISING", "CRIMINAL CAMPAIGN", ["Illustrated story cutscenes", "Rebuild and upgrade eight rooms", "Run scores, level crew, manage Heat"], Color("ff5d8f"), Color("9f46ff"))
 	_draw_card("precinct", "PRECINCT DUTY", "PEACEKEEPER CAMPAIGN", ["Restore the lunar station", "Answer district distress calls", "Arrest Syndicate operators"], Color("5fe5ff"), Color("2779ff"))
 	_draw_card("rts", "TAKE BACK FRONT", "STORY RTS", ["Build a Command Nexus", "Capture lunar territories", "Fight the fixed Act I campaign"], Color("ffd36a"), Color("ff7a3d"))
+	draw_style_box(_panel_style(Color("171326"), Color("7d7095"), 1, 7), sound_rect)
+	var audio_label: String = "AUDIO OFF" if SyndicateAudio.muted else "AUDIO ON"
+	draw_string(ThemeDB.fallback_font, sound_rect.position + Vector2(3.0, 22.0), audio_label, HORIZONTAL_ALIGNMENT_CENTER, sound_rect.size.x - 6.0, 10, Color("eef8ff"))
 	draw_string(ThemeDB.fallback_font, Vector2(64.0, 677.0), status_message, HORIZONTAL_ALIGNMENT_LEFT, 760.0, 13, Color("aebdca"))
 	draw_string(ThemeDB.fallback_font, Vector2(930.0, 677.0), "TAP A CAMPAIGN CARD TO PLAY", HORIZONTAL_ALIGNMENT_RIGHT, 290.0, 12, Color("eef8ff"))
 
@@ -72,7 +88,7 @@ func _draw_header() -> void:
 	draw_rect(Rect2(0.0, 0.0, VIEWPORT_SIZE.x, 142.0), Color("0d1020", 0.92), true)
 	draw_string(ThemeDB.fallback_font, Vector2(52.0, 52.0), "MOONGOONS TAKE BACK", HORIZONTAL_ALIGNMENT_LEFT, 650.0, 31, Color("f4fbff"))
 	draw_string(ThemeDB.fallback_font, Vector2(54.0, 86.0), "THE MOON HAS TWO SIDES. ORDER OWNS ONE. THE UNDERWORLD WANTS THE OTHER.", HORIZONTAL_ALIGNMENT_LEFT, 820.0, 14, Color("c3a9ff"))
-	draw_string(ThemeDB.fallback_font, Vector2(54.0, 116.0), "CAMPAIGN ROUTER // CLEAN-ROOM ORIGINAL MOONGOONS BUILD", HORIZONTAL_ALIGNMENT_LEFT, 650.0, 11, Color("73859a"))
+	draw_string(ThemeDB.fallback_font, Vector2(54.0, 116.0), "CAMPAIGN ROUTER // ORIGINAL MOONGOONS ART, AUDIO, AND GAMEPLAY", HORIZONTAL_ALIGNMENT_LEFT, 760.0, 11, Color("73859a"))
 	draw_line(Vector2(0.0, 141.0), Vector2(VIEWPORT_SIZE.x, 141.0), Color("aa72ff", 0.46), 2.0)
 
 func _draw_card(route: String, title: String, subtitle: String, bullets: Array[String], primary: Color, secondary: Color) -> void:
@@ -90,7 +106,7 @@ func _draw_card(route: String, title: String, subtitle: String, bullets: Array[S
 		draw_string(ThemeDB.fallback_font, Vector2(rect.position.x + 46.0, y), bullets[index], HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 68.0, 12, Color("b8c7d4"))
 	var button_rect: Rect2 = Rect2(rect.position + Vector2(24.0, 360.0), Vector2(rect.size.x - 48.0, 42.0))
 	draw_style_box(_panel_style(Color(primary, 0.20), primary, 2, 9), button_rect)
-	draw_string(ThemeDB.fallback_font, button_rect.position + Vector2(4.0, 27.0), "ENTER CAMPAIGN", HORIZONTAL_ALIGNMENT_CENTER, button_rect.size.x - 8.0, 12, Color("ffffff"))
+	draw_string(ThemeDB.fallback_font, button_rect.position + Vector2(4.0, 27.0), "ENTER CAMPAIGN", HORIZONTAL_ALIGNMENT_CENTER, button_rect.size.x - 8.0, 11, Color("ffffff"))
 
 func _draw_faction_emblem(route: String, center: Vector2, primary: Color, secondary: Color) -> void:
 	if route == "syndicate":
