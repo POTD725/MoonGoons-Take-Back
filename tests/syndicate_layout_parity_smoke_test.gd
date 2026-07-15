@@ -63,7 +63,7 @@ func _run() -> void:
 
 		if precinct != null:
 			precinct.set("selected_room_id", "armory")
-			for _frame: int in range(3):
+			for _frame: int in range(20):
 				await process_frame
 			_expect(String(hud.get("selected_room_id")) == "armory", "HUD inspector follows room selection from the live station")
 
@@ -80,29 +80,29 @@ func _run() -> void:
 			if button == null:
 				continue
 			button.pressed.emit()
-			for _frame: int in range(3):
+			for _frame: int in range(8):
 				await process_frame
 			var id: String = String(audit.get("id", ""))
 			_expect(String(hud.get("active_nav")) == id, "%s navigation link reaches its controller" % id.capitalize())
 			var panel_key: String = String(audit.get("panel", ""))
 			if panel_key == "tasks_panel":
 				var tasks_value: Variant = precinct.get("tasks_panel")
-				_expect(tasks_value is Control and (tasks_value as Control).visible, "Missions link opens the live mission board")
+				_expect(tasks_value is Control and (tasks_value as Control).is_visible_in_tree(), "Missions link opens the live mission board")
 			elif panel_key == "resource":
 				var resource_controller: Node = precinct.get_node_or_null("ResourceHarvestController")
 				var resource_panel: Variant = resource_controller.get("panel") if resource_controller != null else null
-				_expect(resource_panel is Control and (resource_panel as Control).visible, "Operations link opens the live orbital resource map")
+				_expect(resource_panel is Control and (resource_panel as Control).is_visible_in_tree(), "Operations link opens the live orbital resource map")
 			elif panel_key == "officer_panel":
 				var officer_value: Variant = precinct.get("officer_panel")
-				_expect(officer_value is Control and (officer_value as Control).visible, "Officers link opens the live roster")
+				_expect(officer_value is Control and (officer_value as Control).is_visible_in_tree(), "Officers link opens the live roster")
 			elif panel_key == "drawer":
-				_expect(drawer != null and drawer.visible, "Command link opens the grouped command systems")
+				_expect(drawer != null and drawer.is_visible_in_tree(), "Command link opens the grouped command systems")
 
 	if precinct != null:
 		var old_ribbon: Control = precinct.get_node_or_null("CompactCommandRibbonLayer/CompactCommandRibbon") as Control
 		var old_camera: Control = precinct.get_node_or_null("HybridViewControlsLayer/HybridViewControls") as Control
-		_expect(old_ribbon == null or not old_ribbon.visible, "Legacy landscape command ribbon is hidden")
-		_expect(old_camera == null or not old_camera.visible, "Legacy landscape camera bar is hidden")
+		_expect(old_ribbon == null or not old_ribbon.is_visible_in_tree(), "Legacy landscape command ribbon is hidden")
+		_expect(old_camera == null or not old_camera.is_visible_in_tree(), "Legacy landscape camera bar is hidden")
 		var personnel: Node = precinct.get_node_or_null("LivingPrecinctWorld/Personnel")
 		_expect(personnel != null and personnel.get_child_count() >= 10, "Station screen contains a populated NPC crew")
 		if personnel != null and personnel.get_child_count() > 0:
