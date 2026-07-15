@@ -1,10 +1,14 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/precinct_battle.gd" id="1_battle"]
 [ext_resource type="Script" path="res://scripts/precinct_battle_skin_overlay.gd" id="2_skins"]
+[ext_resource type="Script" path="res://scripts/peacekeeper_battle_bridge.gd" id="3_campaign"]
 
 [node name="MoonGoonsPatrolBattle" type="Node2D"]
 script = ExtResource("1_battle")
 
 [node name="MoonGoonsBattleSkinOverlay" type="Node2D" parent="."]
 script = ExtResource("2_skins")
+
+[node name="PeacekeeperBattleBridge" type="Node" parent="."]
+script = ExtResource("3_campaign")
