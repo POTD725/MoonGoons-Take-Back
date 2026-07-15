@@ -40,7 +40,7 @@ func _run() -> void:
 		"HELIUM-3":"helium",
 		"QUANTUM SALVAGE":"salvage",
 		"SYNDICATE FLEET":"threats",
-		"TRUTH SCANNER":"truth_scanner"
+		"truth_scanner":"truth_scanner"
 	}
 	for label_value: Variant in semantic_checks.keys():
 		var label: String = String(label_value)
