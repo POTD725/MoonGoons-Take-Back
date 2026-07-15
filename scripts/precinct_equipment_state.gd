@@ -112,10 +112,8 @@ func upgrade_item(room_id: String, item_id: String) -> Dictionary:
 	var next_level: int = current_level + 1
 	item_levels[_key(room_id, item_id)] = next_level
 	total_upgrades += 1
-	PrecinctMeta.reputation += 1
 	PrecinctState.last_event = "%s upgraded to level %d of %d." % [String(item.get("name", "Equipment")), next_level, cap]
 	save_state()
-	PrecinctMeta.save_meta()
 	PrecinctState.state_changed.emit()
 	equipment_changed.emit()
 	return _result(true, PrecinctState.last_event)
