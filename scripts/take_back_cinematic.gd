@@ -23,7 +23,7 @@ func _ready() -> void:
 	if slides.is_empty():
 		TakeBackCampaign.finish_cinematic()
 		return
-	MoonGoonsAudio.play_music("combat" if TakeBackCampaign.cinematic_kind != "origin" else "precinct")
+	MoonGoonsAudio.play("alert" if TakeBackCampaign.cinematic_kind != "origin" else "dispatch")
 	queue_redraw()
 
 func _process(delta: float) -> void:
@@ -60,13 +60,13 @@ func _input(event: InputEvent) -> void:
 		TakeBackCampaign.finish_cinematic()
 
 func _next() -> void:
-	MoonGoonsAudio.play_sfx("accept")
+	MoonGoonsAudio.play("confirm")
 	TakeBackCampaign.advance_cinematic()
 	queue_redraw()
 
 func _previous() -> void:
 	if TakeBackCampaign.previous_cinematic():
-		MoonGoonsAudio.play_sfx("click")
+		MoonGoonsAudio.play("click")
 	queue_redraw()
 
 func _draw() -> void:
