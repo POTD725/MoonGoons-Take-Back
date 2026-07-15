@@ -1,6 +1,5 @@
 extends Node
-## Extra progression used by the APK-inspired MoonGoons hub.
-## This stays separate from PrecinctState so the proven patrol/combat loop remains stable.
+## Station progression, assignments, custody work, missions, and command caps.
 
 signal meta_changed
 
@@ -37,17 +36,28 @@ func upgrade_room(room_id: String) -> Dictionary:
 	var level: int = int(room.get("level", 1))
 	if level >= 100:
 		return _result(false, "This room is already level 100.")
+	if room_id != "chief":
+		var command_cap: int = chief_level()
+		if level >= command_cap:
+			return _result(false, "%s is capped at level %d. Upgrade the Chief's Office first." % [String(room.get("name", "Room")), command_cap])
 	var cost: int = 90 + level * 55
 	if PrecinctState.credits < cost:
 		return _result(false, "Upgrade requires %d credits." % cost)
 	PrecinctState.credits -= cost
 	room["level"] = level + 1
 	reputation += 2
-	PrecinctState.last_event = "%s upgraded to level %d." % [String(room.get("name", "Room")), level + 1]
+	if room_id == "chief":
+		PrecinctState.last_event = "Chief's Office upgraded to level %d. Station upgrade cap increased." % (level + 1)
+	else:
+		PrecinctState.last_event = "%s upgraded to level %d of command cap %d." % [String(room.get("name", "Room")), level + 1, chief_level()]
 	PrecinctState.state_changed.emit()
 	save_meta()
 	meta_changed.emit()
 	return _result(true, PrecinctState.last_event)
+
+func chief_level() -> int:
+	var chief_room: Dictionary = PrecinctState.get_room("chief")
+	return maxi(1, int(chief_room.get("level", 1)))
 
 func train_officer(officer_id: String) -> Dictionary:
 	var officer: Dictionary = PrecinctState.get_officer(officer_id)
@@ -163,38 +173,50 @@ func custody_action(action: String) -> Dictionary:
 
 func task_catalog() -> Array[Dictionary]:
 	return [
-		{"id":"chapter_restore", "group":"CHAPTER", "title":"Restore the Precinct", "description":"Bring four rooms online.", "target":4, "progress":_repaired_count(), "reward_credits":180, "reward_intel":5},
-		{"id":"chapter_patrol", "group":"CHAPTER", "title":"First Arrests", "description":"Hold two prisoners at once.", "target":2, "progress":PrecinctState.prisoners, "reward_credits":220, "reward_intel":8},
-		{"id":"daily_upgrade", "group":"DAILY", "title":"Improve a Division", "description":"Raise any room to level 2.", "target":1, "progress":_upgraded_room_count(), "reward_credits":90, "reward_intel":2},
-		{"id":"daily_training", "group":"DAILY", "title":"Officer Development", "description":"Train any officer to level 2.", "target":1, "progress":_trained_officer_count(), "reward_credits":100, "reward_intel":2},
-		{"id":"daily_assignment", "group":"DAILY", "title":"Staff the Station", "description":"Assign two officers to rooms.", "target":2, "progress":room_assignments.size(), "reward_credits":80, "reward_intel":3},
-		{"id":"daily_custody", "group":"DAILY", "title":"Work the Case", "description":"Interrogate or transfer one prisoner.", "target":1, "progress":prisoners_interrogated + prisoners_transferred, "reward_credits":110, "reward_intel":4}
+		_mission("chapter_restore", "CHAPTER 1", "Restore the Precinct", "Bring four station divisions online.", 4, _repaired_count(), 180, 5),
+		_mission("chapter_command", "CHAPTER 1", "Establish Command Authority", "Upgrade the Chief's Office to level 2. It controls every room and equipment level cap.", 2, chief_level(), 220, 8),
+		_mission("chapter_equipment", "CHAPTER 1", "Equip the Precinct", "Complete three individual room-equipment upgrades.", 3, PrecinctEquipment.total_upgrades, 240, 8),
+		_mission("chapter_patrol", "CHAPTER 1", "First Arrests", "Hold or process two Syndicate suspects.", 2, PrecinctState.prisoners + prisoners_interrogated + prisoners_transferred, 250, 10),
+		_mission("chapter_hideout", "CHAPTER 2", "Expose a Hideout", "Investigate a district until one Syndicate hideout is exposed.", 1, CounterSyndicate.hideouts_exposed, 300, 12),
+		_mission("chapter_scores", "CHAPTER 2", "Break Their Momentum", "Stop three Syndicate scores through successful patrols or raids.", 3, CounterSyndicate.intercepted_scores, 320, 12),
+		_mission("chapter_arrest", "CHAPTER 2", "Major Arrest", "Capture one major Syndicate operator.", 1, CounterSyndicate.major_arrests, 350, 15),
+		_mission("chapter_control", "CHAPTER 2", "Reclaim Lunar Ground", "Raise overall Authority control to 35 percent.", 35, CounterSyndicate.authority_control, 420, 18),
+		_mission("daily_upgrade", "DAILY", "Calibrate Equipment", "Upgrade one individual item in any room.", 1, PrecinctEquipment.upgraded_item_count(), 100, 3),
+		_mission("daily_training", "DAILY", "Officer Development", "Train any officer to level 2.", 1, _trained_officer_count(), 100, 2),
+		_mission("daily_assignment", "DAILY", "Staff the Station", "Assign two officers to active divisions.", 2, room_assignments.size(), 90, 3),
+		_mission("daily_custody", "DAILY", "Work the Case", "Interrogate or transfer one prisoner.", 1, prisoners_interrogated + prisoners_transferred, 120, 4),
+		_mission("daily_intel", "DAILY", "Build an Intelligence File", "Accumulate 30 intel for active investigations.", 30, PrecinctState.intel, 120, 4),
+		_mission("patrol_response", "PATROL", "Answer the Call", "Stop one Syndicate score in a lunar district.", 1, CounterSyndicate.intercepted_scores, 130, 4),
+		_mission("patrol_veteran", "PATROL", "District Sweep", "Stop five Syndicate scores.", 5, CounterSyndicate.intercepted_scores, 280, 10),
+		_mission("investigation_network", "INVESTIGATION", "Map the Network", "Expose three Syndicate hideouts.", 3, CounterSyndicate.hideouts_exposed, 360, 14),
+		_mission("district_foothold", "DISTRICT", "Secure a Foothold", "Raise one district to 40 percent Authority control.", 40, _highest_district_control(), 260, 10),
+		_mission("station_mastery", "STATION", "Command-Grade Precinct", "Raise six individual equipment items above level 1.", 6, PrecinctEquipment.upgraded_item_count(), 400, 15)
 	]
 
 func claim_task(task_id: String) -> Dictionary:
 	if bool(task_claims.get(task_id, false)):
-		return _result(false, "That reward has already been claimed.")
+		return _result(false, "That mission reward has already been claimed.")
 	for task: Dictionary in task_catalog():
 		if String(task.get("id", "")) != task_id:
 			continue
 		if int(task.get("progress", 0)) < int(task.get("target", 1)):
-			return _result(false, "Task requirements are not complete.")
+			return _result(false, "Mission requirements are not complete.")
 		task_claims[task_id] = true
 		PrecinctState.credits += int(task.get("reward_credits", 0))
 		PrecinctState.intel += int(task.get("reward_intel", 0))
 		reputation += 3
-		PrecinctState.last_event = "%s reward claimed." % String(task.get("title", "Task"))
+		PrecinctState.last_event = "%s mission reward claimed." % String(task.get("title", "Mission"))
 		save_meta()
 		PrecinctState.state_changed.emit()
 		meta_changed.emit()
 		return _result(true, PrecinctState.last_event)
-	return _result(false, "Task not found.")
+	return _result(false, "Mission not found.")
 
 func task_claimed(task_id: String) -> bool:
 	return bool(task_claims.get(task_id, false))
 
 func advance_tutorial() -> void:
-	tutorial_step = min(6, tutorial_step + 1)
+	tutorial_step = mini(6, tutorial_step + 1)
 	save_meta()
 	meta_changed.emit()
 
@@ -235,17 +257,22 @@ func load_meta() -> void:
 	prisoners_interrogated = int(data.get("prisoners_interrogated", 0))
 	prisoners_transferred = int(data.get("prisoners_transferred", 0))
 
+func _mission(id_value: String, group_value: String, title_value: String, description_value: String, target_value: int, progress_value: int, credits_value: int, intel_value: int) -> Dictionary:
+	return {
+		"id": id_value,
+		"group": group_value,
+		"title": title_value,
+		"description": description_value,
+		"target": target_value,
+		"progress": mini(target_value, progress_value),
+		"reward_credits": credits_value,
+		"reward_intel": intel_value
+	}
+
 func _repaired_count() -> int:
 	var total: int = 0
 	for room: Dictionary in PrecinctState.rooms:
 		if bool(room.get("repaired", false)):
-			total += 1
-	return total
-
-func _upgraded_room_count() -> int:
-	var total: int = 0
-	for room: Dictionary in PrecinctState.rooms:
-		if int(room.get("level", 1)) >= 2:
 			total += 1
 	return total
 
@@ -255,6 +282,12 @@ func _trained_officer_count() -> int:
 		if int(officer.get("level", 1)) >= 2:
 			total += 1
 	return total
+
+func _highest_district_control() -> int:
+	var highest: int = 0
+	for district: Dictionary in CounterSyndicate.district_catalog():
+		highest = maxi(highest, int(district.get("control", 0)))
+	return highest
 
 func _result(ok: bool, message: String) -> Dictionary:
 	return {"ok": ok, "message": message}
