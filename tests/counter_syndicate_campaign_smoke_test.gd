@@ -43,9 +43,11 @@ func _run_checks() -> void:
 
 	var map_scene: PackedScene = load("res://scenes/SyndicateThreatMap.tscn") as PackedScene
 	var living_scene: PackedScene = load("res://scenes/LivingPrecinct.tscn") as PackedScene
+	var hub_scene: PackedScene = load("res://scenes/PeacekeeperStationDeck.tscn") as PackedScene
 	var battle_scene: PackedScene = load("res://scenes/PrecinctBattle.tscn") as PackedScene
 	_expect(map_scene != null, "Threat-map scene parses")
 	_expect(living_scene != null, "Living precinct scene parses")
+	_expect(hub_scene != null, "Portrait Peacekeeper station hub parses")
 	_expect(battle_scene != null, "Peacekeeper patrol battle scene parses")
 
 	var living_file: FileAccess = FileAccess.open("res://scenes/LivingPrecinct.tscn", FileAccess.READ)
@@ -53,6 +55,11 @@ func _run_checks() -> void:
 	if living_file != null:
 		var living_text: String = living_file.get_as_text()
 		_expect(living_text.contains("peacekeeper_campaign_mode.gd"), "Precinct includes the counter-Syndicate campaign layer")
+	var hub_file: FileAccess = FileAccess.open("res://scenes/PeacekeeperStationDeck.tscn", FileAccess.READ)
+	_expect(hub_file != null, "Portrait hub can be inspected")
+	if hub_file != null:
+		var hub_text: String = hub_file.get_as_text()
+		_expect(hub_text.contains("LivingPrecinct.tscn"), "Portrait hub keeps the complete cops-side precinct simulation")
 	var battle_file: FileAccess = FileAccess.open("res://scenes/PrecinctBattle.tscn", FileAccess.READ)
 	_expect(battle_file != null, "Patrol battle scene can be inspected")
 	if battle_file != null:
@@ -61,7 +68,7 @@ func _run_checks() -> void:
 	var project_file: ConfigFile = ConfigFile.new()
 	var config_error: Error = project_file.load("res://project.godot")
 	_expect(config_error == OK, "Project configuration loads")
-	_expect(String(project_file.get_value("application", "run/main_scene", "")) == "res://scenes/LivingPrecinct.tscn", "Take Back starts directly in the cops-side precinct")
+	_expect(String(project_file.get_value("application", "run/main_scene", "")) == "res://scenes/PeacekeeperStationDeck.tscn", "Take Back starts directly in the cops-side station deck")
 	_expect(String(project_file.get_value("autoload", "CounterSyndicate", "")) == "*res://scripts/counter_syndicate_state.gd", "Counter-Syndicate state is globally registered")
 
 	threat_state.queue_free()

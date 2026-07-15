@@ -23,7 +23,7 @@
 [ext_resource type="Script" path="res://scripts/precinct_equipment_preview.gd" id="21_equipment_preview"]
 [ext_resource type="Script" path="res://scripts/precinct_hybrid_camera_controller.gd" id="22_hybrid_camera"]
 [ext_resource type="Script" path="res://scripts/precinct_station_board_skin.gd" id="23_station_board"]
-[ext_resource type="Script" path="res://scripts/precinct_icon_tooltip_controller.gd" id="24_icon_hover"]
+[ext_resource type="Script" path="res://scripts/precinct_icon_tooltip_controller_43.gd" id="24_icon_hover"]
 [ext_resource type="Script" path="res://scripts/precinct_station_language_patch.gd" id="25_station_language"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
