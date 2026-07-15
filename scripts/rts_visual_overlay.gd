@@ -3,8 +3,6 @@ extends Node2D
 ## Replaces the prototype circle-and-box look with the established MoonGoons skin pack
 ## while preserving the underlying deterministic RTS simulation and controls.
 
-const VIEW: Vector2 = Vector2(1280.0, 720.0)
-const FIELD: Rect2 = Rect2(18.0, 92.0, 938.0, 608.0)
 const NEXUS_POSITION: Vector2 = Vector2(490.0, 430.0)
 const HIDEOUT_POSITION: Vector2 = Vector2(835.0, 180.0)
 const HUB_BUTTON: Rect2 = Rect2(790.0, 20.0, 150.0, 38.0)
@@ -14,7 +12,6 @@ var pulse: float = 0.0
 
 func _ready() -> void:
 	rts = get_parent() as Node2D
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if self is Control else 0
 	queue_redraw()
 
 func _process(delta: float) -> void:
@@ -61,7 +58,7 @@ func _draw_crater_art() -> void:
 	for index: int in range(0, positions.size(), 3):
 		if index >= radii.size():
 			break
-		var center: Vector2 = positions[index] as Vector2
+		var center: Vector2 = positions[index]
 		var radius: float = float(radii[index]) * 1.45
 		draw_texture_rect(texture, Rect2(center - Vector2(radius, radius), Vector2(radius * 2.0, radius * 2.0)), false, Color(0.72, 0.80, 0.88, 0.34))
 
@@ -76,14 +73,15 @@ func _draw_resource_art() -> void:
 	var resources_value: Variant = rts.get("resource_nodes")
 	if not resources_value is Array:
 		return
-	for resource_value: Variant in resources_value as Array:
+	var resources: Array = resources_value as Array
+	for resource_value: Variant in resources:
 		if not resource_value is Object:
 			continue
 		var resource := resource_value as Object
 		var amount: int = int(resource.get("amount"))
 		if amount <= 0:
 			continue
-		var center: Vector2 = resource.get("pos") as Vector2
+		var center: Vector2 = resource.get("pos")
 		var resource_id: String = str(resource.get("resource_id"))
 		var skin_name: String = "evidence_cache" if resource_id == "credits" else "ore_deposit"
 		var tint: Color = Color(1.0, 0.87, 0.54, 0.96) if resource_id == "credits" else Color(0.76, 0.66, 1.0, 0.96)
@@ -93,11 +91,12 @@ func _draw_structure_art() -> void:
 	var structures_value: Variant = rts.get("structures")
 	if not structures_value is Array:
 		return
-	for structure_value: Variant in structures_value as Array:
+	var structures: Array = structures_value as Array
+	for structure_value: Variant in structures:
 		if not structure_value is Object:
 			continue
 		var structure := structure_value as Object
-		var center: Vector2 = structure.get("pos") as Vector2
+		var center: Vector2 = structure.get("pos")
 		var structure_type: String = str(structure.get("structure_type"))
 		var complete: bool = bool(structure.get("complete"))
 		var skin_name: String = "machine_shop"
@@ -118,18 +117,20 @@ func _draw_structure_art() -> void:
 func _draw_unit_art() -> void:
 	var workers_value: Variant = rts.get("workers")
 	if workers_value is Array:
-		for worker_value: Variant in workers_value as Array:
+		var workers: Array = workers_value as Array
+		for worker_value: Variant in workers:
 			if worker_value is Object:
 				var worker := worker_value as Object
-				var center: Vector2 = worker.get("pos") as Vector2
+				var center: Vector2 = worker.get("pos")
 				_draw_skin("builder_drone", Rect2(center - Vector2(23.0, 23.0), Vector2(46.0, 46.0)), Color.WHITE)
 	var units_value: Variant = rts.get("combat_units")
 	if units_value is Array:
-		for unit_value: Variant in units_value as Array:
+		var units: Array = units_value as Array
+		for unit_value: Variant in units:
 			if not unit_value is Object:
 				continue
 			var unit := unit_value as Object
-			var center: Vector2 = unit.get("pos") as Vector2
+			var center: Vector2 = unit.get("pos")
 			var unit_type: String = str(unit.get("unit_type"))
 			var skin_name: String = "shield_deputy" if unit_type == "vanguard" else "patrol_deputy"
 			var size: Vector2 = Vector2(52.0, 52.0) if unit_type == "vanguard" else Vector2(44.0, 44.0)
@@ -139,11 +140,12 @@ func _draw_enemy_art() -> void:
 	var enemies_value: Variant = rts.get("enemy_units")
 	if not enemies_value is Array:
 		return
-	for enemy_value: Variant in enemies_value as Array:
+	var enemies: Array = enemies_value as Array
+	for enemy_value: Variant in enemies:
 		if not enemy_value is Object:
 			continue
 		var enemy := enemy_value as Object
-		var center: Vector2 = enemy.get("pos") as Vector2
+		var center: Vector2 = enemy.get("pos")
 		var enemy_type: String = str(enemy.get("unit_type"))
 		var skin_name: String = "pulse_cannon" if enemy_type == "bruiser" else "sentry_turret"
 		var size: Vector2 = Vector2(54.0, 54.0) if enemy_type == "bruiser" else Vector2(42.0, 42.0)
