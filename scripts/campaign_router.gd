@@ -35,6 +35,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if sound_rect.has_point(position):
 		var muted: bool = SyndicateAudio.toggle_muted()
+		MoonGoonsAudio.set_ambience_enabled(not muted)
 		status_message = "Audio muted." if muted else "Audio restored."
 		queue_redraw()
 		return
@@ -54,7 +55,7 @@ func _open_route(route: String) -> void:
 			else:
 				get_tree().change_scene_to_file("res://scenes/SyndicateHideout.tscn")
 		"precinct":
-			get_tree().change_scene_to_file("res://scenes/PrecinctVerticalSlice.tscn")
+			get_tree().change_scene_to_file("res://scenes/LivingPrecinct.tscn")
 		"rts":
 			get_tree().change_scene_to_file("res://scenes/Main.tscn")
 		_:
@@ -64,7 +65,7 @@ func _draw() -> void:
 	_draw_backdrop()
 	_draw_header()
 	_draw_card("syndicate", "SYNDICATE RISING", "CRIMINAL CAMPAIGN", ["Illustrated story cutscenes", "Rebuild and upgrade eight rooms", "Run scores, level crew, manage Heat"], Color("ff5d8f"), Color("9f46ff"))
-	_draw_card("precinct", "PRECINCT DUTY", "PEACEKEEPER CAMPAIGN", ["Restore the lunar station", "Answer district distress calls", "Arrest Syndicate operators"], Color("5fe5ff"), Color("2779ff"))
+	_draw_card("precinct", "PRECINCT DUTY", "PEACEKEEPER CAMPAIGN", ["Explore a living 3D lunar precinct", "Post walking officers to working rooms", "Patrol districts and arrest operators"], Color("5fe5ff"), Color("2779ff"))
 	_draw_card("rts", "TAKE BACK FRONT", "STORY RTS", ["Build a Command Nexus", "Capture lunar territories", "Fight the fixed Act I campaign"], Color("ffd36a"), Color("ff7a3d"))
 	draw_style_box(_panel_style(Color("171326"), Color("7d7095"), 1, 7), sound_rect)
 	var audio_label: String = "AUDIO OFF" if SyndicateAudio.muted else "AUDIO ON"
