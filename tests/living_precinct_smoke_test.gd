@@ -103,18 +103,21 @@ func _run() -> void:
 	var project_file:ConfigFile = ConfigFile.new()
 	var config_error:Error = project_file.load("res://project.godot")
 	_expect(config_error == OK,"Project configuration loads")
-	_expect(String(project_file.get_value("application","run/main_scene","")) == "res://scenes/CampaignRouter.tscn","Campaign router remains the startup scene")
+	_expect(String(project_file.get_value("application","run/main_scene","")) == "res://scenes/LivingPrecinct.tscn","Graphic living precinct is the startup scene")
 	_expect(String(project_file.get_value("autoload","MoonGoonsAudio","")) == "*res://scripts/moongoons_audio.gd","Precinct audio service is registered")
 	_expect(String(project_file.get_value("autoload","SyndicateAudio","")) == "*res://scripts/syndicate_audio.gd","Syndicate audio service remains registered")
+	var router_scene:PackedScene = load("res://scenes/CampaignRouter.tscn") as PackedScene
+	_expect(router_scene != null,"Optional campaign hub still parses")
 	var router_file:FileAccess = FileAccess.open("res://scripts/campaign_router.gd",FileAccess.READ)
 	_expect(router_file != null,"Campaign router script can be read")
 	if router_file != null:
 		var router_text:String = router_file.get_as_text()
-		_expect(router_text.contains("res://scenes/LivingPrecinct.tscn"),"Peacekeeper campaign routes to the living precinct")
+		_expect(router_text.contains("res://scenes/LivingPrecinct.tscn"),"Campaign hub routes back to the living precinct")
+		_expect(router_text.contains("command_nexus.png") and router_text.contains("patrol_deputy.png"),"Campaign hub uses established MoonGoons image assets")
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Living precinct graphics, input, and integration smoke tests passed.")
+		print("SUCCESS: Direct graphic precinct startup, art, input, and integration smoke tests passed.")
 	else:
 		push_error("FAILED: %d living precinct smoke test(s) failed." % failures)
 	quit(failures)
