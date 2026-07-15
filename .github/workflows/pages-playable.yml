@@ -97,6 +97,31 @@ jobs:
           test -f builds/web/index.wasm
           test -f builds/web/index.pck
 
+          # Give the game data package an immutable release filename. GitHub Pages
+          # and browsers may retain an older index.pck even after index.html changes.
+          # The unique SHA filename guarantees that the shell and game content match.
+          VERSIONED_PCK="index-${GITHUB_SHA}.pck"
+          mv builds/web/index.pck "builds/web/${VERSIONED_PCK}"
+          python3 - "builds/web/index.html" "${VERSIONED_PCK}" <<'PY'
+          import pathlib
+          import sys
+
+          html_path = pathlib.Path(sys.argv[1])
+          versioned_pck = sys.argv[2]
+          html = html_path.read_text(encoding="utf-8")
+          old = '"mainPack":"index.pck"'
+          new = f'"mainPack":"{versioned_pck}"'
+          if old not in html:
+              raise SystemExit("Godot mainPack entry was not found in exported HTML")
+          html_path.write_text(html.replace(old, new, 1), encoding="utf-8")
+          PY
+          test -f "builds/web/${VERSIONED_PCK}"
+          grep -Fq "\"mainPack\":\"${VERSIONED_PCK}\"" builds/web/index.html
+          if grep -Fq '"mainPack":"index.pck"' builds/web/index.html; then
+            echo "ERROR: Export still references the cache-prone index.pck filename." >&2
+            exit 1
+          fi
+
           # Keep this one-release cleanup script at the former worker URL. Browsers
           # controlled by the broken PWA worker will update to it, clear the old
           # cache, unregister, and reload into the plain single-threaded export.
@@ -118,6 +143,13 @@ jobs:
           set -Eeuo pipefail
           test -f builds/web/index.html
           test -f builds/web/index.service.worker.js
+          VERSIONED_PCK="index-${GITHUB_SHA}.pck"
+          test -f "builds/web/${VERSIONED_PCK}"
+          grep -Fq "\"mainPack\":\"${VERSIONED_PCK}\"" builds/web/index.html
+          if grep -Fq '"mainPack":"index.pck"' builds/web/index.html; then
+            echo "ERROR: Browser package still references stale index.pck." >&2
+            exit 1
+          fi
           if grep -Fq '"serviceWorker":"index.service.worker.js"' builds/web/index.html; then
             echo "ERROR: Godot export still registers the legacy PWA worker." >&2
             exit 1
