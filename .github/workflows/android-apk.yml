@@ -46,14 +46,14 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          yes | sdkmanager --licenses >/dev/null
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager \
             "platform-tools" \
-            "build-tools;35.0.1" \
-            "platforms;android-35" \
+            "build-tools;34.0.0" \
+            "platforms;android-34" \
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
-            "ndk;28.1.13356709"
+            "ndk;23.2.8568313"
 
       - name: Install Godot and export templates
         shell: bash
@@ -73,6 +73,21 @@ jobs:
           mkdir -p "${HOME}/.local/share/godot/export_templates/${GODOT_TEMPLATE_VERSION}"
           cp .ci/godot/export_templates/templates/* "${HOME}/.local/share/godot/export_templates/${GODOT_TEMPLATE_VERSION}/"
 
+      - name: Create Android debug keystore
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "${HOME}/.android"
+          keytool -genkeypair \
+            -keystore "${HOME}/.android/debug.keystore" \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
       - name: Configure Godot Android editor settings
         shell: bash
         run: |
@@ -84,6 +99,9 @@ jobs:
           [resource]
           export/android/android_sdk_path = "${ANDROID_HOME}"
           export/android/java_sdk_path = "${JAVA_HOME}"
+          export/android/debug_keystore = "${HOME}/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
           EOF
 
       - name: Import project and run smoke tests
@@ -94,16 +112,51 @@ jobs:
           GODOT_BIN="${GITHUB_WORKSPACE}/.ci/godot/${GODOT_BINARY}" ./compile_and_test.sh
 
       - name: Export Android debug APK
+        id: export_apk
+        continue-on-error: true
         shell: bash
         run: |
-          set -Eeuo pipefail
-          mkdir -p "$(dirname "${APK_OUTPUT}")"
-          ".ci/godot/${GODOT_BINARY}" --headless --path . --export-debug "${ANDROID_PRESET}" "${APK_OUTPUT}"
-          ls -lh "${APK_OUTPUT}"
+          set +e
+          mkdir -p "$(dirname "${APK_OUTPUT}")" logs
+          ".ci/godot/${GODOT_BINARY}" \
+            --headless \
+            --verbose \
+            --path . \
+            --export-debug "${ANDROID_PRESET}" "${APK_OUTPUT}" \
+            2>&1 | tee logs/android_export.log
+          export_exit=${PIPESTATUS[0]}
+          echo "exit_code=${export_exit}" >> "${GITHUB_OUTPUT}"
+          tail -n 160 logs/android_export.log > logs/android_export_tail.log
+          if [[ -f "${APK_OUTPUT}" ]]; then
+            ls -lh "${APK_OUTPUT}" | tee logs/android_apk_status.txt
+          else
+            echo "APK was not created." | tee logs/android_apk_status.txt
+          fi
+          exit 0
+
+      - name: Upload Android export diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoonGoons-Android-Export-Diagnostics
+          path: |
+            logs/android_export.log
+            logs/android_export_tail.log
+            logs/android_apk_status.txt
+          retention-days: 14
 
       - name: Upload Android APK artifact
+        if: steps.export_apk.outputs.exit_code == '0'
         uses: actions/upload-artifact@v4
         with:
           name: MoonGoons-Take-Back-Android-Test-APK
           path: builds/android/*.apk
           retention-days: 14
+
+      - name: Fail when Android export failed
+        if: steps.export_apk.outputs.exit_code != '0'
+        shell: bash
+        run: |
+          echo "Godot Android export failed with exit code ${{ steps.export_apk.outputs.exit_code }}."
+          cat logs/android_export_tail.log
+          exit 1
