@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
 [ext_resource type="Script" path="res://scripts/living_precinct_input_bridge.gd" id="3_input"]
 [ext_resource type="Script" path="res://scripts/peacekeeper_campaign_mode.gd" id="4_campaign"]
 [ext_resource type="Script" path="res://scripts/living_precinct_view_cleanup.gd" id="5_cleanup"]
+[ext_resource type="Script" path="res://scripts/space_station_architecture.gd" id="6_station"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -20,3 +21,6 @@ script = ExtResource("4_campaign")
 
 [node name="UnobstructedViewCleanup" type="Node" parent="."]
 script = ExtResource("5_cleanup")
+
+[node name="SpaceStationArchitecture" type="Node" parent="."]
+script = ExtResource("6_station")
