@@ -86,20 +86,26 @@ jobs:
           chmod +x compile_and_test.sh
           GODOT_BIN="${GITHUB_WORKSPACE}/.ci/godot/${GODOT_BINARY}" ./compile_and_test.sh
 
-      - name: Export browser playable build
+      - name: Export uniquely versioned browser build
         shell: bash
         run: |
           set -Eeuo pipefail
           mkdir -p "$(dirname "${WEB_OUTPUT}")"
           ".ci/godot/${GODOT_BINARY}" --headless --path . --export-release "${WEB_PRESET}" "${WEB_OUTPUT}"
+          python3 tools/version_web_export.py builds/web "${GITHUB_SHA}"
+          WEB_TOKEN="${GITHUB_SHA:0:16}"
           touch builds/web/.nojekyll
-          test -f builds/web/index.html
-          test -f builds/web/index.wasm
-          test -f builds/web/index.pck
 
-          # Keep this one-release cleanup script at the former worker URL. Browsers
-          # controlled by the broken PWA worker will update to it, clear the old
-          # cache, unregister, and reload into the plain single-threaded export.
+          test -f builds/web/index.html
+          test -f "builds/web/index.${WEB_TOKEN}.js"
+          test -f "builds/web/index.${WEB_TOKEN}.wasm"
+          test -f "builds/web/index.${WEB_TOKEN}.pck"
+          test -f "builds/web/index.${WEB_TOKEN}.audio.worklet.js"
+          test ! -e builds/web/index.wasm
+          test ! -e builds/web/index.pck
+
+          # Keep this cleanup script at the former worker URL so browsers controlled
+          # by the broken PWA worker can unregister and enter the versioned build.
           cp web/legacy-service-worker-reset.js builds/web/index.service.worker.js
           test -f builds/web/index.service.worker.js
           ls -lh builds/web
@@ -112,23 +118,33 @@ jobs:
           path: builds/web
           retention-days: 14
 
-      - name: Validate browser boot package
+      - name: Validate browser package, criminal entry, and cache busting
         shell: bash
         run: |
           set -Eeuo pipefail
+          WEB_TOKEN="${GITHUB_SHA:0:16}"
           test -f builds/web/index.html
           test -f builds/web/index.service.worker.js
-          if grep -Fq '"serviceWorker":"index.service.worker.js"' builds/web/index.html; then
-            echo "ERROR: Godot export still registers the legacy PWA worker." >&2
+          test -f "builds/web/index.${WEB_TOKEN}.pck"
+          test -f "builds/web/index.${WEB_TOKEN}.wasm"
+          grep -Fq "index.${WEB_TOKEN}.pck" builds/web/index.html
+          grep -Fq "index.${WEB_TOKEN}.wasm" builds/web/index.html
+          grep -Fq "index.${WEB_TOKEN}.js" builds/web/index.html
+          grep -Fq 'res://scenes/SyndicateEntry.tscn' builds/web/index.html
+          grep -Fq 'SYNDICATE RISING' builds/web/index.html
+          grep -Fq "BUILD ${WEB_TOKEN}" builds/web/index.html
+          if grep -Fq '"mainPack":"index.pck"' builds/web/index.html; then
+            echo "ERROR: Export still references the stale unversioned pack." >&2
+            exit 1
+          fi
+          if grep -Fq '"executable":"index"' builds/web/index.html; then
+            echo "ERROR: Export still references the stale unversioned engine." >&2
             exit 1
           fi
           if grep -Fq 'index.worker.js' builds/web/index.service.worker.js; then
             echo "ERROR: Cleanup worker references the missing threaded worker." >&2
             exit 1
           fi
-          grep -Fq 'Clear cache and reload' builds/web/index.html
-          grep -Fq 'Campaign Hub' builds/web/index.html
-          grep -F '"serviceWorker"' builds/web/index.html || true
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
