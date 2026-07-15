@@ -5,13 +5,13 @@ const ROOM_ORDER: Array[String] = ["ops", "armory", "cells", "quarters", "medbay
 const X_POSITIONS: Array[float] = [-12.9, -4.3, 4.3, 12.9]
 const NORTH_Z: float = -5.7
 const SOUTH_Z: float = 5.7
-const ROOM_WIDTH: float = 8.6
 const ROOM_DEPTH: float = 7.2
 const WALL_HEIGHT: float = 3.8
 const CORRIDOR_HALF: float = 2.1
 
 var precinct: Node3D
 var hull_root: Node3D
+var node_serial: int = 0
 
 func _ready() -> void:
 	precinct = get_parent() as Node3D
@@ -41,11 +41,7 @@ func _remove_old_corridor(world: Node3D) -> void:
 		if not mesh_instance.mesh is BoxMesh:
 			continue
 		var size: Vector3 = (mesh_instance.mesh as BoxMesh).size
-		var old_corridor: bool = _near_vec(size, Vector3(39.5, 0.22, 4.2))
-		var old_branch: bool = _near_vec(size, Vector3(3.0, 0.24, 5.2))
-		var old_strip: bool = _near_vec(size, Vector3(1.35, 0.03, 0.10))
-		var old_side_barrier: bool = _near_vec(size, Vector3(0.4, 2.3, 22.0))
-		if old_corridor or old_branch or old_strip or old_side_barrier:
+		if _near_vec(size, Vector3(39.5, 0.22, 4.2)) or _near_vec(size, Vector3(3.0, 0.24, 5.2)) or _near_vec(size, Vector3(1.35, 0.03, 0.10)) or _near_vec(size, Vector3(0.4, 2.3, 22.0)):
 			mesh_instance.queue_free()
 
 func _snap_rooms_into_hull(rooms: Node3D) -> void:
@@ -54,17 +50,15 @@ func _snap_rooms_into_hull(rooms: Node3D) -> void:
 		var room: Node3D = rooms.get_node_or_null("Room_%s" % room_id) as Node3D
 		if room == null:
 			continue
-		var column: int = index % 4
 		var south_row: bool = index >= 4
-		room.position = Vector3(X_POSITIONS[column], 0.0, SOUTH_Z if south_row else NORTH_Z)
+		room.position = Vector3(X_POSITIONS[index % 4], 0.0, SOUTH_Z if south_row else NORTH_Z)
 		room.rotation.y = PI if south_row else 0.0
 
 func _remove_individual_room_walls(rooms: Node3D) -> void:
 	for room_node: Node in rooms.get_children():
 		if not room_node is Node3D:
 			continue
-		var room := room_node as Node3D
-		for child: Node in room.get_children():
+		for child: Node in room_node.get_children():
 			if child is Label3D and child.name == "RoomLabel":
 				(child as Label3D).visible = false
 				continue
@@ -74,10 +68,7 @@ func _remove_individual_room_walls(rooms: Node3D) -> void:
 			if not mesh_instance.mesh is BoxMesh:
 				continue
 			var size: Vector3 = (mesh_instance.mesh as BoxMesh).size
-			var back_wall: bool = size.y > 3.0 and size.x > 7.5 and size.z < 0.4
-			var side_wall: bool = size.y > 3.0 and size.x < 0.4 and size.z > 6.5
-			var backdrop_frame: bool = size.y > 2.8 and size.x > 7.0 and size.z < 0.2
-			if back_wall or side_wall or backdrop_frame:
+			if (size.y > 3.0 and size.x > 7.5 and size.z < 0.4) or (size.y > 3.0 and size.x < 0.4 and size.z > 6.5) or (size.y > 2.8 and size.x > 7.0 and size.z < 0.2):
 				mesh_instance.queue_free()
 
 func _build_shared_hull(world: Node3D) -> void:
@@ -127,15 +118,12 @@ func _build_shared_partitions() -> void:
 func _build_corridor_bulkheads() -> void:
 	for index: int in range(ROOM_ORDER.size()):
 		var room_id: String = ROOM_ORDER[index]
-		var column: int = index % 4
 		var south_row: bool = index >= 4
-		var x: float = X_POSITIONS[column]
+		var x: float = X_POSITIONS[index % 4]
 		var z: float = CORRIDOR_HALF if south_row else -CORRIDOR_HALF
 		var accent: Color = _room_accent(room_id)
-		var segment_width: float = 3.12
 		for side: float in [-1.0, 1.0]:
-			var segment_x: float = x + side * 2.72
-			hull_root.add_child(_box(Vector3(segment_width, WALL_HEIGHT, 0.26), Vector3(segment_x, 1.9, z), "#263D4C", 0.0, "CorridorBulkhead"))
+			hull_root.add_child(_box(Vector3(3.12, WALL_HEIGHT, 0.26), Vector3(x + side * 2.72, 1.9, z), "#263D4C", 0.0, "CorridorBulkhead"))
 		hull_root.add_child(_box(Vector3(2.32, 0.78, 0.26), Vector3(x, 3.41, z), "#263D4C", 0.0, "DoorLintel"))
 		var door := StationDoor.new()
 		door.position = Vector3(x, 0.0, z)
@@ -171,8 +159,7 @@ func _build_airlocks() -> void:
 	east_airlock.configure("PATROL AIRLOCK", Color("#56E8FF"), false)
 	hull_root.add_child(east_airlock)
 	for ring_index: int in range(3):
-		var frame := _box(Vector3(0.20, 3.6 - float(ring_index) * 0.34, 4.2 - float(ring_index) * 0.36), Vector3(18.0 + float(ring_index) * 0.38, 1.8, SOUTH_Z), "#365264", 0.0, "AirlockFrame")
-		hull_root.add_child(frame)
+		hull_root.add_child(_box(Vector3(0.20, 3.6 - float(ring_index) * 0.34, 4.2 - float(ring_index) * 0.36), Vector3(18.0 + float(ring_index) * 0.38, 1.8, SOUTH_Z), "#365264", 0.0, "AirlockFrame"))
 
 func _room_accent(room_id: String) -> Color:
 	var accents: Dictionary = {
@@ -180,14 +167,19 @@ func _room_accent(room_id: String) -> Color:
 		"quarters": Color("#FFD18A"), "medbay": Color("#44FFBF"), "chief": Color("#FFD447"),
 		"interrogation": Color("#B75CFF"), "transfer": Color("#3FD0FF")
 	}
-	return accents.get(room_id, Color("#56DFFF")) as Color
+	var value: Variant = accents.get(room_id, Color("#56DFFF"))
+	return value if value is Color else Color("#56DFFF")
 
 func _near_vec(value: Vector3, expected: Vector3, tolerance: float = 0.08) -> bool:
 	return absf(value.x - expected.x) <= tolerance and absf(value.y - expected.y) <= tolerance and absf(value.z - expected.z) <= tolerance
 
+func _next_name(base_name: String) -> String:
+	node_serial += 1
+	return "%s_%03d" % [base_name, node_serial]
+
 func _box(size_value: Vector3, position_value: Vector3, color_hex: String, emission: float, node_name: String) -> MeshInstance3D:
 	var node := MeshInstance3D.new()
-	node.name = node_name
+	node.name = _next_name(node_name)
 	var mesh := BoxMesh.new()
 	mesh.size = size_value
 	node.mesh = mesh
@@ -197,7 +189,7 @@ func _box(size_value: Vector3, position_value: Vector3, color_hex: String, emiss
 
 func _cylinder(radius_value: float, height_value: float, position_value: Vector3, color_hex: String, emission: float, node_name: String) -> MeshInstance3D:
 	var node := MeshInstance3D.new()
-	node.name = node_name
+	node.name = _next_name(node_name)
 	var mesh := CylinderMesh.new()
 	mesh.top_radius = radius_value
 	mesh.bottom_radius = radius_value
