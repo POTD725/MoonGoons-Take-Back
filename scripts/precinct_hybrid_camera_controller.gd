@@ -10,18 +10,18 @@ var current_mode: String = "three_quarter"
 
 const THREE_QUARTER := {
 	"target": Vector3(2.5, 0.8, 0.6),
-	"distance": 40.0,
+	"distance": 68.0,
 	"yaw": 0.52,
 	"pitch": -0.43
 }
 const CUTAWAY := {
-	"distance": 25.0,
+	"distance": 31.0,
 	"yaw": 0.28,
 	"pitch": -0.34
 }
 const TACTICAL := {
 	"target": Vector3(2.5, 0.0, 0.0),
-	"distance": 46.0,
+	"distance": 78.0,
 	"yaw": 0.0,
 	"pitch": -1.05
 }
@@ -36,9 +36,17 @@ func _initialize() -> void:
 	if precinct == null:
 		return
 	bridge = precinct.get_node_or_null("CameraInputBridge")
+	_configure_portrait_camera()
 	_hide_old_camera_box()
 	_build_view_controls()
 	set_three_quarter_view()
+
+func _configure_portrait_camera() -> void:
+	var camera_value: Variant = precinct.get("camera")
+	if camera_value is Camera3D:
+		var camera := camera_value as Camera3D
+		var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+		camera.fov = 62.0 if viewport_size.y > viewport_size.x else 50.0
 
 func set_three_quarter_view() -> void:
 	current_mode = "three_quarter"
@@ -80,14 +88,14 @@ func rotate_right() -> void:
 	_update_label(_mode_name())
 
 func zoom_in() -> void:
-	precinct.set("camera_distance", clampf(float(precinct.get("camera_distance")) - 3.0, 16.0, 58.0))
+	precinct.set("camera_distance", clampf(float(precinct.get("camera_distance")) - 4.0, 22.0, 92.0))
 
 func zoom_out() -> void:
-	precinct.set("camera_distance", clampf(float(precinct.get("camera_distance")) + 3.0, 16.0, 58.0))
+	precinct.set("camera_distance", clampf(float(precinct.get("camera_distance")) + 4.0, 22.0, 92.0))
 
 func _apply_view(data: Dictionary) -> void:
 	precinct.set("camera_target", data.get("target", Vector3.ZERO))
-	precinct.set("camera_distance", float(data.get("distance", 40.0)))
+	precinct.set("camera_distance", float(data.get("distance", 68.0)))
 	precinct.set("camera_yaw", float(data.get("yaw", 0.52)))
 	precinct.set("camera_pitch", float(data.get("pitch", -0.43)))
 
