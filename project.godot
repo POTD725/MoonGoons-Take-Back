@@ -23,7 +23,7 @@ MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"
 MoonGoonsAudio="*res://scripts/moongoons_audio.gd"
 SyndicateState="*res://scripts/syndicate_state.gd"
 SyndicateAudio="*res://scripts/syndicate_audio.gd"
-TakeBackCampaign="*res://scripts/take_back_campaign_state.gd"
+TakeBackCampaign="*res://scripts/take_back_campaign_safe.gd"
 AllianceResearchOverlay="*res://scripts/alliance_research_overlay.gd"
 
 [display/window]
