@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="65%">
+      <stop offset="0" stop-color="#351243"/>
+      <stop offset="1" stop-color="#07030d"/>
+    </radialGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff6aa8"/>
+      <stop offset="0.52" stop-color="#c261ff"/>
+      <stop offset="1" stop-color="#ffbd67"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="256" cy="256" r="238" fill="url(#bg)" stroke="#9e55c8" stroke-width="10"/>
+  <circle cx="256" cy="256" r="201" fill="none" stroke="#ff6aa8" stroke-opacity=".42" stroke-width="5"/>
+  <path d="M151 202 L193 125 L256 100 L319 125 L361 202 L339 331 L256 395 L173 331 Z" fill="#17091e" stroke="url(#neon)" stroke-width="13" filter="url(#glow)"/>
+  <path d="M185 221 C205 190 229 176 256 176 C283 176 307 190 327 221 L306 311 L256 348 L206 311 Z" fill="#4d164f" stroke="#ff7bb7" stroke-width="6"/>
+  <ellipse cx="222" cy="245" rx="25" ry="18" fill="#ffbd67"/>
+  <ellipse cx="290" cy="245" rx="25" ry="18" fill="#ffbd67"/>
+  <path d="M225 303 L256 322 L287 303" fill="none" stroke="#ff6aa8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M129 385 L383 127" stroke="#c261ff" stroke-width="24" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M146 402 L400 144" stroke="#ffbd67" stroke-width="6" stroke-linecap="round"/>
+  <text x="256" y="462" font-family="sans-serif" font-size="40" font-weight="700" text-anchor="middle" fill="#fff2fa" letter-spacing="5">SYNDICATE</text>
+</svg>
