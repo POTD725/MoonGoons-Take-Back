@@ -11,11 +11,13 @@ func _run() -> void:
 	var agent_script:Script = load("res://scripts/precinct_agent.gd") as Script
 	var audio_script:Script = load("res://scripts/moongoons_audio.gd") as Script
 	var living_script:Script = load("res://scripts/living_precinct.gd") as Script
+	var input_script:Script = load("res://scripts/living_precinct_input_bridge.gd") as Script
 	_expect(room_factory != null,"3D room factory loads")
 	_expect(officer_factory != null,"Officer visual factory loads")
 	_expect(agent_script != null,"Walking agent AI loads")
 	_expect(audio_script != null,"Generated audio service loads")
 	_expect(living_script != null,"Living precinct controller loads")
+	_expect(input_script != null,"Living precinct camera input bridge loads")
 
 	var room_data:Dictionary = {"name":"Operations Center","repaired":true,"level":2}
 	var room:Node3D = PrecinctRoomFactory.build_room("ops",room_data)
@@ -53,6 +55,17 @@ func _run() -> void:
 		var personnel_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Personnel")
 		_expect(rooms_node != null and rooms_node.get_child_count() == 8,"All eight room interiors build at runtime")
 		_expect(personnel_node != null and personnel_node.get_child_count() >= 10,"Walking officer and worker population builds at runtime")
+		var input_bridge:Node = instance.get_node_or_null("CameraInputBridge")
+		_expect(input_bridge != null,"Camera input bridge is attached to the living precinct")
+		if input_bridge != null:
+			_expect(input_bridge.get_node_or_null("CameraControlsLayer") is CanvasLayer,"On-screen camera controls build at runtime")
+			var target_before:Vector3 = instance.get("camera_target")
+			input_bridge.call("nudge_camera",Vector2(1.0,0.0),2.0)
+			var target_after:Vector3 = instance.get("camera_target")
+			_expect(target_after.distance_to(target_before) > 1.0,"Camera input command moves the city view target")
+			var distance_before:float = float(instance.get("camera_distance"))
+			input_bridge.call("zoom_camera",-3.0)
+			_expect(float(instance.get("camera_distance")) < distance_before,"Camera input command changes zoom")
 		instance.queue_free()
 
 	var project_file:ConfigFile = ConfigFile.new()
