@@ -1,5 +1,5 @@
 extends Node
-## Station progression, assignments, custody work, missions, and command caps.
+## Station assignments, custody work, missions, and command progression.
 
 signal meta_changed
 
@@ -28,36 +28,13 @@ func reset_meta() -> void:
 	meta_changed.emit()
 
 func upgrade_room(room_id: String) -> Dictionary:
-	var room: Dictionary = PrecinctState.get_room(room_id)
-	if room.is_empty():
-		return _result(false, "Room not found.")
-	if not bool(room.get("repaired", false)):
-		return _result(false, "Restore this room before upgrading it.")
-	var level: int = int(room.get("level", 1))
-	if level >= 100:
-		return _result(false, "This room is already level 100.")
-	if room_id != "chief":
-		var command_cap: int = chief_level()
-		if level >= command_cap:
-			return _result(false, "%s is capped at level %d. Upgrade the Chief's Office first." % [String(room.get("name", "Room")), command_cap])
-	var cost: int = 90 + level * 55
-	if PrecinctState.credits < cost:
-		return _result(false, "Upgrade requires %d credits." % cost)
-	PrecinctState.credits -= cost
-	room["level"] = level + 1
-	reputation += 2
-	if room_id == "chief":
-		PrecinctState.last_event = "Chief's Office upgraded to level %d. Station upgrade cap increased." % (level + 1)
-	else:
-		PrecinctState.last_event = "%s upgraded to level %d of command cap %d." % [String(room.get("name", "Room")), level + 1, chief_level()]
-	PrecinctState.state_changed.emit()
-	save_meta()
-	meta_changed.emit()
-	return _result(true, PrecinctState.last_event)
+	var progression: Node = get_node_or_null("/root/StationProgression")
+	if progression != null and progression.has_method("begin_room_upgrade"):
+		return progression.call("begin_room_upgrade", room_id) as Dictionary
+	return _result(false, "Station progression service is unavailable.")
 
 func chief_level() -> int:
-	var chief_room: Dictionary = PrecinctState.get_room("chief")
-	return maxi(1, int(chief_room.get("level", 1)))
+	return maxi(1, int(PrecinctState.get_room("chief").get("level", 1)))
 
 func train_officer(officer_id: String) -> Dictionary:
 	var officer: Dictionary = PrecinctState.get_officer(officer_id)
@@ -174,14 +151,15 @@ func custody_action(action: String) -> Dictionary:
 func task_catalog() -> Array[Dictionary]:
 	return [
 		_mission("chapter_restore", "CHAPTER 1", "Restore the Precinct", "Bring four station divisions online.", 4, _repaired_count(), 180, 5),
-		_mission("chapter_command", "CHAPTER 1", "Establish Command Authority", "Upgrade the Chief's Office to level 2. It controls every room and equipment level cap.", 2, chief_level(), 220, 8),
+		_mission("chapter_station", "CHAPTER 1", "Expand the Station", "Raise the orbital station to level 2 so the Chief's Office can advance.", 2, StationProgression.station_level, 260, 8),
+		_mission("chapter_command", "CHAPTER 1", "Establish Command Authority", "Raise the Chief's Office to level 2. It unlocks level 2 rooms.", 2, chief_level(), 220, 8),
 		_mission("chapter_equipment", "CHAPTER 1", "Equip the Precinct", "Complete three individual room-equipment upgrades.", 3, PrecinctEquipment.total_upgrades, 240, 8),
 		_mission("chapter_patrol", "CHAPTER 1", "First Arrests", "Hold or process two Syndicate suspects.", 2, PrecinctState.prisoners + prisoners_interrogated + prisoners_transferred, 250, 10),
 		_mission("chapter_hideout", "CHAPTER 2", "Expose a Hideout", "Investigate a district until one Syndicate hideout is exposed.", 1, CounterSyndicate.hideouts_exposed, 300, 12),
 		_mission("chapter_scores", "CHAPTER 2", "Break Their Momentum", "Stop three Syndicate scores through successful patrols or raids.", 3, CounterSyndicate.intercepted_scores, 320, 12),
 		_mission("chapter_arrest", "CHAPTER 2", "Major Arrest", "Capture one major Syndicate operator.", 1, CounterSyndicate.major_arrests, 350, 15),
 		_mission("chapter_control", "CHAPTER 2", "Reclaim Lunar Ground", "Raise overall Authority control to 35 percent.", 35, CounterSyndicate.authority_control, 420, 18),
-		_mission("daily_upgrade", "DAILY", "Calibrate Equipment", "Upgrade one individual item in any room.", 1, PrecinctEquipment.upgraded_item_count(), 100, 3),
+		_mission("daily_upgrade", "DAILY", "Calibrate Equipment", "Complete one individual item upgrade.", 1, PrecinctEquipment.upgraded_item_count(), 100, 3),
 		_mission("daily_training", "DAILY", "Officer Development", "Train any officer to level 2.", 1, _trained_officer_count(), 100, 2),
 		_mission("daily_assignment", "DAILY", "Staff the Station", "Assign two officers to active divisions.", 2, room_assignments.size(), 90, 3),
 		_mission("daily_custody", "DAILY", "Work the Case", "Interrogate or transfer one prisoner.", 1, prisoners_interrogated + prisoners_transferred, 120, 4),
@@ -190,7 +168,14 @@ func task_catalog() -> Array[Dictionary]:
 		_mission("patrol_veteran", "PATROL", "District Sweep", "Stop five Syndicate scores.", 5, CounterSyndicate.intercepted_scores, 280, 10),
 		_mission("investigation_network", "INVESTIGATION", "Map the Network", "Expose three Syndicate hideouts.", 3, CounterSyndicate.hideouts_exposed, 360, 14),
 		_mission("district_foothold", "DISTRICT", "Secure a Foothold", "Raise one district to 40 percent Authority control.", 40, _highest_district_control(), 260, 10),
-		_mission("station_mastery", "STATION", "Command-Grade Precinct", "Raise six individual equipment items above level 1.", 6, PrecinctEquipment.upgraded_item_count(), 400, 15)
+		_mission("station_mastery", "STATION", "Command-Grade Precinct", "Raise six individual equipment items above level 1.", 6, PrecinctEquipment.upgraded_item_count(), 400, 15),
+		_mission("side_engine", "SIDE OPS", "Drive Section Emergency", "Complete one engine-repair puzzle.", 1, SideOperations.engine_repairs, 140, 4),
+		_mission("side_weapons", "SIDE OPS", "Arm the Station", "Complete one weapons-fitting and calibration puzzle.", 1, SideOperations.weapon_upgrades, 160, 4),
+		_mission("side_medical", "SIDE OPS", "Emergency Medicine", "Stabilize one patient in Medical Ops.", 1, SideOperations.medical_cases, 140, 5),
+		_mission("side_interrogation", "SIDE OPS", "Reliable Confession", "Obtain one reliable confession without excessive stress.", 1, SideOperations.confessions, 180, 8),
+		_mission("defense_upgrade", "DEFENSE", "Harden the Perimeter", "Raise any station defense system to level 2.", 2, _highest_defense_level(), 240, 8),
+		_mission("defense_wave", "DEFENSE", "Repel Marauders", "Survive one marauder attack.", 1, StationProgression.attacks_survived, 260, 10),
+		_mission("defense_veteran", "DEFENSE", "Hold the Line", "Destroy ten marauder ships.", 10, StationProgression.marauders_defeated, 420, 16)
 	]
 
 func claim_task(task_id: String) -> Dictionary:
@@ -287,6 +272,12 @@ func _highest_district_control() -> int:
 	var highest: int = 0
 	for district: Dictionary in CounterSyndicate.district_catalog():
 		highest = maxi(highest, int(district.get("control", 0)))
+	return highest
+
+func _highest_defense_level() -> int:
+	var highest: int = 1
+	for defense_value: Variant in StationProgression.DEFENSE_CATALOG.keys():
+		highest = maxi(highest, StationProgression.defense_level(String(defense_value)))
 	return highest
 
 func _result(ok: bool, message: String) -> Dictionary:
