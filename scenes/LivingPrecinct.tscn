@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" path="res://scripts/precinct_equipment_style_state.gd" id="18_style_state"]
 [ext_resource type="Script" path="res://scripts/precinct_equipment_visual_controller.gd" id="19_visual_controller"]
 [ext_resource type="Script" path="res://scripts/precinct_exterior_city_visuals.gd" id="20_exterior_city"]
+[ext_resource type="Script" path="res://scripts/precinct_equipment_preview.gd" id="21_equipment_preview"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -91,3 +92,6 @@ script = ExtResource("19_visual_controller")
 
 [node name="ExteriorCityVisuals" type="Node" parent="."]
 script = ExtResource("20_exterior_city")
+
+[node name="EquipmentPreview" type="Node" parent="."]
+script = ExtResource("21_equipment_preview")
