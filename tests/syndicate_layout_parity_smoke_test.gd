@@ -11,6 +11,17 @@ func _run() -> void:
 	_expect(int(ProjectSettings.get_setting("display/window/size/viewport_height", 0)) == 1280, "Viewport matches Syndicate Rising's 1280-pixel mobile height")
 	_expect(String(ProjectSettings.get_setting("display/window/stretch/aspect", "")) == "keep", "Portrait GUI preserves its authored aspect ratio")
 
+	var shell_file: FileAccess = FileAccess.open("res://web/shell.html", FileAccess.READ)
+	_expect(shell_file != null, "Custom web shell is available")
+	if shell_file != null:
+		var shell: String = shell_file.get_as_text()
+		_expect(shell.contains("id=\"fit-button\"") and shell.contains("id=\"width-button\""), "Web mode exposes Fit and Fit Width display controls")
+		_expect(shell.contains("id=\"zoom-in-button\"") and shell.contains("id=\"zoom-out-button\""), "Web mode exposes direct zoom buttons")
+		_expect(shell.contains("id=\"fullscreen-button\""), "Web mode exposes fullscreen")
+		_expect(shell.contains("Ctrl/Cmd +") and shell.contains("ZOOM_STORAGE_KEY"), "Web zoom includes keyboard shortcuts and remembered preferences")
+		_expect(shell.contains("canvasStage.style.width") and shell.contains("canvasStage.style.height"), "Web zoom resizes the actual Godot canvas stage")
+		_expect(shell.contains("displayMode = window.matchMedia") and shell.contains("'width'"), "Desktop browsers default to a larger Fit Width presentation")
+
 	var packed: PackedScene = load("res://scenes/PeacekeeperStationDeck.tscn") as PackedScene
 	_expect(packed != null, "Syndicate-style Peacekeeper station scene loads")
 	if packed == null:
@@ -61,7 +72,7 @@ func _run() -> void:
 	instance.queue_free()
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Syndicate Rising layout parity passed.")
+		print("SUCCESS: Syndicate Rising layout parity and web zoom passed.")
 	else:
 		push_error("FAILED: %d Syndicate layout parity check(s) failed." % failures)
 	quit(failures)
