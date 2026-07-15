@@ -6,6 +6,10 @@ The current browser build launches the MoonGoons precinct vertical slice with ro
 
 https://potd725.github.io/MoonGoons-Take-Back/
 
+## Deployment status
+
+GitHub Pages is configured to publish through GitHub Actions. A fresh verified deployment was triggered on July 15, 2026 after the Pages source was enabled.
+
 ## Browser notes
 
 - Use a modern Chromium, Edge, Firefox, or Safari browser with WebAssembly enabled.
