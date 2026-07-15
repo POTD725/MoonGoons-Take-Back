@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -22,6 +22,9 @@
 [ext_resource type="Script" path="res://scripts/precinct_exterior_city_visuals.gd" id="20_exterior_city"]
 [ext_resource type="Script" path="res://scripts/precinct_equipment_preview.gd" id="21_equipment_preview"]
 [ext_resource type="Script" path="res://scripts/precinct_hybrid_camera_controller.gd" id="22_hybrid_camera"]
+[ext_resource type="Script" path="res://scripts/precinct_station_board_skin.gd" id="23_station_board"]
+[ext_resource type="Script" path="res://scripts/precinct_icon_tooltip_controller.gd" id="24_icon_hover"]
+[ext_resource type="Script" path="res://scripts/precinct_station_language_patch.gd" id="25_station_language"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -38,6 +41,19 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_web_backdrop")
+
+[node name="StationBoardFrameLayer" type="CanvasLayer" parent="."]
+layer = 4
+
+[node name="StationBoardFrame" type="Control" parent="StationBoardFrameLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("23_station_board")
 
 [node name="VisualPolish" type="Node" parent="."]
 script = ExtResource("2_polish")
@@ -99,3 +115,9 @@ script = ExtResource("21_equipment_preview")
 
 [node name="HybridCameraController" type="Node" parent="."]
 script = ExtResource("22_hybrid_camera")
+
+[node name="StationIconHoverController" type="Node" parent="."]
+script = ExtResource("24_icon_hover")
+
+[node name="StationLanguagePatch" type="Node" parent="."]
+script = ExtResource("25_station_language")
