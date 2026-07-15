@@ -1,6 +1,6 @@
 extends Control
-## Displays the approved isometric orbital-station artwork above the emergency
-## procedural renderer while preserving live game state, panels, and controls.
+## Displays the approved isometric orbital-station artwork above every fallback
+## renderer while preserving live game state, facility hotspots, and GUI panels.
 
 const ART_PATH: String = "res://assets/generated/approved_station_deck.svg"
 const DESIGN_SIZE := Vector2(720.0, 760.0)
@@ -30,12 +30,17 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	precinct = get_parent().get_parent()
 	art_texture = load(ART_PATH) as Texture2D
-	if OS.has_feature("web"):
-		var old_backdrop: CanvasLayer = precinct.get_node_or_null("PrecinctWebBackdropLayer") as CanvasLayer
-		if old_backdrop != null:
-			old_backdrop.visible = false
+	_hide_all_fallback_art()
 	set_process(true)
 	queue_redraw()
+
+func _hide_all_fallback_art() -> void:
+	if precinct == null:
+		return
+	for node_path: String in ["PrecinctWebBackdropLayer", "StationBoardFrameLayer"]:
+		var fallback: CanvasLayer = precinct.get_node_or_null(node_path) as CanvasLayer
+		if fallback != null:
+			fallback.visible = false
 
 func _process(delta: float) -> void:
 	animation_clock += delta
@@ -43,19 +48,40 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var top_margin: float = clampf(size.y * 0.105, 108.0, 145.0)
-	var available_height: float = maxf(480.0, size.y - top_margin - 300.0)
+	var top_margin: float = clampf(size.y * 0.095, 96.0, 128.0)
+	var bottom_reserved: float = clampf(size.y * 0.19, 190.0, 245.0)
+	var available_height: float = maxf(560.0, size.y - top_margin - bottom_reserved)
 	art_scale = minf(size.x / DESIGN_SIZE.x, available_height / DESIGN_SIZE.y)
 	var rendered_size: Vector2 = DESIGN_SIZE * art_scale
 	art_rect = Rect2(Vector2((size.x - rendered_size.x) * 0.5, top_margin), rendered_size)
+	draw_rect(Rect2(Vector2.ZERO, size), Color("#020711"), true)
 	if art_texture != null:
 		draw_texture_rect(art_texture, art_rect, false)
 	else:
 		draw_rect(art_rect, Color("#06111d"), true)
-		draw_string(ThemeDB.fallback_font, art_rect.get_center(), "GENERATING STATION ART...", HORIZONTAL_ALIGNMENT_CENTER, 300.0, 18, Color("#7ee7ff"))
+		draw_string(ThemeDB.fallback_font, art_rect.get_center(), "STATION ART FAILED TO LOAD", HORIZONTAL_ALIGNMENT_CENTER, 320.0, 18, Color("#ff8b9e"))
+	_draw_station_activity()
 	_draw_hover_state()
 	_draw_live_personnel()
 	_draw_status_message()
+
+func _draw_station_activity() -> void:
+	if art_rect.size.x <= 1.0:
+		return
+	var core: Vector2 = art_rect.position + Vector2(360.0, 340.0) * art_scale
+	for ring_index: int in range(3):
+		var radius: float = (18.0 + float(ring_index) * 12.0 + fmod(animation_clock * 12.0, 12.0)) * art_scale
+		draw_arc(core, radius, 0.0, TAU, 48, Color(0.35, 0.92, 1.0, 0.24 - float(ring_index) * 0.05), maxf(1.0, 1.5 * art_scale))
+	var fly: float = fmod(animation_clock * 86.0, DESIGN_SIZE.x + 220.0) - 110.0
+	var ship_y: float = 88.0 + sin(animation_clock * 0.8) * 18.0
+	var ship: Vector2 = art_rect.position + Vector2(fly, ship_y) * art_scale
+	draw_line(ship - Vector2(52.0, 0.0) * art_scale, ship - Vector2(10.0, 0.0) * art_scale, Color(0.2, 0.8, 1.0, 0.5), maxf(2.0, 3.0 * art_scale))
+	draw_colored_polygon(PackedVector2Array([
+		ship + Vector2(-12.0, 0.0) * art_scale,
+		ship + Vector2(8.0, -7.0) * art_scale,
+		ship + Vector2(24.0, 0.0) * art_scale,
+		ship + Vector2(8.0, 7.0) * art_scale
+	]), Color("#a9e8ff"))
 
 func _draw_hover_state() -> void:
 	if hovered_facility.is_empty() or not FACILITIES.has(hovered_facility):
@@ -66,7 +92,7 @@ func _draw_hover_state() -> void:
 	var pulse: float = 0.45 + 0.35 * sin(animation_clock * 4.0)
 	draw_rect(screen_rect, Color(0.35, 0.93, 1.0, 0.08 + pulse * 0.08), true)
 	draw_rect(screen_rect, Color(0.45, 0.95, 1.0, 0.72), false, maxf(2.0, art_scale * 2.0))
-	var label_width: float = minf(420.0, size.x - 30.0)
+	var label_width: float = minf(460.0, size.x - 30.0)
 	var label_rect := Rect2(Vector2((size.x - label_width) * 0.5, art_rect.end.y - 48.0), Vector2(label_width, 42.0))
 	draw_style_box(_tooltip_box(), label_rect)
 	draw_string(ThemeDB.fallback_font, label_rect.position + Vector2(10.0, 17.0), String(data.get("title", "Facility")), HORIZONTAL_ALIGNMENT_LEFT, label_rect.size.x - 20.0, 13, Color("#f0fbff"))
@@ -75,11 +101,11 @@ func _draw_hover_state() -> void:
 func _draw_live_personnel() -> void:
 	if art_rect.size.x <= 1.0:
 		return
-	for index: int in range(10):
-		var travel: float = fmod(animation_clock * (26.0 + float(index % 4) * 5.0) + float(index) * 61.0, 460.0)
-		var design_position := Vector2(125.0 + travel, 350.0 + sin(animation_clock * 1.4 + float(index)) * 34.0 + float(index % 3) * 34.0)
+	for index: int in range(14):
+		var travel: float = fmod(animation_clock * (28.0 + float(index % 4) * 5.0) + float(index) * 53.0, 500.0)
+		var design_position := Vector2(105.0 + travel, 330.0 + sin(animation_clock * 1.4 + float(index)) * 32.0 + float(index % 4) * 36.0)
 		var p: Vector2 = art_rect.position + design_position * art_scale
-		var body_color: Color = Color("#7ee7ff") if index < 6 else Color("#ffc36c")
+		var body_color: Color = Color("#7ee7ff") if index < 9 else Color("#ffc36c")
 		draw_circle(p - Vector2(0.0, 5.0 * art_scale), maxf(2.0, 2.4 * art_scale), Color("#dffaff"))
 		draw_line(p - Vector2(0.0, 2.0 * art_scale), p + Vector2(0.0, 7.0 * art_scale), body_color, maxf(1.5, 1.8 * art_scale))
 		var step: float = sin(animation_clock * 9.0 + float(index)) * 4.0 * art_scale
@@ -141,22 +167,14 @@ func _facility_at(pointer_position: Vector2) -> String:
 
 func _activate_facility(facility_id: String) -> void:
 	match facility_id:
-		"hq":
-			_select_room("ops", "Police Headquarters opened")
-		"research":
-			_open_research()
-		"training":
-			_open_core_panel("officer_panel", "Training and officer roster opened")
-		"crime":
-			_select_room("interrogation", "Crime Lab and investigation systems opened")
-		"hospital":
-			_select_room("medbay", "Station Hospital opened")
-		"robotics":
-			_open_external_panel("PrecinctProgressionUI", "equipment_panel", "Robotics and equipment systems opened")
-		"storage":
-			_open_external_panel("ResourceHarvestController", "panel", "Storage and resource operations opened")
-		"armory":
-			_select_room("armory", "Armory opened")
+		"hq": _select_room("ops", "Police Headquarters opened")
+		"research": _open_research()
+		"training": _open_core_panel("officer_panel", "Training and officer roster opened")
+		"crime": _select_room("interrogation", "Crime Lab and investigation systems opened")
+		"hospital": _select_room("medbay", "Station Hospital opened")
+		"robotics": _open_external_panel("PrecinctProgressionUI", "equipment_panel", "Robotics and equipment systems opened")
+		"storage": _open_external_panel("ResourceHarvestController", "panel", "Storage and resource operations opened")
+		"armory": _select_room("armory", "Armory opened")
 	MoonGoonsAudio.play("door")
 
 func _select_room(room_id: String, message: String) -> void:
