@@ -95,6 +95,28 @@ jobs:
           touch builds/web/.nojekyll
           test -f builds/web/index.html
           test -f builds/web/index.wasm
+          test -f builds/web/index.pck
+
+          # Keep this one-release cleanup script at the former worker URL. Browsers
+          # controlled by the broken PWA worker will update to it, clear the old
+          # cache, unregister, and reload into the plain single-threaded export.
+          cp web/legacy-service-worker-reset.js builds/web/index.service.worker.js
+          test -f builds/web/index.service.worker.js
+
+          if grep -Fq '"serviceWorker":"index.service.worker.js"' builds/web/index.html; then
+            echo "ERROR: Godot export still registers the legacy PWA worker." >&2
+            exit 1
+          fi
+          if grep -Fq '"ensureCrossOriginIsolationHeaders":true' builds/web/index.html; then
+            echo "ERROR: Non-threaded web export unexpectedly requires cross-origin isolation." >&2
+            exit 1
+          fi
+          if grep -Fq 'index.worker.js' builds/web/index.service.worker.js; then
+            echo "ERROR: Cleanup worker references the missing threaded worker." >&2
+            exit 1
+          fi
+          grep -Fq 'Clear cache and reload' builds/web/index.html
+          grep -Fq 'Campaign Hub' builds/web/index.html
           ls -lh builds/web
 
       - name: Upload browser validation artifact
