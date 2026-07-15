@@ -41,6 +41,20 @@ func _run() -> void:
 
 	var scene:PackedScene = load("res://scenes/LivingPrecinct.tscn") as PackedScene
 	_expect(scene != null,"Living precinct startup scene parses")
+	if scene != null:
+		var instance:Node = scene.instantiate()
+		root.add_child(instance)
+		await process_frame
+		await process_frame
+		_expect(instance.get_node_or_null("LivingPrecinctWorld") is Node3D,"Full city world builds at runtime")
+		_expect(instance.get_node_or_null("CityCamera") is Camera3D,"Runtime camera is active")
+		_expect(instance.get_node_or_null("Interface") is CanvasLayer,"Runtime management interface builds")
+		var rooms_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Rooms")
+		var personnel_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Personnel")
+		_expect(rooms_node != null and rooms_node.get_child_count() == 8,"All eight room interiors build at runtime")
+		_expect(personnel_node != null and personnel_node.get_child_count() >= 10,"Walking officer and worker population builds at runtime")
+		instance.queue_free()
+
 	var project_file:ConfigFile = ConfigFile.new()
 	var config_error:Error = project_file.load("res://project.godot")
 	_expect(config_error == OK,"Project configuration loads")
