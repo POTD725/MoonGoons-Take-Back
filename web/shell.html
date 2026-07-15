@@ -11,7 +11,7 @@
     :root {
       color-scheme: dark;
       --bg: #030916;
-      --panel: rgba(7, 21, 34, 0.92);
+      --panel: rgba(7, 21, 34, 0.94);
       --cyan: #7ee7ff;
       --mint: #7ef5d0;
       --rose: #ff7094;
@@ -26,7 +26,6 @@
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow: hidden;
-      touch-action: none;
     }
     body::before {
       content: "";
@@ -79,20 +78,102 @@
     #game-wrap {
       position: relative;
       min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
       border: 1px solid rgba(126,231,255,0.30);
       border-radius: 18px;
       background: #020711;
       overflow: hidden;
       box-shadow: 0 12px 40px rgba(0,0,0,0.36), 0 0 36px rgba(126,231,255,0.10);
     }
+    #game-wrap:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+      border-radius: 0;
+      background: #020711;
+    }
+    #view-toolbar {
+      position: relative;
+      z-index: 6;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(126,231,255,0.30);
+      background: rgba(5, 18, 30, 0.98);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+    }
+    #view-toolbar .toolbar-label {
+      margin-right: 3px;
+      color: #9fcde0;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    #view-toolbar button {
+      min-width: 40px;
+      min-height: 30px;
+      padding: 5px 9px;
+    }
+    #view-toolbar button.active {
+      border-color: var(--mint);
+      background: rgba(31, 92, 105, 0.98);
+      color: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(126,245,208,0.24), 0 0 14px rgba(126,245,208,0.12);
+    }
+    #zoom-readout {
+      min-width: 92px;
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 850;
+      text-align: center;
+      white-space: nowrap;
+    }
+    #canvas-scroll {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 8px;
+      scrollbar-color: rgba(126,231,255,0.56) rgba(5,18,30,0.96);
+      scrollbar-width: thin;
+      overscroll-behavior: contain;
+      touch-action: pan-x pan-y;
+    }
+    #canvas-scroll::-webkit-scrollbar { width: 12px; height: 12px; }
+    #canvas-scroll::-webkit-scrollbar-track { background: rgba(5,18,30,0.96); }
+    #canvas-scroll::-webkit-scrollbar-thumb {
+      border: 3px solid rgba(5,18,30,0.96);
+      border-radius: 999px;
+      background: rgba(126,231,255,0.56);
+    }
+    #canvas-stage {
+      position: relative;
+      flex: 0 0 auto;
+      width: 720px;
+      height: 1280px;
+      overflow: hidden;
+      border: 1px solid rgba(126,231,255,0.18);
+      border-radius: 8px;
+      background: #020711;
+      box-shadow: 0 0 30px rgba(126,231,255,0.08);
+    }
     #canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 100% !important;
+      height: 100% !important;
       outline: none;
+      touch-action: none;
     }
     #status {
       position: absolute;
+      z-index: 10;
       inset: auto 14px 14px 14px;
       display: flex;
       justify-content: center;
@@ -152,6 +233,7 @@
       cursor: pointer;
     }
     button:hover { background: rgba(32,88,108,0.98); }
+    button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
     button.danger {
       border-color: rgba(255,112,148,0.65);
       background: rgba(92,31,52,0.96);
@@ -168,7 +250,12 @@
       #shell { gap: 6px; padding: 6px; }
       header, footer { border-radius: 12px; padding: 6px 8px; }
       footer { display: none; }
-      .badge { font-size: 10px; padding: 4px 8px; }
+      .badge { display: none; }
+      #view-toolbar { gap: 4px; padding: 4px; flex-wrap: wrap; }
+      #view-toolbar .toolbar-label { display: none; }
+      #view-toolbar button { min-width: 34px; min-height: 28px; padding: 4px 6px; font-size: 10px; }
+      #zoom-readout { min-width: 72px; font-size: 10px; }
+      #canvas-scroll { padding: 3px; }
       #status-progress { min-width: 92vw; }
     }
   </style>
@@ -178,14 +265,28 @@ $GODOT_HEAD_INCLUDE
   <div id="shell">
     <header>
       <h1>MoonGoons Take Back</h1>
-      <span class="badge">Campaign Hub</span>
+      <span class="badge">Peacekeeper Station</span>
     </header>
     <main id="game-wrap">
-      <canvas id="canvas">Your browser does not support HTML5 canvas.</canvas>
+      <div id="view-toolbar" aria-label="Web game display controls">
+        <span class="toolbar-label">WEB DISPLAY</span>
+        <button id="fit-button" type="button" title="Fit the whole station screen inside the browser">FIT</button>
+        <button id="width-button" type="button" title="Enlarge the station to fill the browser width and scroll vertically">FIT WIDTH</button>
+        <button id="actual-button" type="button" title="Show the authored 720 by 1280 game screen at 100 percent">100%</button>
+        <button id="zoom-out-button" type="button" title="Make the game screen smaller">−</button>
+        <button id="zoom-in-button" type="button" title="Make the game screen larger">+</button>
+        <span id="zoom-readout" aria-live="polite">FIT</span>
+        <button id="fullscreen-button" type="button" title="Open or close fullscreen mode">FULLSCREEN</button>
+      </div>
+      <div id="canvas-scroll">
+        <div id="canvas-stage">
+          <canvas id="canvas">Your browser does not support HTML5 canvas.</canvas>
+        </div>
+      </div>
       <div id="status">
         <div id="status-progress">
           <div id="status-progress-track"><div id="status-progress-inner"></div></div>
-          <div id="status-notice">Preparing the MoonGoons campaign hub...</div>
+          <div id="status-notice">Preparing the MoonGoons Peacekeeper station...</div>
           <div id="status-detail">Checking for an older frozen web cache.</div>
           <div id="recovery-actions">
             <button id="retry-button" type="button">Retry launch</button>
@@ -195,14 +296,32 @@ $GODOT_HEAD_INCLUDE
       </div>
     </main>
     <footer>
-      <span><strong>Syndicate Rising:</strong> rebuild the hideout and run criminal scores</span>
-      <span><strong>Campaign Hub:</strong> criminal, precinct, and RTS routes</span>
+      <span><strong>Display:</strong> Fit Width makes the portrait station larger and scrollable</span>
+      <span><strong>Shortcuts:</strong> Ctrl/Cmd +, −, or 0</span>
     </footer>
   </div>
   <script src="$GODOT_URL"></script>
   <script>
-    const WEB_FIX_VERSION = '2';
+    const WEB_FIX_VERSION = '3';
     const LEGACY_CACHE_PREFIX = 'MoonGoons Take B-sw-cache-';
+    const DESIGN_WIDTH = 720;
+    const DESIGN_HEIGHT = 1280;
+    const MIN_SCALE = 0.35;
+    const MAX_SCALE = 2.5;
+    const SCALE_STEP = 0.25;
+    const ZOOM_STORAGE_KEY = 'moongoons-take-back-web-display-v1';
+
+    const gameWrap = document.getElementById('game-wrap');
+    const canvasScroll = document.getElementById('canvas-scroll');
+    const canvasStage = document.getElementById('canvas-stage');
+    const canvas = document.getElementById('canvas');
+    const fitButton = document.getElementById('fit-button');
+    const widthButton = document.getElementById('width-button');
+    const actualButton = document.getElementById('actual-button');
+    const zoomOutButton = document.getElementById('zoom-out-button');
+    const zoomInButton = document.getElementById('zoom-in-button');
+    const zoomReadout = document.getElementById('zoom-readout');
+    const fullscreenButton = document.getElementById('fullscreen-button');
     const statusOverlay = document.getElementById('status');
     const progressInner = document.getElementById('status-progress-inner');
     const statusNotice = document.getElementById('status-notice');
@@ -210,8 +329,99 @@ $GODOT_HEAD_INCLUDE
     const recoveryActions = document.getElementById('recovery-actions');
     const retryButton = document.getElementById('retry-button');
     const resetButton = document.getElementById('reset-button');
+
     let launchTimer = null;
     let gameStarted = false;
+    let currentScale = 1;
+    let displayMode = window.matchMedia('(max-width: 760px)').matches ? 'fit' : 'width';
+    let manualScale = 1;
+
+    function loadDisplayPreference() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(ZOOM_STORAGE_KEY) || '{}');
+        if (['fit', 'width', 'manual'].includes(stored.mode)) {
+          displayMode = stored.mode;
+        }
+        if (Number.isFinite(stored.scale)) {
+          manualScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, Number(stored.scale)));
+        }
+      } catch (_) {
+        displayMode = window.matchMedia('(max-width: 760px)').matches ? 'fit' : 'width';
+        manualScale = 1;
+      }
+    }
+
+    function saveDisplayPreference() {
+      try {
+        localStorage.setItem(ZOOM_STORAGE_KEY, JSON.stringify({ mode: displayMode, scale: manualScale }));
+      } catch (_) {
+        // Private browser modes may reject storage. The scaler still works for this session.
+      }
+    }
+
+    function availableCanvasSpace() {
+      return {
+        width: Math.max(240, canvasScroll.clientWidth - 16),
+        height: Math.max(320, canvasScroll.clientHeight - 16)
+      };
+    }
+
+    function calculatedScale() {
+      const available = availableCanvasSpace();
+      if (displayMode === 'fit') {
+        return Math.min(available.width / DESIGN_WIDTH, available.height / DESIGN_HEIGHT);
+      }
+      if (displayMode === 'width') {
+        return available.width / DESIGN_WIDTH;
+      }
+      return manualScale;
+    }
+
+    function updateActiveControls() {
+      fitButton.classList.toggle('active', displayMode === 'fit');
+      widthButton.classList.toggle('active', displayMode === 'width');
+      actualButton.classList.toggle('active', displayMode === 'manual' && Math.abs(manualScale - 1) < 0.01);
+      const modeLabel = displayMode === 'fit' ? 'FIT' : (displayMode === 'width' ? 'FIT WIDTH' : 'ZOOM');
+      zoomReadout.textContent = `${modeLabel} ${Math.round(currentScale * 100)}%`;
+      fullscreenButton.textContent = document.fullscreenElement ? 'EXIT FULL' : 'FULLSCREEN';
+    }
+
+    function applyDisplayScale(preserveCenter = true) {
+      const oldWidth = Math.max(1, canvasStage.getBoundingClientRect().width);
+      const oldHeight = Math.max(1, canvasStage.getBoundingClientRect().height);
+      const centerRatioX = (canvasScroll.scrollLeft + canvasScroll.clientWidth * 0.5) / oldWidth;
+      const centerRatioY = (canvasScroll.scrollTop + canvasScroll.clientHeight * 0.5) / oldHeight;
+
+      currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, calculatedScale()));
+      const scaledWidth = Math.round(DESIGN_WIDTH * currentScale);
+      const scaledHeight = Math.round(DESIGN_HEIGHT * currentScale);
+      canvasStage.style.width = `${scaledWidth}px`;
+      canvasStage.style.height = `${scaledHeight}px`;
+      canvas.style.setProperty('width', '100%', 'important');
+      canvas.style.setProperty('height', '100%', 'important');
+      canvas.dataset.webScale = currentScale.toFixed(3);
+      updateActiveControls();
+
+      if (preserveCenter) {
+        requestAnimationFrame(() => {
+          canvasScroll.scrollLeft = Math.max(0, centerRatioX * scaledWidth - canvasScroll.clientWidth * 0.5);
+          canvasScroll.scrollTop = Math.max(0, centerRatioY * scaledHeight - canvasScroll.clientHeight * 0.5);
+        });
+      }
+    }
+
+    function setDisplayMode(mode, scale = manualScale) {
+      displayMode = mode;
+      manualScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
+      saveDisplayPreference();
+      applyDisplayScale(false);
+    }
+
+    function stepZoom(direction) {
+      const startingScale = currentScale || calculatedScale();
+      const stepped = Math.round((startingScale + direction * SCALE_STEP) / SCALE_STEP) * SCALE_STEP;
+      setDisplayMode('manual', stepped);
+    }
 
     function setStatusMode(mode) {
       statusOverlay.style.display = mode === 'hidden' ? 'none' : 'flex';
@@ -227,7 +437,6 @@ $GODOT_HEAD_INCLUDE
     async function clearLegacyWebState(forceReload) {
       let removedRegistration = false;
       let hadController = false;
-
       try {
         if ('serviceWorker' in navigator) {
           hadController = Boolean(navigator.serviceWorker.controller);
@@ -242,14 +451,9 @@ $GODOT_HEAD_INCLUDE
           removedRegistration = localRegistrations.length > 0;
           await Promise.all(localRegistrations.map((registration) => registration.unregister()));
         }
-
         if ('caches' in window) {
           const keys = await caches.keys();
-          await Promise.all(
-            keys
-              .filter((key) => key.startsWith(LEGACY_CACHE_PREFIX))
-              .map((key) => caches.delete(key))
-          );
+          await Promise.all(keys.filter((key) => key.startsWith(LEGACY_CACHE_PREFIX)).map((key) => caches.delete(key)));
         }
       } catch (error) {
         console.warn('MoonGoons legacy cache cleanup warning:', error);
@@ -264,7 +468,6 @@ $GODOT_HEAD_INCLUDE
         window.location.replace(url.toString());
         return false;
       }
-
       sessionStorage.removeItem('moongoons-webfix');
       return true;
     }
@@ -275,19 +478,17 @@ $GODOT_HEAD_INCLUDE
 
     async function launchGame() {
       statusNotice.style.color = '#bfefff';
-      statusNotice.textContent = 'Loading MoonGoons campaign systems...';
-      statusDetail.textContent = 'Downloading the game engine and campaign data.';
+      statusNotice.textContent = 'Loading MoonGoons Peacekeeper systems...';
+      statusDetail.textContent = 'Downloading the game engine and station data.';
       recoveryActions.classList.remove('visible');
       progressInner.style.width = '0%';
+      applyDisplayScale(false);
 
       const engine = new Engine($GODOT_CONFIG);
       clearTimeout(launchTimer);
       launchTimer = window.setTimeout(() => {
         if (!gameStarted) {
-          showRecovery(
-            'The browser launch is taking too long.',
-            'The old service worker may still control this tab. Clear the cache below, then the page will reload once.'
-          );
+          showRecovery('The browser launch is taking too long.', 'The old service worker may still control this tab. Clear the cache below, then the page will reload once.');
         }
       }, 75000);
 
@@ -304,6 +505,8 @@ $GODOT_HEAD_INCLUDE
         gameStarted = true;
         clearTimeout(launchTimer);
         setStatusMode('hidden');
+        applyDisplayScale(false);
+        canvas.focus();
       } catch (error) {
         clearTimeout(launchTimer);
         console.error('MoonGoons browser launch failed:', error);
@@ -312,10 +515,24 @@ $GODOT_HEAD_INCLUDE
       }
     }
 
-    retryButton.addEventListener('click', () => {
-      window.location.reload();
+    fitButton.addEventListener('click', () => setDisplayMode('fit'));
+    widthButton.addEventListener('click', () => setDisplayMode('width'));
+    actualButton.addEventListener('click', () => setDisplayMode('manual', 1));
+    zoomOutButton.addEventListener('click', () => stepZoom(-1));
+    zoomInButton.addEventListener('click', () => stepZoom(1));
+    fullscreenButton.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else {
+          await gameWrap.requestFullscreen();
+        }
+      } catch (error) {
+        console.warn('Fullscreen request was declined:', error);
+      }
     });
 
+    retryButton.addEventListener('click', () => window.location.reload());
     resetButton.addEventListener('click', async () => {
       statusNotice.textContent = 'Clearing the older web build...';
       statusDetail.textContent = 'The page will reload automatically.';
@@ -330,22 +547,48 @@ $GODOT_HEAD_INCLUDE
       }
     });
 
+    window.addEventListener('resize', () => {
+      if (displayMode !== 'manual') {
+        applyDisplayScale(false);
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      window.setTimeout(() => applyDisplayScale(false), 80);
+    });
+    window.addEventListener('keydown', (event) => {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      if (event.key === '+' || event.key === '=') {
+        event.preventDefault();
+        stepZoom(1);
+      } else if (event.key === '-' || event.key === '_') {
+        event.preventDefault();
+        stepZoom(-1);
+      } else if (event.key === '0') {
+        event.preventDefault();
+        setDisplayMode('fit');
+      }
+    });
+    gameWrap.addEventListener('wheel', (event) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      stepZoom(event.deltaY < 0 ? 1 : -1);
+    }, { passive: false });
+
     window.addEventListener('error', (event) => {
       if (!gameStarted) {
         showRecovery('A browser startup error stopped the game.', event.message || 'Unknown browser error.');
       }
     });
-
     window.addEventListener('unhandledrejection', (event) => {
       if (!gameStarted) {
         showRecovery('The game loader was interrupted.', String(event.reason || 'Unknown promise rejection.'));
       }
     });
 
+    loadDisplayPreference();
+    applyDisplayScale(false);
     clearLegacyWebState(false).then((ready) => {
-      if (ready) {
-        launchGame();
-      }
+      if (ready) launchGame();
     }).catch((error) => {
       console.error('MoonGoons cleanup stage failed:', error);
       launchGame();
