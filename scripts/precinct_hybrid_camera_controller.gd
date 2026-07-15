@@ -1,6 +1,6 @@
 extends Node
-## Makes the precinct a 2D/3D hybrid instead of a straight-down strategy map.
-## Three-quarter city is the default. Cutaway and tactical views remain optional.
+## Makes the precinct a 2D/3D orbital station hybrid instead of a straight-down strategy map.
+## Three-quarter Station Deck is the default. Cutaway and tactical views remain optional.
 
 var precinct: Node
 var bridge: Node
@@ -45,7 +45,7 @@ func set_three_quarter_view() -> void:
 	_apply_view(THREE_QUARTER)
 	_set_exterior_visible(true)
 	_set_ribbon_mode("city")
-	_update_label("3/4 CITY")
+	_update_label("STATION DECK")
 
 func set_cutaway_view() -> void:
 	current_mode = "cutaway"
@@ -119,7 +119,7 @@ func _build_view_controls() -> void:
 	var panel := PanelContainer.new()
 	panel.name = "HybridViewControls"
 	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	panel.offset_left = -452.0
+	panel.offset_left = -480.0
 	panel.offset_top = 148.0
 	panel.offset_right = -14.0
 	panel.offset_bottom = 190.0
@@ -128,15 +128,15 @@ func _build_view_controls() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
 	panel.add_child(row)
-	row.add_child(_button("3/4 CITY", set_three_quarter_view, "Default 2D/3D city angle"))
-	row.add_child(_button("CUTAWAY", set_cutaway_view, "Open the selected room interior"))
-	row.add_child(_button("MAP", set_tactical_view, "Optional overhead tactical view"))
-	row.add_child(_button("TURN L", rotate_left, "Rotate city left"))
-	row.add_child(_button("TURN R", rotate_right, "Rotate city right"))
-	row.add_child(_button("ZOOM +", zoom_in, "Move camera closer"))
-	row.add_child(_button("ZOOM -", zoom_out, "Move camera farther away"))
+	row.add_child(_button("STATION DECK", set_three_quarter_view, "Default three-quarter orbital station view"))
+	row.add_child(_button("CUTAWAY", set_cutaway_view, "Open the selected station module interior"))
+	row.add_child(_button("MAP", set_tactical_view, "Optional overhead station tactical view"))
+	row.add_child(_button("TURN L", rotate_left, "Rotate the station deck left"))
+	row.add_child(_button("TURN R", rotate_right, "Rotate the station deck right"))
+	row.add_child(_button("ZOOM +", zoom_in, "Move the command camera closer"))
+	row.add_child(_button("ZOOM -", zoom_out, "Move the command camera farther away"))
 	mode_label = Label.new()
-	mode_label.custom_minimum_size = Vector2(88.0, 30.0)
+	mode_label.custom_minimum_size = Vector2(96.0, 30.0)
 	mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	mode_label.add_theme_font_size_override("font_size", 9)
@@ -146,7 +146,7 @@ func _button(text_value: String, callback: Callable, tooltip: String) -> Button:
 	var button := Button.new()
 	button.text = text_value
 	button.tooltip_text = tooltip
-	button.custom_minimum_size = Vector2(52.0, 30.0)
+	button.custom_minimum_size = Vector2(62.0, 30.0)
 	button.add_theme_font_size_override("font_size", 9)
 	button.pressed.connect(callback)
 	return button
@@ -159,7 +159,7 @@ func _mode_name() -> String:
 	match current_mode:
 		"cutaway": return "ROOM CUTAWAY"
 		"tactical": return "TACTICAL MAP"
-	return "3/4 CITY"
+	return "STATION DECK"
 
 func _panel_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
