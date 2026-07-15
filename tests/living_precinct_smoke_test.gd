@@ -42,7 +42,8 @@ func _run() -> void:
 	_expect(room.get_node_or_null("RoomArt") is MeshInstance3D,"Room mounts an illustrated interior backdrop")
 	var room_label:Label3D = room.get_node_or_null("RoomLabel") as Label3D
 	_expect(room_label != null and not room_label.text.contains("\n"),"Room signage is compact and single-line")
-	if MoonGoonsSkins.assets_ready():
+	var skin_service:Node = root.get_node_or_null("MoonGoonsSkins")
+	if skin_service != null and bool(skin_service.call("assets_ready")):
 		_expect(room.get_node_or_null("EstablishedMoonGoonsArt") is MeshInstance3D,"Room mounts established MoonGoons artwork")
 	room.queue_free()
 
@@ -81,7 +82,7 @@ func _run() -> void:
 		var title_label:Label = _find_label(instance,"LIVING LUNAR PRECINCT")
 		var resource_value:Variant = instance.get("resource_label")
 		_expect(title_label != null,"Responsive header preserves the precinct title")
-		_expect(resource_value is Label and (resource_value as Label).get_parent() != title_label.get_parent(),"Title and economy telemetry use separate header rows")
+		_expect(resource_value is Label and title_label != null and (resource_value as Label).get_parent() != title_label.get_parent(),"Title and economy telemetry use separate header rows")
 		instance.queue_free()
 
 	var project_file:ConfigFile = ConfigFile.new()
