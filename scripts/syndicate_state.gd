@@ -1,12 +1,13 @@
 extends Node
 ## Persistent state for the criminal-side Syndicate Rising campaign.
-## Mirrors the precinct slice's dependable timer/save structure while using a distinct underworld economy.
 
 signal state_changed
 signal job_added(job_id: String)
 
 const SAVE_PATH: String = "user://moongoons_syndicate_save.json"
 const JOB_LIMIT: int = 3
+const MAX_ROOM_LEVEL: int = 5
+const FINAL_STORY_CHAPTER: int = 5
 
 var credits: int = 520
 var contraband: int = 18
@@ -15,9 +16,14 @@ var heat: int = 10
 var notoriety: int = 1
 var black_tech_level: int = 1
 var black_tech_end: int = 0
+var story_chapter: int = 1
+var jobs_completed: int = 0
+var pending_cutscene: String = "prologue"
+var intro_seen: bool = false
 var rooms: Array[Dictionary] = []
 var crew: Array[Dictionary] = []
 var jobs: Array[Dictionary] = []
+var completed_story_jobs: Array[String] = []
 var active_job: Dictionary = {}
 var active_crew_ids: Array[String] = []
 var next_job_at: int = 0
@@ -41,10 +47,15 @@ func reset_state() -> void:
 	notoriety = 1
 	black_tech_level = 1
 	black_tech_end = 0
+	story_chapter = 1
+	jobs_completed = 0
+	pending_cutscene = "prologue"
+	intro_seen = false
 	job_serial = 1
 	active_job = {}
 	active_crew_ids = []
 	jobs = []
+	completed_story_jobs = []
 	rooms = [
 		_room("backroom", "Backroom Command", "Operations", true, 0, 0),
 		_room("chop_shop", "Chop Shop", "Vehicles", false, 125, 0),
@@ -56,12 +67,12 @@ func reset_state() -> void:
 		_room("tunnel", "Smuggler Tunnel", "Fence Contraband", false, 155, 0)
 	]
 	crew = [
-		_crew_member("crew_1", "Nyx Raze", "Enforcer", 74, 108, 18),
-		_crew_member("crew_2", "Vox-13", "Runner", 87, 91, 13),
-		_crew_member("crew_3", "Cinder Quell", "Sharpshot", 91, 84, 15),
-		_crew_member("crew_4", "Grit Mercer", "Enforcer", 70, 112, 20)
+		_crew_member("crew_1", "Nyx Raze", "Enforcer", 74, 108, 18, "res://assets/syndicate/portraits/nyx_raze.svg"),
+		_crew_member("crew_2", "Vox-13", "Runner", 87, 91, 13, "res://assets/syndicate/portraits/vox_13.svg"),
+		_crew_member("crew_3", "Cinder Quell", "Sharpshot", 91, 84, 15, "res://assets/syndicate/portraits/cinder_quell.svg"),
+		_crew_member("crew_4", "Grit Mercer", "Enforcer", 70, 112, 20, "res://assets/syndicate/portraits/grit_mercer.svg")
 	]
-	next_job_at = now + 4
+	next_job_at = now + 3
 	next_heat_decay_at = now + 12
 	last_event = "HIDEOUT ONLINE // Backroom Command survived the raid. Seven rooms need rebuilding."
 	state_changed.emit()
@@ -104,11 +115,20 @@ func tick() -> void:
 	if now >= next_heat_decay_at:
 		next_heat_decay_at = now + 12
 		if heat > 0:
-			heat = max(0, heat - (2 if is_room_repaired("signal_den") else 1))
+			var signal_cooling: int = 1 + get_room_level("signal_den") / 2 if is_room_repaired("signal_den") else 1
+			heat = max(0, heat - signal_cooling)
 			last_event = "Signal spoofers cooled the district. Heat dropped to %d." % heat
 			changed = true
 	if changed:
 		state_changed.emit()
+
+func repair_or_upgrade_room(room_id: String) -> Dictionary:
+	var room: Dictionary = get_room(room_id)
+	if room.is_empty():
+		return {"ok": false, "message": "Hideout room not found."}
+	if bool(room.get("repaired", false)):
+		return upgrade_room(room_id)
+	return repair_room(room_id)
 
 func repair_room(room_id: String) -> Dictionary:
 	var room: Dictionary = get_room(room_id)
@@ -127,6 +147,22 @@ func repair_room(room_id: String) -> Dictionary:
 	state_changed.emit()
 	return {"ok": true, "message": last_event}
 
+func upgrade_room(room_id: String) -> Dictionary:
+	var room: Dictionary = get_room(room_id)
+	if room.is_empty() or not bool(room.get("repaired", false)):
+		return {"ok": false, "message": "Rebuild that room before upgrading it."}
+	var level: int = int(room.get("level", 1))
+	if level >= MAX_ROOM_LEVEL:
+		return {"ok": false, "message": "%s is already level %d." % [room.get("name", "Room"), MAX_ROOM_LEVEL]}
+	var cost: int = 100 + level * 85
+	if credits < cost:
+		return {"ok": false, "message": "The level %d upgrade needs %d credits." % [level + 1, cost]}
+	credits -= cost
+	room["level"] = level + 1
+	last_event = "%s upgraded to level %d." % [room.get("name", "Room"), level + 1]
+	state_changed.emit()
+	return {"ok": true, "message": last_event}
+
 func begin_black_tech() -> Dictionary:
 	if black_tech_end > 0:
 		return {"ok": false, "message": "A black-tech project is already cooking."}
@@ -138,7 +174,7 @@ func begin_black_tech() -> Dictionary:
 		return {"ok": false, "message": "Black tech needs %d credits and %d intel." % [credit_cost, intel_cost]}
 	credits -= credit_cost
 	intel -= intel_cost
-	black_tech_end = _now() + 18
+	black_tech_end = _now() + max(8, 18 - get_room_level("signal_den"))
 	last_event = "Signal Den started black-tech level %d." % (black_tech_level + 1)
 	state_changed.emit()
 	return {"ok": true, "message": last_event}
@@ -148,8 +184,9 @@ func fence_contraband() -> Dictionary:
 		return {"ok": false, "message": "No contraband is ready to fence."}
 	if not is_room_repaired("tunnel"):
 		return {"ok": false, "message": "Rebuild the Smuggler Tunnel before fencing cargo."}
-	var moved: int = mini(contraband, 5 + black_tech_level)
-	var payout: int = moved * (22 + black_tech_level * 3)
+	var tunnel_level: int = get_room_level("tunnel")
+	var moved: int = mini(contraband, 5 + black_tech_level + tunnel_level)
+	var payout: int = moved * (22 + black_tech_level * 3 + tunnel_level * 2)
 	contraband -= moved
 	credits += payout
 	heat = clampi(heat + 1, 0, 100)
@@ -174,8 +211,9 @@ func begin_job(job_id: String, crew_ids: Array[String]) -> Dictionary:
 			valid_ids.append(crew_id)
 	if valid_ids.is_empty():
 		return {"ok": false, "message": "Select at least one available crew member."}
-	if valid_ids.size() > 3:
-		valid_ids.resize(3)
+	var crew_limit: int = mini(4, 2 + get_room_level("boss_office")) if is_room_repaired("boss_office") else 3
+	if valid_ids.size() > crew_limit:
+		valid_ids.resize(crew_limit)
 	active_job = jobs[job_index].duplicate(true)
 	active_crew_ids = valid_ids
 	jobs.remove_at(job_index)
@@ -197,27 +235,73 @@ func finish_job(victory: bool, surviving_hp: Dictionary) -> void:
 		member["hp"] = max(1, hp_value)
 		member["busy_until"] = now + 8
 		if hp_value <= int(float(member.get("max_hp", 100)) * 0.25):
-			member["injured_until"] = now + 30
+			var recovery: int = 30
+			if is_room_repaired("clinic"):
+				recovery = max(10, recovery - get_room_level("clinic") * 4)
+			member["injured_until"] = now + recovery
 	if victory and not active_job.is_empty():
 		var reward: int = int(active_job.get("reward", 0))
 		var cargo: int = int(active_job.get("contraband", 1))
 		var difficulty: int = int(active_job.get("difficulty", 1))
-		credits += reward
+		var market_bonus: int = get_room_level("black_market") * 8 if is_room_repaired("black_market") else 0
+		credits += reward + market_bonus
 		contraband += cargo
 		intel += difficulty
 		notoriety += difficulty
+		jobs_completed += 1
 		for crew_id: String in active_crew_ids:
 			var member: Dictionary = get_crew_member(crew_id)
 			member["xp"] = int(member.get("xp", 0)) + 12 * difficulty
-		last_event = "JOB CLEAN // +%d credits, +%d contraband, Notoriety %d." % [reward, cargo, notoriety]
+			_apply_crew_level(member)
+		if bool(active_job.get("story", false)):
+			_complete_story_job(String(active_job.get("story_id", "")), int(active_job.get("chapter", story_chapter)))
+		last_event = "JOB CLEAN // +%d credits, +%d contraband, Notoriety %d." % [reward + market_bonus, cargo, notoriety]
 	else:
 		heat = clampi(heat + 8, 0, 100)
 		last_event = "JOB BURNED // The crew escaped, but Heat spiked to %d." % heat
 	active_job = {}
 	active_crew_ids = []
-	next_job_at = min(next_job_at, now + 6)
+	next_job_at = min(next_job_at, now + 5)
 	save_game()
 	state_changed.emit()
+
+func _apply_crew_level(member: Dictionary) -> void:
+	var level: int = int(member.get("level", 1))
+	var needed: int = level * 80
+	while int(member.get("xp", 0)) >= needed and level < 20:
+		member["xp"] = int(member.get("xp", 0)) - needed
+		level += 1
+		member["level"] = level
+		member["power"] = int(member.get("power", 50)) + 5
+		member["max_hp"] = int(member.get("max_hp", 100)) + 6
+		member["hp"] = int(member.get("max_hp", 100))
+		member["defense"] = int(member.get("defense", 10)) + 2
+		needed = level * 80
+
+func _complete_story_job(story_id: String, chapter: int) -> void:
+	if story_id.is_empty() or completed_story_jobs.has(story_id):
+		return
+	completed_story_jobs.append(story_id)
+	if chapter >= story_chapter:
+		story_chapter = mini(FINAL_STORY_CHAPTER + 1, chapter + 1)
+	match chapter:
+		1:
+			pending_cutscene = "ghost_key"
+		3:
+			pending_cutscene = "war_room"
+		5:
+			pending_cutscene = "finale"
+		_:
+			pending_cutscene = ""
+
+func consume_cutscene() -> String:
+	var value: String = pending_cutscene
+	pending_cutscene = ""
+	if value == "prologue":
+		intro_seen = true
+	save_game()
+	state_changed.emit()
+	return value
 
 func save_game() -> Dictionary:
 	var data: Dictionary = {
@@ -228,9 +312,14 @@ func save_game() -> Dictionary:
 		"notoriety": notoriety,
 		"black_tech_level": black_tech_level,
 		"black_tech_end": black_tech_end,
+		"story_chapter": story_chapter,
+		"jobs_completed": jobs_completed,
+		"pending_cutscene": pending_cutscene,
+		"intro_seen": intro_seen,
 		"rooms": rooms,
 		"crew": crew,
 		"jobs": jobs,
+		"completed_story_jobs": completed_story_jobs,
 		"active_job": active_job,
 		"active_crew_ids": active_crew_ids,
 		"next_job_at": next_job_at,
@@ -242,8 +331,7 @@ func save_game() -> Dictionary:
 	if file == null:
 		return {"ok": false, "message": "Syndicate save could not be opened."}
 	file.store_string(JSON.stringify(data))
-	last_event = "Syndicate operation saved."
-	return {"ok": true, "message": last_event}
+	return {"ok": true, "message": "Syndicate operation saved."}
 
 func load_game() -> Dictionary:
 	if not FileAccess.file_exists(SAVE_PATH):
@@ -262,9 +350,14 @@ func load_game() -> Dictionary:
 	notoriety = int(data.get("notoriety", 1))
 	black_tech_level = int(data.get("black_tech_level", 1))
 	black_tech_end = int(data.get("black_tech_end", 0))
+	story_chapter = int(data.get("story_chapter", 1))
+	jobs_completed = int(data.get("jobs_completed", 0))
+	pending_cutscene = String(data.get("pending_cutscene", ""))
+	intro_seen = bool(data.get("intro_seen", false))
 	rooms = _dictionary_array(data.get("rooms", []))
 	crew = _dictionary_array(data.get("crew", []))
 	jobs = _dictionary_array(data.get("jobs", []))
+	completed_story_jobs = _string_array(data.get("completed_story_jobs", []))
 	active_job = Dictionary(data.get("active_job", {}))
 	active_crew_ids = _string_array(data.get("active_crew_ids", []))
 	next_job_at = int(data.get("next_job_at", _now() + 6))
@@ -279,6 +372,10 @@ func get_room(room_id: String) -> Dictionary:
 		if String(room.get("id", "")) == room_id:
 			return room
 	return {}
+
+func get_room_level(room_id: String) -> int:
+	var room: Dictionary = get_room(room_id)
+	return int(room.get("level", 1)) if not room.is_empty() else 0
 
 func get_crew_member(crew_id: String) -> Dictionary:
 	for member: Dictionary in crew:
@@ -306,16 +403,38 @@ func seconds_left(timestamp: int) -> int:
 	return max(0, timestamp - _now())
 
 func _generate_job() -> void:
-	var templates: Array[Dictionary] = [
-		{"title": "Hijack Supply Skiff", "sector": "Tycho Freight Spine", "difficulty": 1, "target": "Peacekeepers"},
-		{"title": "Crack Evidence Vault", "sector": "Blueglass Ward", "difficulty": 2, "target": "Peacekeepers"},
-		{"title": "Siphon Transit Payroll", "sector": "Mare Exchange", "difficulty": 1, "target": "Corporate Security"},
-		{"title": "Extract Captured Fixer", "sector": "Dock Seven", "difficulty": 2, "target": "Peacekeepers"},
-		{"title": "Sabotage Sensor Grid", "sector": "Signal Canyon", "difficulty": 3, "target": "Peacekeepers"},
-		{"title": "Smuggle Reactor Cores", "sector": "Eclipse Foundry", "difficulty": 3, "target": "Customs Patrol"},
-		{"title": "Raid Rival Cache", "sector": "Crater Market", "difficulty": 2, "target": "Hollow Fang"}
-	]
-	var template: Dictionary = templates[_rng.randi_range(0, templates.size() - 1)]
+	var existing_story: bool = false
+	for candidate: Dictionary in jobs:
+		if bool(candidate.get("story", false)):
+			existing_story = true
+			break
+	var template: Dictionary
+	if not existing_story and story_chapter <= FINAL_STORY_CHAPTER:
+		template = _story_template(story_chapter)
+	else:
+		var templates: Array[Dictionary] = [
+			{"title": "Hijack Supply Skiff", "sector": "Tycho Freight Spine", "difficulty": 1, "target": "Peacekeepers"},
+			{"title": "Crack Evidence Vault", "sector": "Blueglass Ward", "difficulty": 2, "target": "Peacekeepers"},
+			{"title": "Siphon Transit Payroll", "sector": "Mare Exchange", "difficulty": 1, "target": "Corporate Security"},
+			{"title": "Extract Captured Fixer", "sector": "Dock Seven", "difficulty": 2, "target": "Peacekeepers"},
+			{"title": "Sabotage Sensor Grid", "sector": "Signal Canyon", "difficulty": 3, "target": "Peacekeepers"},
+			{"title": "Smuggle Reactor Cores", "sector": "Eclipse Foundry", "difficulty": 3, "target": "Customs Patrol"},
+			{"title": "Raid Rival Cache", "sector": "Crater Market", "difficulty": 2, "target": "Hollow Fang"}
+		]
+		template = templates[_rng.randi_range(0, templates.size() - 1)]
+	_add_job_from_template(template)
+
+func _story_template(chapter: int) -> Dictionary:
+	var templates: Dictionary = {
+		1: {"title": "Steal the Ghost Key", "sector": "Crater Market Relay", "difficulty": 1, "target": "Peacekeepers", "story": true, "story_id": "ghost_key", "chapter": 1},
+		2: {"title": "Break Blueglass Records", "sector": "Blueglass Evidence Vault", "difficulty": 2, "target": "Peacekeepers", "story": true, "story_id": "blueglass", "chapter": 2},
+		3: {"title": "Hijack the Dawn Convoy", "sector": "Mare Highway", "difficulty": 3, "target": "Armored Patrol", "story": true, "story_id": "dawn_convoy", "chapter": 3},
+		4: {"title": "Blackout the Precinct", "sector": "Authority Grid Seven", "difficulty": 3, "target": "Peacekeepers", "story": true, "story_id": "blackout", "chapter": 4},
+		5: {"title": "Crown the Crater", "sector": "Eclipse Signal Tower", "difficulty": 4, "target": "Peacekeeper Command", "story": true, "story_id": "crater_crown", "chapter": 5}
+	}
+	return Dictionary(templates.get(chapter, templates[1]))
+
+func _add_job_from_template(template: Dictionary) -> void:
 	var difficulty: int = int(template.get("difficulty", 1))
 	var job_id: String = "job_%04d" % job_serial
 	job_serial += 1
@@ -331,11 +450,14 @@ func _generate_job() -> void:
 		"heat_gain": 3 + difficulty * 2,
 		"expires_at": _now() + max(32, 62 - heat / 2) + _rng.randi_range(0, 18),
 		"enemy_hp": 72 + difficulty * 58 + response_bonus * 5,
-		"enemy_power": 10 + difficulty * 5 + response_bonus
+		"enemy_power": 10 + difficulty * 5 + response_bonus,
+		"story": bool(template.get("story", false)),
+		"story_id": String(template.get("story_id", "")),
+		"chapter": int(template.get("chapter", 0))
 	}
 	jobs.append(job)
 	next_job_at = _now() + _rng.randi_range(17, 25)
-	last_event = "NEW SCORE // %s in %s." % [String(job.get("title", "Job")), String(job.get("sector", "Sector"))]
+	last_event = "NEW SCORE // %s in %s." % [job.get("title", "Job"), job.get("sector", "Sector")]
 	job_added.emit(job_id)
 
 func _room(id_value: String, name_value: String, function_value: String, repaired_value: bool, cost_value: int, repair_end_value: int) -> Dictionary:
@@ -349,7 +471,7 @@ func _room(id_value: String, name_value: String, function_value: String, repaire
 		"repair_end": repair_end_value
 	}
 
-func _crew_member(id_value: String, name_value: String, class_value: String, power_value: int, hp_value: int, defense_value: int) -> Dictionary:
+func _crew_member(id_value: String, name_value: String, class_value: String, power_value: int, hp_value: int, defense_value: int, portrait_value: String) -> Dictionary:
 	return {
 		"id": id_value,
 		"name": name_value,
@@ -361,6 +483,7 @@ func _crew_member(id_value: String, name_value: String, class_value: String, pow
 		"hp": hp_value,
 		"defense": defense_value,
 		"xp": 0,
+		"portrait": portrait_value,
 		"busy_until": 0,
 		"injured_until": 0
 	}
