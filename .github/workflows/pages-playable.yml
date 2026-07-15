@@ -14,6 +14,19 @@ on:
       - "project.godot"
       - "export_presets.cfg"
       - ".github/workflows/pages-playable.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "assets/**"
+      - "data/**"
+      - "docs/**"
+      - "scenes/**"
+      - "scripts/**"
+      - "tests/**"
+      - "web/**"
+      - "project.godot"
+      - "export_presets.cfg"
+      - ".github/workflows/pages-playable.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,8 +35,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   export-web-playable:
@@ -70,16 +83,28 @@ jobs:
           mkdir -p "$(dirname "${WEB_OUTPUT}")"
           ".ci/godot/${GODOT_BINARY}" --headless --path . --export-release "${WEB_PRESET}" "${WEB_OUTPUT}"
           touch builds/web/.nojekyll
+          test -f builds/web/index.html
+          test -f builds/web/index.wasm
           ls -lh builds/web
 
+      - name: Upload browser validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoonGoons-Take-Back-Web-Playable
+          path: builds/web
+          retention-days: 14
+
       - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: builds/web
 
       - name: Deploy playable build to GitHub Pages
+        if: github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@v4
