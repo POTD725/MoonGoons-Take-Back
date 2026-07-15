@@ -174,11 +174,11 @@ func _execute_player_action(action: String) -> void:
 				unit["special_ready"] = false
 				unit["evading"] = false
 				specials_used += 1
-				var class_name: String = String(unit.get("class", "Enforcer"))
-				if class_name == "Enforcer":
+				var crew_class: String = String(unit.get("class", "Enforcer"))
+				if crew_class == "Enforcer":
 					total_damage += 17 + int(unit.get("level", 1))
 					unit["hp"] = min(int(unit.get("max_hp", 100)), int(unit.get("hp", 1)) + 10)
-				elif class_name == "Runner":
+				elif crew_class == "Runner":
 					total_damage += 26 + int(unit.get("level", 1))
 					unit["evading"] = true
 				else:

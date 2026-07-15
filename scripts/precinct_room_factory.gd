@@ -12,6 +12,36 @@ const THEMES := {
 	"interrogation":{"floor":"#321F48","wall":"#281C3C","accent":"#B75CFF"},
 	"transfer":{"floor":"#243946","wall":"#202B35","accent":"#3FD0FF"}
 }
+const ROOM_ART: Dictionary = {
+	"ops": preload("res://assets/precinct/rooms/ops_center.svg"),
+	"armory": preload("res://assets/precinct/rooms/armory.svg"),
+	"cells": preload("res://assets/precinct/rooms/holding_cells.svg"),
+	"quarters": preload("res://assets/precinct/rooms/crew_quarters.svg"),
+	"medbay": preload("res://assets/precinct/rooms/medbay.svg"),
+	"chief": preload("res://assets/precinct/rooms/chief_office.svg"),
+	"interrogation": preload("res://assets/precinct/rooms/interrogation.svg"),
+	"transfer": preload("res://assets/precinct/rooms/transfer_hall.svg")
+}
+const ROOM_SKINS: Dictionary = {
+	"ops": "command_nexus",
+	"armory": "tactical_armory",
+	"cells": "evidence_cache",
+	"quarters": "patrol_deputy",
+	"medbay": "shield_deputy",
+	"chief": "builder_drone",
+	"interrogation": "cargo_crate",
+	"transfer": "wrecked_shuttle"
+}
+const SIGN_NAMES: Dictionary = {
+	"ops": "OPS",
+	"armory": "ARMORY",
+	"cells": "CELLS",
+	"quarters": "QUARTERS",
+	"medbay": "MEDBAY",
+	"chief": "CHIEF",
+	"interrogation": "INTERROG.",
+	"transfer": "TRANSFER"
+}
 
 static func build_room(room_id:String, room_data:Dictionary) -> Node3D:
 	var root := Node3D.new()
@@ -22,6 +52,8 @@ static func build_room(room_id:String, room_data:Dictionary) -> Node3D:
 	root.set_meta("room_id", room_id)
 	root.set_meta("clickable", true)
 	_add_shell(root, theme, repaired)
+	_add_room_backdrop(root, room_id, repaired)
+	_add_established_skin_display(root, room_id, repaired)
 	match room_id:
 		"ops": _ops(root, theme, repaired)
 		"armory": _armory(root, theme, repaired)
@@ -31,7 +63,8 @@ static func build_room(room_id:String, room_data:Dictionary) -> Node3D:
 		"chief": _chief(root, theme, repaired)
 		"interrogation": _interrogation(root, theme, repaired)
 		"transfer": _transfer(root, theme, repaired)
-	_add_label(root, String(room_data.get("name", room_id.capitalize())), repaired, level, str(theme["accent"]))
+	_add_label(root, room_id, repaired, level, str(theme["accent"]))
+	_add_status_beacon(root, repaired, str(theme["accent"]))
 	_add_click_area(root)
 	if not repaired:
 		_add_damage(root)
@@ -51,6 +84,27 @@ static func _add_shell(root:Node3D, theme:Dictionary, repaired:bool) -> void:
 	_marker(root,"Door",Vector3(0,0,3.8))
 	_marker(root,"Idle",Vector3(-2.8,0,2.2))
 	_marker(root,"Center",Vector3(0,0,0.6))
+
+static func _add_room_backdrop(root:Node3D, room_id:String, repaired:bool) -> void:
+	var texture:Texture2D = ROOM_ART.get(room_id) as Texture2D
+	if texture == null:
+		return
+	root.add_child(_box(Vector3(8.05,3.28,0.12),Vector3(0,1.82,-3.40),"#05080D",0.0))
+	var panel:MeshInstance3D = _texture_panel(texture,Vector2(7.72,3.02),Vector3(0,1.82,-3.325),repaired,0.28)
+	panel.name = "RoomArt"
+	root.add_child(panel)
+
+static func _add_established_skin_display(root:Node3D, room_id:String, repaired:bool) -> void:
+	var skin_name:String = str(ROOM_SKINS.get(room_id,""))
+	if skin_name.is_empty():
+		return
+	var texture:Texture2D = MoonGoonsSkins.get_texture(skin_name)
+	if texture == null:
+		return
+	root.add_child(_box(Vector3(2.28,1.48,0.10),Vector3(2.72,1.62,-3.205),"#07101A",0.0))
+	var panel:MeshInstance3D = _texture_panel(texture,Vector2(2.08,1.28),Vector3(2.72,1.62,-3.135),repaired,0.55)
+	panel.name = "EstablishedMoonGoonsArt"
+	root.add_child(panel)
 
 static func _ops(root:Node3D, theme:Dictionary, repaired:bool) -> void:
 	var accent:String = str(theme["accent"])
@@ -152,16 +206,22 @@ static func _add_damage(root:Node3D) -> void:
 	smoke.transparency = 0.5
 	root.add_child(smoke)
 
-static func _add_label(root:Node3D, title:String, repaired:bool, level:int, accent:String) -> void:
+static func _add_label(root:Node3D, room_id:String, repaired:bool, level:int, accent:String) -> void:
 	var label := Label3D.new()
 	label.name = "RoomLabel"
-	label.text = "%s  L%d\n%s" % [title.to_upper(),level,"ONLINE" if repaired else "DAMAGED"]
-	label.position = Vector3(0,4.15,-2.7)
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.font_size = 42
-	label.outline_size = 6
+	label.text = "%s  L%d" % [str(SIGN_NAMES.get(room_id,room_id.to_upper())),level]
+	label.position = Vector3(0,3.62,0.0)
+	label.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+	label.fixed_size = true
+	label.font_size = 18
+	label.outline_size = 4
 	label.modulate = Color.from_string(accent,Color.CYAN) if repaired else Color("#FF7A96")
 	root.add_child(label)
+
+static func _add_status_beacon(root:Node3D, repaired:bool, accent:String) -> void:
+	var color:String = accent if repaired else "#FF5B68"
+	root.add_child(_cylinder(0.16,0.65,Vector3(3.72,0.48,2.92),"#202733",0.0))
+	root.add_child(_sphere(0.24,Vector3(3.72,0.92,2.92),color,0.8 if repaired else 1.0))
 
 static func _add_click_area(root:Node3D) -> void:
 	var body := StaticBody3D.new()
@@ -180,6 +240,24 @@ static func _marker(root:Node3D, marker_name:String, marker_position:Vector3) ->
 	marker.name = marker_name
 	marker.position = marker_position
 	root.add_child(marker)
+
+static func _texture_panel(texture:Texture2D, size_value:Vector2, position_value:Vector3, repaired:bool, emission:float) -> MeshInstance3D:
+	var node := MeshInstance3D.new()
+	var mesh := QuadMesh.new()
+	mesh.size = size_value
+	node.mesh = mesh
+	node.position = position_value
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = texture
+	material.albedo_color = Color.WHITE if repaired else Color(0.24,0.25,0.30,1.0)
+	material.roughness = 0.72
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	if repaired and emission > 0.0:
+		material.emission_enabled = true
+		material.emission_texture = texture
+		material.emission_energy_multiplier = emission
+	node.material_override = material
+	return node
 
 static func _box(size_value:Vector3, position_value:Vector3, color_hex:String, emission:float) -> MeshInstance3D:
 	var node := MeshInstance3D.new()

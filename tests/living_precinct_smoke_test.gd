@@ -11,11 +11,26 @@ func _run() -> void:
 	var agent_script:Script = load("res://scripts/precinct_agent.gd") as Script
 	var audio_script:Script = load("res://scripts/moongoons_audio.gd") as Script
 	var living_script:Script = load("res://scripts/living_precinct.gd") as Script
+	var polish_script:Script = load("res://scripts/living_precinct_ui_polish.gd") as Script
 	_expect(room_factory != null,"3D room factory loads")
 	_expect(officer_factory != null,"Officer visual factory loads")
 	_expect(agent_script != null,"Walking agent AI loads")
 	_expect(audio_script != null,"Generated audio service loads")
 	_expect(living_script != null,"Living precinct controller loads")
+	_expect(polish_script != null,"Responsive precinct graphics layer loads")
+
+	var art_paths:Array[String] = [
+		"res://assets/precinct/rooms/ops_center.svg",
+		"res://assets/precinct/rooms/armory.svg",
+		"res://assets/precinct/rooms/holding_cells.svg",
+		"res://assets/precinct/rooms/crew_quarters.svg",
+		"res://assets/precinct/rooms/medbay.svg",
+		"res://assets/precinct/rooms/chief_office.svg",
+		"res://assets/precinct/rooms/interrogation.svg",
+		"res://assets/precinct/rooms/transfer_hall.svg"
+	]
+	for art_path:String in art_paths:
+		_expect(load(art_path) is Texture2D,"Illustrated room art imports: %s" % art_path.get_file())
 
 	var room_data:Dictionary = {"name":"Operations Center","repaired":true,"level":2}
 	var room:Node3D = PrecinctRoomFactory.build_room("ops",room_data)
@@ -24,6 +39,12 @@ func _run() -> void:
 	_expect(room.get_node_or_null("Door") is Marker3D,"Room exposes a corridor door marker")
 	_expect(room.get_node_or_null("Job0") is Marker3D,"Room exposes worker job markers")
 	_expect(room.get_node_or_null("ClickArea") is StaticBody3D,"Room exposes a 3D click collider")
+	_expect(room.get_node_or_null("RoomArt") is MeshInstance3D,"Room mounts an illustrated interior backdrop")
+	var room_label:Label3D = room.get_node_or_null("RoomLabel") as Label3D
+	_expect(room_label != null and not room_label.text.contains("\n"),"Room signage is compact and single-line")
+	var skin_service:Node = root.get_node_or_null("MoonGoonsSkins")
+	if skin_service != null and bool(skin_service.call("assets_ready")):
+		_expect(room.get_node_or_null("EstablishedMoonGoonsArt") is MeshInstance3D,"Room mounts established MoonGoons artwork")
 	room.queue_free()
 
 	var officer:Node3D = OfficerVisualFactory.build_authority_officer({"name":"Test Officer","division":"Tactical","rank":2})
@@ -46,13 +67,22 @@ func _run() -> void:
 		root.add_child(instance)
 		await process_frame
 		await process_frame
+		await process_frame
+		await process_frame
 		_expect(instance.get_node_or_null("LivingPrecinctWorld") is Node3D,"Full city world builds at runtime")
 		_expect(instance.get_node_or_null("CityCamera") is Camera3D,"Runtime camera is active")
 		_expect(instance.get_node_or_null("Interface") is CanvasLayer,"Runtime management interface builds")
+		_expect(instance.get_node_or_null("VisualPolish") is Node,"Responsive art and HUD polish layer is attached")
 		var rooms_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Rooms")
 		var personnel_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Personnel")
 		_expect(rooms_node != null and rooms_node.get_child_count() == 8,"All eight room interiors build at runtime")
 		_expect(personnel_node != null and personnel_node.get_child_count() >= 10,"Walking officer and worker population builds at runtime")
+		var preview:TextureRect = _find_by_name(instance,"SelectedRoomArtwork") as TextureRect
+		_expect(preview != null and preview.texture != null,"Selected-room inspector displays illustrated artwork")
+		var title_label:Label = _find_label(instance,"LIVING LUNAR PRECINCT")
+		var resource_value:Variant = instance.get("resource_label")
+		_expect(title_label != null,"Responsive header preserves the precinct title")
+		_expect(resource_value is Label and title_label != null and (resource_value as Label).get_parent() != title_label.get_parent(),"Title and economy telemetry use separate header rows")
 		instance.queue_free()
 
 	var project_file:ConfigFile = ConfigFile.new()
@@ -69,10 +99,28 @@ func _run() -> void:
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Living precinct integration smoke tests passed.")
+		print("SUCCESS: Living precinct graphics and integration smoke tests passed.")
 	else:
 		push_error("FAILED: %d living precinct smoke test(s) failed." % failures)
 	quit(failures)
+
+func _find_by_name(root_node:Node,node_name:String) -> Node:
+	if root_node.name == node_name:
+		return root_node
+	for child:Node in root_node.get_children():
+		var found:Node = _find_by_name(child,node_name)
+		if found != null:
+			return found
+	return null
+
+func _find_label(root_node:Node,needle:String) -> Label:
+	if root_node is Label and (root_node as Label).text.contains(needle):
+		return root_node as Label
+	for child:Node in root_node.get_children():
+		var found:Label = _find_label(child,needle)
+		if found != null:
+			return found
+	return null
 
 func _expect(condition:bool,label:String) -> void:
 	if condition:
