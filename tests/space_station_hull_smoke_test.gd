@@ -20,11 +20,11 @@ func _run() -> void:
 	if hull != null:
 		_expect(bool(hull.get_meta("shared_walls", false)), "Hull declares shared-wall architecture")
 		_expect(int(hull.get_meta("automatic_doors", 0)) == 8, "Hull declares eight room doors")
-		_expect(_count_named(hull, "SharedPartition") == 6, "Six shared partitions divide adjacent rooms")
+		_expect(_count_prefixed(hull, "SharedPartition") == 6, "Six shared partitions divide adjacent rooms")
 		_expect(_count_prefixed(hull, "Door_") >= 9, "Eight room doors and patrol airlock exist")
-		_expect(_count_named(hull, "CorridorBulkhead") == 16, "Corridor-facing bulkhead segments seal room fronts")
-		_expect(_count_named(hull, "HullRib") >= 9, "Station ceiling ribs connect the hull")
-		_expect(_count_named(hull, "UtilityPipe") >= 6, "Utility piping details the station interior")
+		_expect(_count_prefixed(hull, "CorridorBulkhead") == 16, "Corridor-facing bulkhead segments seal room fronts")
+		_expect(_count_prefixed(hull, "HullRib") >= 9, "Station ceiling ribs connect the hull")
+		_expect(_count_prefixed(hull, "UtilityPipe") >= 6, "Utility piping details the station interior")
 		_expect(hull.get_node_or_null("Door_PATROL AIRLOCK") is StationDoor, "Patrol airlock uses an automatic station door")
 	var rooms: Node3D = instance.get_node_or_null("LivingPrecinctWorld/Rooms") as Node3D
 	_expect(rooms != null and rooms.get_child_count() == 8, "All eight rooms remain playable")
@@ -50,12 +50,6 @@ func _run() -> void:
 	else:
 		push_error("FAILED: %d station architecture check(s) failed." % failures)
 	quit(failures)
-
-func _count_named(root_node: Node, node_name: String) -> int:
-	var total: int = 1 if root_node.name == node_name else 0
-	for child: Node in root_node.get_children():
-		total += _count_named(child, node_name)
-	return total
 
 func _count_prefixed(root_node: Node, prefix: String) -> int:
 	var total: int = 1 if String(root_node.name).begins_with(prefix) else 0
