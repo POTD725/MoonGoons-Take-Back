@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## Visual alliance research browser with exact Level 1-100 schedules.
 
-const TREE_ART: Texture2D = preload("res://assets/ui/alliance_research_tree.svg")
+const TREE_ART_PATH: String = "res://assets/ui/alliance_research_tree.svg"
 
 var root_control: Control
 var open_button: Button
@@ -19,6 +19,7 @@ var research_button: Button
 var selected_branch: String = "construction"
 var selected_node_id: String = "modular_foundry"
 var refresh_clock: float = 0.0
+var last_scene_name: String = ""
 
 func _ready() -> void:
 	layer = 80
@@ -26,14 +27,23 @@ func _ready() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
 	_build_interface()
-	get_tree().scene_changed.connect(_on_scene_changed)
-	AllianceResearch.research_changed.connect(_refresh)
-	ResourceHarvest.resources_changed.connect(_refresh)
-	PrecinctState.state_changed.connect(_refresh)
+	if not AllianceResearch.research_changed.is_connected(_refresh):
+		AllianceResearch.research_changed.connect(_refresh)
+	if not ResourceHarvest.resources_changed.is_connected(_refresh):
+		ResourceHarvest.resources_changed.connect(_refresh)
+	if not PrecinctState.state_changed.is_connected(_refresh):
+		PrecinctState.state_changed.connect(_refresh)
 	_on_scene_changed(get_tree().current_scene)
 
 func _process(delta: float) -> void:
-	if root_control == null or not root_control.visible:
+	if root_control == null:
+		return
+	var scene: Node = get_tree().current_scene
+	var scene_name: String = scene.name if scene != null else ""
+	if scene_name != last_scene_name:
+		last_scene_name = scene_name
+		_on_scene_changed(scene)
+	if not root_control.visible:
 		return
 	refresh_clock += delta
 	if refresh_clock >= 0.5:
@@ -123,7 +133,10 @@ func _build_interface() -> void:
 	art_frame.add_theme_stylebox_override("panel", _panel_style(Color("0a1725"), Color("526d80"), 2, 12))
 	content.add_child(art_frame)
 	var art := TextureRect.new()
-	art.texture = TREE_ART
+	var art_texture: Texture2D = null
+	if ResourceLoader.exists(TREE_ART_PATH):
+		art_texture = load(TREE_ART_PATH) as Texture2D
+	art.texture = art_texture
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	art_frame.add_child(art)
@@ -269,14 +282,7 @@ func _refresh_details() -> void:
 	var parent_text: String = "ROOT NODE"
 	if not parent_id.is_empty():
 		parent_text = "%s • GAP %d" % [AllianceResearch.node_name(parent_id), int(definition.get("gap", 0))]
-	detail_label.text = "%s
-Branch: %s
-Current Level: %d / 100
-Prerequisite: %s
-
-%s
-
-NEXT: %s" % [
+	detail_label.text = "%s\nBranch: %s\nCurrent Level: %d / 100\nPrerequisite: %s\n\n%s\n\nNEXT: %s" % [
 		String(definition.get("name", "Research")),
 		selected_branch.capitalize(), current_level, parent_text,
 		String(definition.get("benefit", "")),
@@ -306,8 +312,6 @@ func _refresh_schedule() -> void:
 				int(costs.get("helium3", 0)), int(costs.get("quantum_salvage", 0))
 			]
 		schedule_list.add_item(line)
-	if current_level > 1:
-		schedule_list.ensure_current_is_visible()
 
 func _refresh_jobs() -> void:
 	var parts: Array[String] = []
