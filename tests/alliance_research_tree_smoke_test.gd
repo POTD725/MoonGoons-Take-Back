@@ -19,7 +19,7 @@ func _run() -> void:
 	harvest.call("reset_state")
 	precinct.call("reset_state")
 
-	var branches: Array = research.get("BRANCHES") as Array
+	var branches: Array = research.call("branch_catalog") as Array
 	_expect(branches.size() == 3, "Exactly three Alliance branches exist")
 	_expect(branches.has("construction") and branches.has("technology") and branches.has("weapons"), "Branches are Construction, Technology, and Weapons")
 
