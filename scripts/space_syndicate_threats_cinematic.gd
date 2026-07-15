@@ -3,6 +3,10 @@ extends "res://scripts/space_syndicate_threats_state.gd"
 
 signal battle_started(target_id: String)
 
+var active_target_id: String:
+	get:
+		return String(active_battle.get("target_id", ""))
+
 func begin_battle(target_id: String) -> Dictionary:
 	var result: Dictionary = super.begin_battle(target_id)
 	if bool(result.get("ok", false)) and not active_battle.is_empty():
