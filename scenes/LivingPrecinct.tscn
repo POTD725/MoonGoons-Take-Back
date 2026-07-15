@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -13,7 +13,7 @@
 [ext_resource type="Script" path="res://scripts/progression_ui_bootstrap.gd" id="11_bootstrap"]
 [ext_resource type="Script" path="res://scripts/resource_harvesting_layer.gd" id="12_resources"]
 [ext_resource type="Script" path="res://scripts/space_syndicate_threats_ui.gd" id="13_threats"]
-[ext_resource type="Script" path="res://scripts/living_precinct_web_backdrop.gd" id="14_web_backdrop"]
+[ext_resource type="Script" path="res://scripts/living_precinct_web_hybrid_view.gd" id="14_web_backdrop"]
 [ext_resource type="Script" path="res://scripts/living_precinct_web_layout_fix.gd" id="15_web_layout"]
 [ext_resource type="Script" path="res://scripts/precinct_compact_action_cards.gd" id="16_action_cards"]
 [ext_resource type="Script" path="res://scripts/precinct_compact_command_ribbon.gd" id="17_command_ribbon"]
@@ -21,6 +21,7 @@
 [ext_resource type="Script" path="res://scripts/precinct_equipment_visual_controller.gd" id="19_visual_controller"]
 [ext_resource type="Script" path="res://scripts/precinct_exterior_city_visuals.gd" id="20_exterior_city"]
 [ext_resource type="Script" path="res://scripts/precinct_equipment_preview.gd" id="21_equipment_preview"]
+[ext_resource type="Script" path="res://scripts/precinct_hybrid_camera_controller.gd" id="22_hybrid_camera"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -95,3 +96,6 @@ script = ExtResource("20_exterior_city")
 
 [node name="EquipmentPreview" type="Node" parent="."]
 script = ExtResource("21_equipment_preview")
+
+[node name="HybridCameraController" type="Node" parent="."]
+script = ExtResource("22_hybrid_camera")
