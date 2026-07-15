@@ -127,10 +127,13 @@ func site_catalog() -> Array[Dictionary]:
 		station_level = int(get_node("/root/StationProgression").get("station_level"))
 	for site: Dictionary in sites:
 		var entry: Dictionary = site.duplicate(true)
+		var site_id: String = String(site.get("id", ""))
 		entry["locked"] = station_level < int(site.get("unlock_level", 1))
 		entry["time_left"] = seconds_left(int(site.get("harvest_end", 0)))
 		entry["recovery_left"] = seconds_left(int(site.get("recovery_end", 0)))
 		entry["yield"] = projected_yield(site)
+		entry["threatened"] = _site_threatened(site_id)
+		entry["threat_commander"] = _site_threat_commander(site_id)
 		result.append(entry)
 	return result
 
@@ -151,6 +154,8 @@ func begin_harvest(site_id: String) -> Dictionary:
 	var unlock_level: int = int(site.get("unlock_level", 1))
 	if station_level < unlock_level:
 		return _result(false, "%s unlocks at station level %d." % [String(site.get("name", "Site")), unlock_level])
+	if _site_threatened(site_id):
+		return _result(false, "%s controls this resource lane. Defeat the Syndicate fleet first." % _site_threat_commander(site_id))
 	if int(site.get("harvest_end", 0)) > 0:
 		return _result(false, "A harvester is already working this site.")
 	if int(site.get("recovery_end", 0)) > 0:
@@ -282,6 +287,17 @@ func _complete_harvest(site: Dictionary) -> void:
 func _start_recovery(site: Dictionary) -> void:
 	var level: int = int(site.get("level", 1))
 	site["recovery_end"] = _now() + maxi(30, 70 - level * 5)
+
+func _site_threatened(site_id: String) -> bool:
+	var threats: Node = get_node_or_null("/root/SpaceThreats")
+	return bool(threats.call("site_is_threatened", site_id)) if threats != null and threats.has_method("site_is_threatened") else false
+
+func _site_threat_commander(site_id: String) -> String:
+	var threats: Node = get_node_or_null("/root/SpaceThreats")
+	if threats == null or not threats.has_method("target_for_site"):
+		return "A Syndicate fleet"
+	var target: Dictionary = threats.call("target_for_site", site_id) as Dictionary
+	return String(target.get("commander", "A Syndicate fleet"))
 
 func _dictionary_array(value: Variant) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
