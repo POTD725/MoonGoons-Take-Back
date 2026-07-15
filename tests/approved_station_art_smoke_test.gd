@@ -21,7 +21,7 @@ func _run() -> void:
 		var art_layer: CanvasLayer = instance.get_node_or_null("ApprovedStationArtLayer") as CanvasLayer
 		var art_control: Control = instance.get_node_or_null("ApprovedStationArtLayer/ApprovedStationArt") as Control
 		_expect(art_layer != null and art_layer.layer == 1, "Approved artwork is mounted above the emergency renderer")
-		_expect(art_control != null and art_control.script == overlay_script, "Live station uses the approved artwork controller")
+		_expect(art_control != null and art_control.get_script() == overlay_script, "Live station uses the approved artwork controller")
 		instance.queue_free()
 	var overlay_file := FileAccess.open("res://scripts/approved_station_art_overlay.gd", FileAccess.READ)
 	_expect(overlay_file != null, "Approved artwork controller can be inspected")
