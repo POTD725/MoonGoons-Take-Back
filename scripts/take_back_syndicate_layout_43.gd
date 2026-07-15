@@ -1,6 +1,7 @@
 extends "res://scripts/take_back_syndicate_layout.gd"
 ## Godot 4.3 compatibility layer for the Syndicate-style station GUI.
 ## Keeps icons at authored dimensions because Button.icon_max_width is unavailable.
+## Routes each portrait navigation link directly to its live game panel.
 
 const PATROL_SPACECRAFT: Texture2D = preload("res://assets/ui/patrol_spacecraft.svg")
 const NAV_DATA_COMPAT: Array[Dictionary] = [
@@ -87,6 +88,87 @@ func _make_button(id: String, rect: Rect2, label: String, tooltip: String, icon_
 	add_child(button)
 	buttons[id] = button
 	return button
+
+func _activate_internal(command_id: String) -> void:
+	_close_live_trays()
+	var tray: Control = null
+	match command_id:
+		"city":
+			precinct.call("_show_tab", "city")
+			_set_core_panel("city_panel", false)
+		"missions":
+			precinct.call("_show_tab", "tasks")
+			tray = _set_core_panel("tasks_panel", true)
+		"dispatch":
+			precinct.call("_show_tab", "patrol")
+			tray = _set_core_panel("patrol_panel", true)
+		"officers":
+			precinct.call("_show_tab", "officers")
+			tray = _set_core_panel("officer_panel", true)
+		"equipment":
+			precinct.call("_show_tab", "city")
+			tray = _set_external_panel("PrecinctProgressionUI", "equipment_panel", true)
+		"station":
+			tray = _set_external_panel("StationCommandUI", "panel", true)
+		"resources":
+			tray = _set_external_panel("ResourceHarvestController", "panel", true)
+		"threats":
+			tray = _set_external_panel("SpaceThreatOperations", "panel", true)
+		"side_ops":
+			tray = _set_external_panel("SideOperationsUI", "panel", true)
+		"research":
+			var overlay: Node = get_node_or_null("/root/AllianceResearchOverlay")
+			if overlay != null:
+				var panel_value: Variant = overlay.get("panel")
+				if panel_value is Control:
+					tray = panel_value as Control
+					tray.visible = true
+	if tray != null:
+		_place_tray(tray)
+	message = "%s console opened." % command_id.replace("_", " ").capitalize()
+
+func _close_live_trays() -> void:
+	for property_name: String in ["city_panel", "officer_panel", "patrol_panel", "custody_panel", "tasks_panel"]:
+		_set_core_panel(property_name, false)
+	for pair: Array[String] in [
+		["PrecinctProgressionUI", "equipment_panel"],
+		["StationCommandUI", "panel"],
+		["ResourceHarvestController", "panel"],
+		["SpaceThreatOperations", "panel"],
+		["SideOperationsUI", "panel"]
+	]:
+		_set_external_panel(pair[0], pair[1], false)
+	var overlay: Node = get_node_or_null("/root/AllianceResearchOverlay")
+	if overlay != null:
+		var panel_value: Variant = overlay.get("panel")
+		if panel_value is Control:
+			(panel_value as Control).visible = false
+
+func _set_core_panel(property_name: String, show: bool) -> Control:
+	var value: Variant = precinct.get(property_name)
+	if value is Control:
+		var control := value as Control
+		control.visible = show
+		return control
+	return null
+
+func _set_external_panel(controller_name: String, property_name: String, show: bool) -> Control:
+	var controller: Node = precinct.get_node_or_null(controller_name)
+	if controller == null:
+		return null
+	var value: Variant = controller.get(property_name)
+	if value is Control:
+		var control := value as Control
+		control.visible = show
+		return control
+	return null
+
+func _place_tray(tray: Control) -> void:
+	tray.position = Vector2(366.0, 160.0)
+	tray.size = Vector2(338.0, 790.0)
+	tray.custom_minimum_size = Vector2.ZERO
+	tray.visible = true
+	tray.move_to_front()
 
 func _is_patrol_control(id: String, label: String, icon_key: String) -> bool:
 	var combined: String = "%s %s %s" % [id, label, icon_key]
