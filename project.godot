@@ -4,8 +4,8 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="0.5.0-living-campaigns"
-run/main_scene="res://scenes/CampaignRouter.tscn"
+config/version="0.6.0-graphic-city-start"
+run/main_scene="res://scenes/LivingPrecinct.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
 
