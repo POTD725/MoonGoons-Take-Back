@@ -139,20 +139,20 @@ $GODOT_HEAD_INCLUDE
   <div id="shell">
     <header>
       <h1>MoonGoons Take Back</h1>
-      <span class="badge">Browser Test Build</span>
+      <span class="badge">Precinct Vertical Slice</span>
     </header>
     <main id="game-wrap">
       <canvas id="canvas">Your browser does not support HTML5 canvas.</canvas>
       <div id="status">
         <div id="status-progress">
           <div id="status-progress-inner"></div>
-          <div id="status-notice">Loading lunar command systems...</div>
+          <div id="status-notice">Loading lunar precinct command systems...</div>
         </div>
       </div>
     </main>
     <footer>
-      <span><strong>Touch:</strong> tap unit, drag select, use command deck</span>
-      <span><strong>Desktop:</strong> left select, right move, C story</span>
+      <span><strong>Precinct:</strong> select rooms, officers, and distress calls</span>
+      <span><strong>Patrol:</strong> attack, cover, use specials, or enable auto combat</span>
     </footer>
   </div>
   <script src="$GODOT_URL"></script>
@@ -163,11 +163,7 @@ $GODOT_HEAD_INCLUDE
     const engine = new Engine($GODOT_CONFIG);
 
     function setStatusMode(mode) {
-      if (mode === 'hidden') {
-        statusOverlay.style.display = 'none';
-      } else {
-        statusOverlay.style.display = 'flex';
-      }
+      statusOverlay.style.display = mode === 'hidden' ? 'none' : 'flex';
     }
 
     engine.startGame({
