@@ -4,13 +4,14 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="0.2.1-skinned-precinct"
+config/version="0.3.0-precinct-hub"
 run/main_scene="res://scenes/PrecinctVerticalSlice.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
 
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
+PrecinctMeta="*res://scripts/precinct_meta_state.gd"
 MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"
 
 [display/window]
