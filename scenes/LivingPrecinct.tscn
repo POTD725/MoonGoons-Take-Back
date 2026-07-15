@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -13,9 +13,24 @@
 [ext_resource type="Script" path="res://scripts/progression_ui_bootstrap.gd" id="11_bootstrap"]
 [ext_resource type="Script" path="res://scripts/resource_harvesting_layer.gd" id="12_resources"]
 [ext_resource type="Script" path="res://scripts/space_syndicate_threats_ui.gd" id="13_threats"]
+[ext_resource type="Script" path="res://scripts/living_precinct_web_backdrop.gd" id="14_web_backdrop"]
+[ext_resource type="Script" path="res://scripts/living_precinct_web_layout_fix.gd" id="15_web_layout"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
+
+[node name="PrecinctWebBackdropLayer" type="CanvasLayer" parent="."]
+layer = -20
+
+[node name="PrecinctWebBackdrop" type="Control" parent="PrecinctWebBackdropLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("14_web_backdrop")
 
 [node name="VisualPolish" type="Node" parent="."]
 script = ExtResource("2_polish")
@@ -53,3 +68,6 @@ script = ExtResource("12_resources")
 
 [node name="SpaceThreatOperations" type="Node" parent="."]
 script = ExtResource("13_threats")
+
+[node name="WebLayoutRepair" type="Node" parent="."]
+script = ExtResource("15_web_layout")
