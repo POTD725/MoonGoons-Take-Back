@@ -1,8 +1,9 @@
 /*
  * One-release cleanup worker for the former MoonGoons PWA export.
- * The old Godot worker cached a missing index.worker.js and could trap browsers
- * on a nearly complete loading bar. This replacement clears those caches,
- * unregisters itself, and reloads controlled pages from the network.
+ * The old Godot worker cached a threaded-worker dependency that was not shipped
+ * and could trap browsers on a nearly complete loading bar. This replacement
+ * clears those caches, unregisters itself, and reloads controlled pages from
+ * the network.
  */
 const MOONGOONS_CACHE_PREFIX = 'MoonGoons Take B-sw-cache-';
 
