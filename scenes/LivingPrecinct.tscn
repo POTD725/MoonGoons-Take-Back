@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -25,6 +25,7 @@
 [ext_resource type="Script" path="res://scripts/precinct_station_board_skin.gd" id="23_station_board"]
 [ext_resource type="Script" path="res://scripts/precinct_icon_tooltip_controller_43.gd" id="24_icon_hover"]
 [ext_resource type="Script" path="res://scripts/precinct_station_language_patch.gd" id="25_station_language"]
+[ext_resource type="Script" path="res://scripts/approved_station_art_overlay.gd" id="26_approved_art"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -41,6 +42,19 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_web_backdrop")
+
+[node name="ApprovedStationArtLayer" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="ApprovedStationArt" type="Control" parent="ApprovedStationArtLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("26_approved_art")
 
 [node name="StationBoardFrameLayer" type="CanvasLayer" parent="."]
 layer = 4
