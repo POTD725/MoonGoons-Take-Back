@@ -12,12 +12,14 @@ func _run() -> void:
 	var audio_script:Script = load("res://scripts/moongoons_audio.gd") as Script
 	var living_script:Script = load("res://scripts/living_precinct.gd") as Script
 	var polish_script:Script = load("res://scripts/living_precinct_ui_polish.gd") as Script
+	var input_script:Script = load("res://scripts/living_precinct_input_bridge.gd") as Script
 	_expect(room_factory != null,"3D room factory loads")
 	_expect(officer_factory != null,"Officer visual factory loads")
 	_expect(agent_script != null,"Walking agent AI loads")
 	_expect(audio_script != null,"Generated audio service loads")
 	_expect(living_script != null,"Living precinct controller loads")
 	_expect(polish_script != null,"Responsive precinct graphics layer loads")
+	_expect(input_script != null,"Camera input bridge loads")
 
 	var art_paths:Array[String] = [
 		"res://assets/precinct/rooms/ops_center.svg",
@@ -69,10 +71,14 @@ func _run() -> void:
 		await process_frame
 		await process_frame
 		await process_frame
+		await process_frame
+		await process_frame
 		_expect(instance.get_node_or_null("LivingPrecinctWorld") is Node3D,"Full city world builds at runtime")
 		_expect(instance.get_node_or_null("CityCamera") is Camera3D,"Runtime camera is active")
 		_expect(instance.get_node_or_null("Interface") is CanvasLayer,"Runtime management interface builds")
 		_expect(instance.get_node_or_null("VisualPolish") is Node,"Responsive art and HUD polish layer is attached")
+		var input_bridge:Node = instance.get_node_or_null("CameraInputBridge")
+		_expect(input_bridge != null,"Camera input bridge is attached")
 		var rooms_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Rooms")
 		var personnel_node:Node = instance.get_node_or_null("LivingPrecinctWorld/Personnel")
 		_expect(rooms_node != null and rooms_node.get_child_count() == 8,"All eight room interiors build at runtime")
@@ -83,6 +89,15 @@ func _run() -> void:
 		var resource_value:Variant = instance.get("resource_label")
 		_expect(title_label != null,"Responsive header preserves the precinct title")
 		_expect(resource_value is Label and title_label != null and (resource_value as Label).get_parent() != title_label.get_parent(),"Title and economy telemetry use separate header rows")
+		if input_bridge != null:
+			_expect(input_bridge.get_node_or_null("CameraControlsLayer") is CanvasLayer,"On-screen camera controls build at runtime")
+			var target_before:Vector3 = instance.get("camera_target")
+			input_bridge.call("nudge_camera",Vector2(1.0,0.0),2.0)
+			var target_after:Vector3 = instance.get("camera_target")
+			_expect(target_after.distance_to(target_before) > 1.0,"Camera input command moves the city target")
+			var distance_before:float = float(instance.get("camera_distance"))
+			input_bridge.call("zoom_camera",-3.0)
+			_expect(float(instance.get("camera_distance")) < distance_before,"Camera input command changes zoom")
 		instance.queue_free()
 
 	var project_file:ConfigFile = ConfigFile.new()
@@ -99,7 +114,7 @@ func _run() -> void:
 
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Living precinct graphics and integration smoke tests passed.")
+		print("SUCCESS: Living precinct graphics, input, and integration smoke tests passed.")
 	else:
 		push_error("FAILED: %d living precinct smoke test(s) failed." % failures)
 	quit(failures)
