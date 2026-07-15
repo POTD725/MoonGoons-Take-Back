@@ -12,8 +12,6 @@ config/icon="res://assets/android/icon.svg"
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
 
-[display]
-
 [display/window]
 size/viewport_width=1280
 size/viewport_height=720
