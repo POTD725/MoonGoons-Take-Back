@@ -12,6 +12,19 @@ const NAV_DATA_COMPAT: Array[Dictionary] = [
 	{"id":"command", "title":"COMMAND", "subtitle":"SYSTEMS", "icon":"equipment"}
 ]
 
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	precinct = get_node_or_null(precinct_path)
+	if precinct == null:
+		precinct = get_node_or_null("../../LivingPrecinct")
+	_build_input_blockers()
+	_build_header_buttons()
+	_build_camera_buttons()
+	_build_inspector_buttons()
+	_build_navigation()
+	_build_command_drawer()
+	call_deferred("_finish_initialization")
+
 func _build_navigation() -> void:
 	var rects: Array[Rect2] = [
 		Rect2(8.0, 1170.0, 134.0, 96.0), Rect2(150.0, 1170.0, 134.0, 96.0),
@@ -90,6 +103,9 @@ func _make_button(id: String, rect: Rect2, label: String, tooltip: String, icon_
 	return button
 
 func _activate_internal(command_id: String) -> void:
+	if precinct == null:
+		message = "Station controller is still linking."
+		return
 	_close_live_trays()
 	var tray: Control = null
 	match command_id:
@@ -128,16 +144,20 @@ func _activate_internal(command_id: String) -> void:
 	message = "%s console opened." % command_id.replace("_", " ").capitalize()
 
 func _close_live_trays() -> void:
+	if precinct == null:
+		return
 	for property_name: String in ["city_panel", "officer_panel", "patrol_panel", "custody_panel", "tasks_panel"]:
 		_set_core_panel(property_name, false)
-	for pair: Array[String] in [
+	var panel_pairs: Array = [
 		["PrecinctProgressionUI", "equipment_panel"],
 		["StationCommandUI", "panel"],
 		["ResourceHarvestController", "panel"],
 		["SpaceThreatOperations", "panel"],
 		["SideOperationsUI", "panel"]
-	]:
-		_set_external_panel(pair[0], pair[1], false)
+	]
+	for pair_value: Variant in panel_pairs:
+		var pair: Array = pair_value as Array
+		_set_external_panel(String(pair[0]), String(pair[1]), false)
 	var overlay: Node = get_node_or_null("/root/AllianceResearchOverlay")
 	if overlay != null:
 		var panel_value: Variant = overlay.get("panel")
@@ -145,6 +165,8 @@ func _close_live_trays() -> void:
 			(panel_value as Control).visible = false
 
 func _set_core_panel(property_name: String, show: bool) -> Control:
+	if precinct == null:
+		return null
 	var value: Variant = precinct.get(property_name)
 	if value is Control:
 		var control := value as Control
@@ -153,6 +175,8 @@ func _set_core_panel(property_name: String, show: bool) -> Control:
 	return null
 
 func _set_external_panel(controller_name: String, property_name: String, show: bool) -> Control:
+	if precinct == null:
+		return null
 	var controller: Node = precinct.get_node_or_null(controller_name)
 	if controller == null:
 		return null
