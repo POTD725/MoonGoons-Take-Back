@@ -4,13 +4,16 @@ config_version=5
 
 [application]
 config/name="MoonGoons Take Back"
-config/version="0.7.0-counter-syndicate"
+config/version="0.9.0-station-command"
 run/main_scene="res://scenes/LivingPrecinct.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/android/icon.svg"
 
 [autoload]
 PrecinctState="*res://scripts/precinct_state.gd"
+PrecinctEquipment="*res://scripts/precinct_equipment_state.gd"
+SideOperations="*res://scripts/side_operations_state.gd"
+StationProgression="*res://scripts/station_progression_state.gd"
 PrecinctMeta="*res://scripts/precinct_meta_state.gd"
 CounterSyndicate="*res://scripts/counter_syndicate_state.gd"
 MoonGoonsSkins="*res://scripts/moongoons_skin_bank.gd"

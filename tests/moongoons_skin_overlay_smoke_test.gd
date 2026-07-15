@@ -1,5 +1,6 @@
 extends SceneTree
-## Verifies the imported-art catalog, multi-view hub wiring, and battle skin layer.
+## Verifies the imported-art catalog, multi-view hub wiring, battle skin layer,
+## and expanded precinct mission catalog.
 
 var failures: int = 0
 
@@ -24,7 +25,7 @@ func _run_checks() -> void:
 	if meta_script != null:
 		var meta_node: Node = meta_script.new() as Node
 		var tasks_value: Variant = meta_node.call("task_catalog")
-		_expect(tasks_value is Array and (tasks_value as Array).size() == 6, "Chapter and daily task catalog contains six objectives")
+		_expect(tasks_value is Array and (tasks_value as Array).size() >= 18, "Expanded mission catalog contains chapter, daily, patrol, investigation, district, and station objectives")
 		meta_node.queue_free()
 
 	var precinct_scene: PackedScene = load("res://scenes/PrecinctVerticalSlice.tscn") as PackedScene

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -6,6 +6,11 @@
 [ext_resource type="Script" path="res://scripts/peacekeeper_campaign_mode.gd" id="4_campaign"]
 [ext_resource type="Script" path="res://scripts/living_precinct_view_cleanup.gd" id="5_cleanup"]
 [ext_resource type="Script" path="res://scripts/space_station_architecture.gd" id="6_station"]
+[ext_resource type="Script" path="res://scripts/precinct_progression_ui.gd" id="7_progression"]
+[ext_resource type="Script" path="res://scripts/side_operations_ui.gd" id="8_sideops"]
+[ext_resource type="Script" path="res://scripts/station_command_ui.gd" id="9_command"]
+[ext_resource type="Script" path="res://scripts/station_defense_visuals.gd" id="10_defense"]
+[ext_resource type="Script" path="res://scripts/progression_ui_bootstrap.gd" id="11_bootstrap"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -24,3 +29,19 @@ script = ExtResource("5_cleanup")
 
 [node name="SpaceStationArchitecture" type="Node" parent="."]
 script = ExtResource("6_station")
+
+[node name="PrecinctProgressionUI" type="Node" parent="."]
+process_mode = 4
+script = ExtResource("7_progression")
+
+[node name="ProgressionUIBootstrap" type="Node" parent="."]
+script = ExtResource("11_bootstrap")
+
+[node name="SideOperationsUI" type="Node" parent="."]
+script = ExtResource("8_sideops")
+
+[node name="StationCommandUI" type="Node" parent="."]
+script = ExtResource("9_command")
+
+[node name="StationDefenseVisualsController" type="Node" parent="."]
+script = ExtResource("10_defense")
