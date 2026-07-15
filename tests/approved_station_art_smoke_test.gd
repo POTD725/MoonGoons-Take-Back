@@ -20,7 +20,9 @@ func _run() -> void:
 			await process_frame
 		var art_layer: CanvasLayer = instance.get_node_or_null("ApprovedStationArtLayer") as CanvasLayer
 		var art_control: Control = instance.get_node_or_null("ApprovedStationArtLayer/ApprovedStationArt") as Control
-		_expect(art_layer != null and art_layer.layer == 1, "Approved artwork is mounted above the emergency renderer")
+		var fallback_layer: CanvasLayer = instance.get_node_or_null("StationBoardFrameLayer") as CanvasLayer
+		_expect(art_layer != null and art_layer.layer == 12, "Approved artwork is mounted above every fallback renderer")
+		_expect(fallback_layer != null and not fallback_layer.visible, "Old schematic station frame is disabled")
 		_expect(art_control != null and art_control.get_script() == overlay_script, "Live station uses the approved artwork controller")
 		instance.queue_free()
 	var overlay_file := FileAccess.open("res://scripts/approved_station_art_overlay.gd", FileAccess.READ)
@@ -30,12 +32,13 @@ func _run() -> void:
 		for required: String in [
 			"Police Headquarters", "Research Lab", "Training Center", "Crime Lab",
 			"Station Hospital", "Robotics Bay", "Storage Depot", "Armory",
-			"_draw_live_personnel", "_facility_at", "_activate_facility"
+			"_draw_live_personnel", "_draw_station_activity", "_hide_all_fallback_art",
+			"_facility_at", "_activate_facility"
 		]:
 			_expect(text.contains(required), "Approved station layer includes %s" % required)
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Approved station artwork, animation, and facility hotspots passed.")
+		print("SUCCESS: Approved station artwork, animation, facility hotspots, and layer ordering passed.")
 	else:
 		push_error("FAILED: %d approved station artwork check(s) failed." % failures)
 	quit(failures)
