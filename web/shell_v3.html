@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#071827">
+  <title>$GODOT_PROJECT_NAME</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020711;
+      --panel: rgba(6, 22, 36, 0.96);
+      --cyan: #7ee7ff;
+      --mint: #7ef5d0;
+      --rose: #ff709f;
+      --amber: #ffc36c;
+      --text: #eafdff;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; margin: 0; overflow: hidden;
+      background: radial-gradient(circle at 50% 12%, #173a5b 0, #071827 42%, #020711 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      touch-action: none;
+    }
+    #shell {
+      position: fixed; inset: 0; display: grid; grid-template-rows: 52px 1fr 38px;
+      gap: 7px; padding: 9px;
+    }
+    header, footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border: 1px solid rgba(126,231,255,0.28); border-radius: 14px;
+      background: var(--panel); padding: 7px 13px;
+      box-shadow: 0 0 28px rgba(126,231,255,0.08);
+    }
+    h1 { margin: 0; font-size: clamp(16px, 2.1vw, 23px); letter-spacing: .05em; }
+    .badge {
+      white-space: nowrap; border-radius: 999px; padding: 5px 11px;
+      background: linear-gradient(135deg, var(--rose), #a86cff); color: white;
+      font-size: 11px; font-weight: 850;
+    }
+    #game-wrap {
+      position: relative; min-height: 0; overflow: hidden; border-radius: 17px;
+      border: 1px solid rgba(126,231,255,0.34); background: #020711;
+      box-shadow: 0 14px 46px rgba(0,0,0,.42), 0 0 32px rgba(126,231,255,.10);
+    }
+    #canvas { display: block; width: 100%; height: 100%; outline: none; }
+    #status {
+      position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+      padding: 16px; pointer-events: none; background: rgba(2,7,17,.14);
+    }
+    #status-card {
+      width: min(560px, 92vw); border: 1px solid rgba(255,112,159,.44);
+      border-radius: 14px; background: rgba(13,9,24,.96); padding: 11px 13px;
+      box-shadow: 0 10px 32px rgba(0,0,0,.44);
+    }
+    #track { height: 10px; border-radius: 999px; background: rgba(255,112,159,.12); overflow: hidden; }
+    #bar { width: 0; height: 100%; background: linear-gradient(90deg, var(--rose), #a86cff, var(--cyan)); transition: width .18s ease; }
+    #notice { margin-top: 8px; text-align: center; font-size: 13px; color: #ffd8e8; }
+    #detail { min-height: 17px; margin-top: 3px; text-align: center; font-size: 11px; color: #9e88ae; }
+    #actions { display: none; justify-content: center; gap: 8px; margin-top: 9px; pointer-events: auto; }
+    #actions.visible { display: flex; }
+    button {
+      border: 1px solid rgba(255,112,159,.62); border-radius: 9px;
+      background: rgba(80,28,62,.96); color: white; padding: 7px 12px;
+      font: inherit; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+    footer { color: #a8cadd; font-size: 12px; }
+    footer strong { color: var(--mint); }
+    @media (max-width: 760px) {
+      #shell { grid-template-rows: 44px 1fr; gap: 5px; padding: 5px; }
+      footer { display: none; }
+      header { border-radius: 11px; padding: 5px 8px; }
+      .badge { font-size: 9px; padding: 4px 7px; }
+    }
+  </style>
+$GODOT_HEAD_INCLUDE
+</head>
+<body>
+  <div id="shell">
+    <header>
+      <h1>MOONGOONS TAKE BACK</h1>
+      <span class="badge">SYNDICATE RISING · BUILD __MOONGOONS_BUILD_TOKEN__</span>
+    </header>
+    <main id="game-wrap">
+      <canvas id="canvas">Your browser does not support HTML5 canvas.</canvas>
+      <div id="status">
+        <div id="status-card">
+          <div id="track"><div id="bar"></div></div>
+          <div id="notice">Loading the Syndicate Rising criminal campaign...</div>
+          <div id="detail">Fetching a uniquely versioned MoonGoons game package.</div>
+          <div id="actions">
+            <button id="retry" type="button">Retry launch</button>
+            <button id="reset" type="button">Clear old build and reload</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <span><strong>Default route:</strong> criminal hideout, scores, crew, Heat, and story cinematics</span>
+      <span><strong>Campaign Hub:</strong> available from inside the hideout</span>
+    </footer>
+  </div>
+  <script src="$GODOT_URL"></script>
+  <script>
+    const WEB_FIX_VERSION = '3';
+    const LEGACY_CACHE_PREFIX = 'MoonGoons Take B-sw-cache-';
+    const status = document.getElementById('status');
+    const bar = document.getElementById('bar');
+    const notice = document.getElementById('notice');
+    const detail = document.getElementById('detail');
+    const actions = document.getElementById('actions');
+    const retry = document.getElementById('retry');
+    const reset = document.getElementById('reset');
+    let started = false;
+    let timeoutHandle = null;
+
+    function showRecovery(message, extra) {
+      notice.textContent = message;
+      notice.style.color = 'var(--amber)';
+      detail.textContent = extra || 'Clear the older browser build, then reload once.';
+      actions.classList.add('visible');
+    }
+
+    async function clearOldState(forceReload) {
+      let changed = false;
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          const local = registrations.filter((registration) => registration.scope.includes('/MoonGoons-Take-Back/'));
+          changed = local.length > 0;
+          await Promise.all(local.map((registration) => registration.unregister()));
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          const oldKeys = keys.filter((key) => key.startsWith(LEGACY_CACHE_PREFIX));
+          changed = changed || oldKeys.length > 0;
+          await Promise.all(oldKeys.map((key) => caches.delete(key)));
+        }
+      } catch (error) {
+        console.warn('MoonGoons cache cleanup warning:', error);
+      }
+      const marker = sessionStorage.getItem('moongoons-webfix');
+      if ((forceReload || changed) && marker !== WEB_FIX_VERSION) {
+        sessionStorage.setItem('moongoons-webfix', WEB_FIX_VERSION);
+        const url = new URL(location.href);
+        url.searchParams.set('webfix', WEB_FIX_VERSION);
+        url.searchParams.set('t', String(Date.now()));
+        location.replace(url.toString());
+        return false;
+      }
+      sessionStorage.removeItem('moongoons-webfix');
+      return true;
+    }
+
+    async function launchGame() {
+      notice.style.color = '#ffd8e8';
+      notice.textContent = 'Loading the Syndicate Rising criminal campaign...';
+      detail.textContent = 'Downloading the current engine and uniquely versioned game data.';
+      actions.classList.remove('visible');
+      bar.style.width = '0%';
+      const engine = new Engine($GODOT_CONFIG);
+      timeoutHandle = setTimeout(() => {
+        if (!started) showRecovery('The game is taking too long to launch.', 'Use Clear old build and reload once.');
+      }, 75000);
+      try {
+        await engine.startGame({
+          onProgress(current, total) {
+            if (total > 0) {
+              const percent = Math.max(0, Math.min(100, Math.round(current / total * 100)));
+              bar.style.width = `${percent}%`;
+              detail.textContent = `${percent}% · ${(current / 1048576).toFixed(1)} MB of ${(total / 1048576).toFixed(1)} MB`;
+            }
+          }
+        });
+        started = true;
+        clearTimeout(timeoutHandle);
+        status.style.display = 'none';
+      } catch (error) {
+        clearTimeout(timeoutHandle);
+        console.error('MoonGoons launch failed:', error);
+        showRecovery('Launch failed.', String(error && error.message ? error.message : error));
+      }
+    }
+
+    retry.addEventListener('click', () => location.reload());
+    reset.addEventListener('click', async () => {
+      sessionStorage.removeItem('moongoons-webfix');
+      const ready = await clearOldState(true);
+      if (ready) location.reload();
+    });
+
+    window.addEventListener('error', (event) => {
+      if (!started) showRecovery('A browser startup error stopped the game.', event.message || 'Unknown error.');
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      if (!started) showRecovery('The game loader was interrupted.', String(event.reason || 'Unknown rejection.'));
+    });
+
+    clearOldState(false).then((ready) => {
+      if (ready) launchGame();
+    }).catch(() => launchGame());
+  </script>
+</body>
+</html>
