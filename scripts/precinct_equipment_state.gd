@@ -8,44 +8,44 @@ const SAVE_PATH: String = "user://moongoons_precinct_equipment.json"
 
 const EQUIPMENT_CATALOG: Dictionary = {
 	"ops": [
-		{"id":"command_table","name":"Command Table","effect":"Patrol planning speed","base_cost":70},
-		{"id":"dispatch_console","name":"Dispatch Console","effect":"Distress-call response","base_cost":65},
-		{"id":"holo_map","name":"Lunar Holo-Map","effect":"District intelligence","base_cost":80}
+		{"id":"command_table","icon":"command_table","name":"Command Table","effect":"Patrol planning speed","description":"Projects patrol routes, active calls, officer positions, and command priorities above the Operations deck.","base_cost":70},
+		{"id":"dispatch_console","icon":"dispatch_console","name":"Dispatch Console","effect":"Distress-call response","description":"Coordinates distress calls and shortens the time between an alert, officer assignment, and launch clearance.","base_cost":65},
+		{"id":"holo_map","icon":"holo_map","name":"Lunar Holo-Map","effect":"District intelligence","description":"Builds a live three-dimensional map of lunar districts, orbital lanes, criminal activity, and mission routes.","base_cost":80}
 	],
 	"armory": [
-		{"id":"weapon_racks","name":"Weapon Racks","effect":"Officer attack power","base_cost":75},
-		{"id":"armor_forge","name":"Armor Forge","effect":"Officer defense","base_cost":85},
-		{"id":"ammo_loader","name":"Ammo Loader","effect":"Patrol readiness","base_cost":65}
+		{"id":"weapon_racks","icon":"weapon_racks","name":"Weapon Racks","effect":"Officer attack power","description":"Stores calibrated Peacekeeper weapons and improves the attack readiness of officers posted to the Armory.","base_cost":75},
+		{"id":"armor_forge","icon":"armor_forge","name":"Armor Forge","effect":"Officer defense","description":"Fabricates and repairs pressure-rated armor plates, helmets, seals, and defensive field components.","base_cost":85},
+		{"id":"ammo_loader","icon":"ammo_loader","name":"Ammo Loader","effect":"Patrol readiness","description":"Loads patrol craft and response teams with ammunition, power cells, and mission-specific equipment.","base_cost":65}
 	],
 	"cells": [
-		{"id":"cell_locks","name":"Cell Door Locks","effect":"Prisoner capacity","base_cost":70},
-		{"id":"security_scanner","name":"Security Scanner","effect":"Contraband detection","base_cost":75},
-		{"id":"intake_terminal","name":"Intake Terminal","effect":"Prisoner processing","base_cost":60}
+		{"id":"cell_locks","icon":"cell_locks","name":"Cell Door Locks","effect":"Prisoner capacity","description":"Controls reinforced detention doors, emergency lockdowns, prisoner capacity, and escape resistance.","base_cost":70},
+		{"id":"security_scanner","icon":"security_scanner","name":"Security Scanner","effect":"Contraband detection","description":"Searches detainees and cargo for contraband, hidden weapons, trackers, and Syndicate devices.","base_cost":75},
+		{"id":"intake_terminal","icon":"intake_terminal","name":"Intake Terminal","effect":"Prisoner processing","description":"Processes arrests, identity records, evidence links, charges, and secure prisoner assignments.","base_cost":60}
 	],
 	"quarters": [
-		{"id":"bunks","name":"Crew Bunks","effect":"Officer recovery","base_cost":60},
-		{"id":"mess_station","name":"Mess Station","effect":"Crew stamina","base_cost":65},
-		{"id":"morale_console","name":"Morale Console","effect":"Training efficiency","base_cost":70}
+		{"id":"bunks","icon":"bunks","name":"Crew Bunks","effect":"Officer recovery","description":"Provides pressure-safe crew rest quarters that improve recovery between patrols and station emergencies.","base_cost":60},
+		{"id":"mess_station","icon":"mess_station","name":"Mess Station","effect":"Crew stamina","description":"Produces crew meals and hydration packs, improving stamina during long duty rotations.","base_cost":65},
+		{"id":"morale_console","icon":"morale_console","name":"Morale Console","effect":"Training efficiency","description":"Tracks fatigue, commendations, team cohesion, and training efficiency across the station crew.","base_cost":70}
 	],
 	"medbay": [
-		{"id":"med_pods","name":"Medical Pods","effect":"Healing speed","base_cost":85},
-		{"id":"diagnostic_scanner","name":"Diagnostic Scanner","effect":"Injury detection","base_cost":75},
-		{"id":"trauma_console","name":"Trauma Console","effect":"Critical recovery","base_cost":90}
+		{"id":"med_pods","icon":"med_pods","name":"Medical Pods","effect":"Healing speed","description":"Stabilizes injured officers and civilians inside automated recovery capsules with life-support monitoring.","base_cost":85},
+		{"id":"diagnostic_scanner","icon":"diagnostic_scanner","name":"Diagnostic Scanner","effect":"Injury detection","description":"Detects internal injuries, toxins, radiation exposure, alien pathogens, and suit-seal failures.","base_cost":75},
+		{"id":"trauma_console","icon":"trauma_console","name":"Trauma Console","effect":"Critical recovery","description":"Coordinates critical treatment, surgical tools, emergency medication, and medical side operations.","base_cost":90}
 	],
 	"chief": [
-		{"id":"command_desk","name":"Chief's Command Desk","effect":"Station authority","base_cost":90},
-		{"id":"strategy_wall","name":"Strategy Wall","effect":"Mission rewards","base_cost":95},
-		{"id":"authority_uplink","name":"Authority Uplink","effect":"District command range","base_cost":100}
+		{"id":"command_desk","icon":"command_desk","name":"Chief's Command Desk","effect":"Station authority","description":"Sets the maximum level for station rooms and equipment while coordinating precinct-wide authority.","base_cost":90},
+		{"id":"strategy_wall","icon":"strategy_wall","name":"Strategy Wall","effect":"Mission rewards","description":"Combines mission intelligence, fleet movements, evidence, and district control into command plans.","base_cost":95},
+		{"id":"authority_uplink","icon":"authority_uplink","name":"Authority Uplink","effect":"District command range","description":"Maintains encrypted contact with regional Peacekeeper command and expands station command range.","base_cost":100}
 	],
 	"interrogation": [
-		{"id":"truth_scanner","name":"Truth Scanner","effect":"Interrogation intel","base_cost":85},
-		{"id":"evidence_console","name":"Evidence Console","effect":"Evidence recovery","base_cost":75},
-		{"id":"restraint_table","name":"Restraint Table","effect":"Suspect compliance","base_cost":70}
+		{"id":"truth_scanner","icon":"truth_scanner","name":"Truth Scanner","effect":"Interrogation intel","description":"Compares stress, voice, bio-signals, evidence, and testimony during interrogation operations.","base_cost":85},
+		{"id":"evidence_console","icon":"evidence_console","name":"Evidence Console","effect":"Evidence recovery","description":"Catalogs recovered evidence and links suspects, locations, ships, crimes, and Syndicate networks.","base_cost":75},
+		{"id":"restraint_table","icon":"restraint_table","name":"Restraint Table","effect":"Suspect compliance","description":"Secures dangerous suspects while preserving monitored, controlled interrogation conditions.","base_cost":70}
 	],
 	"transfer": [
-		{"id":"airlock_gate","name":"Transfer Airlock","effect":"Transfer security","base_cost":90},
-		{"id":"prisoner_scanner","name":"Prisoner Scanner","effect":"Transfer inspection","base_cost":75},
-		{"id":"transport_console","name":"Transport Console","effect":"Transfer rewards","base_cost":80}
+		{"id":"airlock_gate","icon":"airlock_gate","name":"Transfer Airlock","effect":"Transfer security","description":"Seals prisoner-transfer corridors and prevents decompression, escape, or hostile boarding.","base_cost":90},
+		{"id":"prisoner_scanner","icon":"prisoner_scanner","name":"Prisoner Scanner","effect":"Transfer inspection","description":"Performs final identity, health, contraband, and tracking checks before secure transport.","base_cost":75},
+		{"id":"transport_console","icon":"transport_console","name":"Transport Console","effect":"Transfer rewards","description":"Schedules prisoner shuttles, escort teams, docking windows, routes, and transfer rewards.","base_cost":80}
 	]
 }
 
