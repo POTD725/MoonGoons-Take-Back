@@ -39,6 +39,13 @@ func _validate_web_playable_files() -> void:
 		failures.append("Custom web playable shell could not be opened.")
 		return
 	var shell_text: String = shell.get_as_text()
-	for required_shell_text: String in ["MoonGoons Take Back", "$GODOT_URL", "$GODOT_CONFIG", "Browser Test Build"]:
+	for required_shell_text: String in [
+		"MoonGoons Take Back",
+		"$GODOT_URL",
+		"$GODOT_CONFIG",
+		"Precinct Vertical Slice",
+		"Loading lunar precinct command systems",
+		"attack, cover, use specials"
+	]:
 		if not shell_text.contains(required_shell_text):
 			failures.append("Web shell missing token or label: %s" % required_shell_text)
