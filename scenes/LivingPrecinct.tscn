@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -11,6 +11,8 @@
 [ext_resource type="Script" path="res://scripts/station_command_ui.gd" id="9_command"]
 [ext_resource type="Script" path="res://scripts/station_defense_visuals.gd" id="10_defense"]
 [ext_resource type="Script" path="res://scripts/progression_ui_bootstrap.gd" id="11_bootstrap"]
+[ext_resource type="Script" path="res://scripts/resource_harvesting_layer.gd" id="12_resources"]
+[ext_resource type="Script" path="res://scripts/space_syndicate_threats_ui.gd" id="13_threats"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -45,3 +47,9 @@ script = ExtResource("9_command")
 
 [node name="StationDefenseVisualsController" type="Node" parent="."]
 script = ExtResource("10_defense")
+
+[node name="ResourceHarvestController" type="Node" parent="."]
+script = ExtResource("12_resources")
+
+[node name="SpaceThreatOperations" type="Node" parent="."]
+script = ExtResource("13_threats")
