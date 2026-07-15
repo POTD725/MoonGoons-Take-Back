@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/living_precinct.gd" id="1_living"]
 [ext_resource type="Script" path="res://scripts/living_precinct_ui_polish.gd" id="2_polish"]
@@ -17,6 +17,8 @@
 [ext_resource type="Script" path="res://scripts/living_precinct_web_layout_fix.gd" id="15_web_layout"]
 [ext_resource type="Script" path="res://scripts/precinct_compact_action_cards.gd" id="16_action_cards"]
 [ext_resource type="Script" path="res://scripts/precinct_compact_command_ribbon.gd" id="17_command_ribbon"]
+[ext_resource type="Script" path="res://scripts/precinct_equipment_style_state.gd" id="18_style_state"]
+[ext_resource type="Script" path="res://scripts/precinct_equipment_visual_controller.gd" id="19_visual_controller"]
 
 [node name="LivingMoonGoonsPrecinct" type="Node3D"]
 script = ExtResource("1_living")
@@ -79,3 +81,9 @@ script = ExtResource("16_action_cards")
 
 [node name="CompactCommandRibbon" type="Node" parent="."]
 script = ExtResource("17_command_ribbon")
+
+[node name="EquipmentStyleState" type="Node" parent="."]
+script = ExtResource("18_style_state")
+
+[node name="EquipmentVisualController" type="Node" parent="."]
+script = ExtResource("19_visual_controller")
