@@ -20,7 +20,7 @@ func _run() -> void:
 		_expect(shell.contains("id=\"fullscreen-button\""), "Web mode exposes fullscreen")
 		_expect(shell.contains("Ctrl/Cmd +") and shell.contains("ZOOM_STORAGE_KEY"), "Web zoom includes keyboard shortcuts and remembered preferences")
 		_expect(shell.contains("canvasStage.style.width") and shell.contains("canvasStage.style.height"), "Web zoom resizes the actual Godot canvas stage")
-		_expect(shell.contains("displayMode = window.matchMedia") and shell.contains("'width'"), "Desktop browsers default to a larger Fit Width presentation")
+		_expect(shell.contains("displayMode = window.matchMedia") and shell.contains("'width'"), "Web shell retains responsive Fit Width support")
 
 	var patrol_icon: Texture2D = load("res://assets/ui/patrol_spacecraft.svg") as Texture2D
 	_expect(patrol_icon != null, "Patrol uses a Peacekeeper spacecraft icon asset")
@@ -38,36 +38,35 @@ func _run() -> void:
 	var precinct: Node = instance.get_node_or_null("LivingPrecinct")
 	var hud: Control = instance.get_node_or_null("SyndicateParityLayer/SyndicateParityHUD") as Control
 	_expect(precinct != null, "The complete living precinct simulation remains mounted under the new GUI")
-	_expect(hud != null, "Fixed Syndicate-style status, inspector, and navigation HUD exists")
+	_expect(hud != null, "Fixed Syndicate-style compatibility controller exists")
 	if hud != null:
 		var station: Button = hud.get_node_or_null("nav_station") as Button
 		var missions: Button = hud.get_node_or_null("nav_missions") as Button
 		var operations: Button = hud.get_node_or_null("nav_operations") as Button
 		var officers: Button = hud.get_node_or_null("nav_officers") as Button
 		var command: Button = hud.get_node_or_null("nav_command") as Button
-		_expect(station != null and missions != null and operations != null and officers != null and command != null, "Five large bottom navigation tabs mirror Syndicate Rising's layout")
+		_expect(station != null and missions != null and operations != null and officers != null and command != null, "Five compatibility navigation controllers remain available")
 		if station != null and command != null:
-			_expect(is_equal_approx(station.position.y, 1170.0) and is_equal_approx(command.position.y, 1170.0), "Bottom navigation is anchored to the same 1170-1266 band")
-			_expect(station.icon != null and command.icon != null, "Bottom navigation tabs use picture icons")
+			_expect(is_equal_approx(station.position.y, 1170.0) and is_equal_approx(command.position.y, 1170.0), "Compatibility navigation retains the authored inspector band")
+			_expect(station.icon != null and command.icon != null, "Compatibility navigation retains picture icons")
 		var cutaway: Button = hud.get_node_or_null("cutaway") as Button
 		var rotate: Button = hud.get_node_or_null("rotate") as Button
 		var center: Button = hud.get_node_or_null("center") as Button
-		_expect(cutaway != null and rotate != null and center != null, "Compact camera strip provides cutaway, rotate, and center controls")
+		_expect(cutaway != null and rotate != null and center != null, "Compact camera controller provides cutaway, rotate, and center commands")
 		var room_action: Button = hud.get_node_or_null("room_action") as Button
 		var room_operation: Button = hud.get_node_or_null("room_operation") as Button
-		_expect(room_action != null and room_operation != null, "Persistent room inspector exposes primary and equipment actions")
+		_expect(room_action != null and room_operation != null, "Room inspector controller exposes primary and equipment actions")
 		if room_action != null:
-			_expect(is_equal_approx(room_action.position.y, 1062.0), "Room action occupies Syndicate Rising's inspector action band")
+			_expect(is_equal_approx(room_action.position.y, 1062.0), "Room action retains the inspector action band")
 		var drawer: PanelContainer = hud.get_node_or_null("CommandSystemsDrawer") as PanelContainer
-		_expect(drawer != null, "Command Systems drawer groups equipment, defense, threats, side ops, and research")
+		_expect(drawer != null, "Command Systems controller groups equipment, defense, threats, side ops, and research")
 
 		if precinct != null:
 			precinct.set("selected_room_id", "armory")
 			for _frame: int in range(20):
 				await process_frame
-			_expect(String(hud.get("selected_room_id")) == "armory", "HUD inspector follows room selection from the live station")
+			_expect(String(hud.get("selected_room_id")) == "armory", "Compatibility inspector follows room selection from the live station")
 
-		# Press every large navigation link and verify it reaches a real live destination.
 		var nav_audit: Array[Dictionary] = [
 			{"button":station, "id":"station", "panel":""},
 			{"button":missions, "id":"missions", "panel":"tasks_panel"},
@@ -83,20 +82,20 @@ func _run() -> void:
 			for _frame: int in range(8):
 				await process_frame
 			var id: String = String(audit.get("id", ""))
-			_expect(String(hud.get("active_nav")) == id, "%s navigation link reaches its controller" % id.capitalize())
+			_expect(String(hud.get("active_nav")) == id, "%s compatibility command reaches its controller" % id.capitalize())
 			var panel_key: String = String(audit.get("panel", ""))
 			if panel_key == "tasks_panel":
 				var tasks_value: Variant = precinct.get("tasks_panel")
-				_expect(tasks_value is Control and (tasks_value as Control).is_visible_in_tree(), "Missions link opens the live mission board")
+				_expect(tasks_value is Control and (tasks_value as Control).visible, "Missions controller opens the live mission board")
 			elif panel_key == "resource":
 				var resource_controller: Node = precinct.get_node_or_null("ResourceHarvestController")
 				var resource_panel: Variant = resource_controller.get("panel") if resource_controller != null else null
-				_expect(resource_panel is Control and (resource_panel as Control).is_visible_in_tree(), "Operations link opens the live orbital resource map")
+				_expect(resource_panel is Control and (resource_panel as Control).visible, "Operations controller opens the live orbital resource map")
 			elif panel_key == "officer_panel":
 				var officer_value: Variant = precinct.get("officer_panel")
-				_expect(officer_value is Control and (officer_value as Control).is_visible_in_tree(), "Officers link opens the live roster")
+				_expect(officer_value is Control and (officer_value as Control).visible, "Officers controller opens the live roster")
 			elif panel_key == "drawer":
-				_expect(drawer != null and drawer.is_visible_in_tree(), "Command link opens the grouped command systems")
+				_expect(drawer != null and drawer.visible, "Command controller opens its grouped systems state")
 
 	if precinct != null:
 		var old_ribbon: Control = precinct.get_node_or_null("CompactCommandRibbonLayer/CompactCommandRibbon") as Control
@@ -125,9 +124,9 @@ func _run() -> void:
 	instance.queue_free()
 	await process_frame
 	if failures == 0:
-		print("SUCCESS: Syndicate GUI parity, working links, web zoom, Patrol spacecraft, and animated NPCs passed.")
+		print("SUCCESS: Rendered GUI compatibility, working links, web zoom, Patrol spacecraft, and animated NPCs passed.")
 	else:
-		push_error("FAILED: %d Syndicate layout parity check(s) failed." % failures)
+		push_error("FAILED: %d rendered GUI compatibility check(s) failed." % failures)
 	quit(failures)
 
 func _expect(condition: bool, label: String) -> void:
