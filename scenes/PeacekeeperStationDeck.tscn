@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://scenes/LivingPrecinct.tscn" id="1_precinct"]
 [ext_resource type="Script" path="res://scripts/take_back_syndicate_layout_43.gd" id="2_layout"]
-[ext_resource type="Script" path="res://scripts/rendered_dashboard_controller.gd" id="3_rendered"]
+[ext_resource type="Script" path="res://scripts/rendered_dashboard_controller_live.gd" id="3_rendered"]
 
 [node name="PeacekeeperStationDeck" type="Node"]
 
