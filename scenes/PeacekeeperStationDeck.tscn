@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/LivingPrecinct.tscn" id="1_precinct"]
 [ext_resource type="Script" path="res://scripts/take_back_syndicate_layout_43.gd" id="2_layout"]
+[ext_resource type="Script" path="res://scripts/rendered_dashboard_controller_live.gd" id="3_rendered"]
 
 [node name="PeacekeeperStationDeck" type="Node"]
 
@@ -9,6 +10,7 @@
 
 [node name="SyndicateParityLayer" type="CanvasLayer" parent="."]
 layer = 200
+visible = false
 
 [node name="SyndicateParityHUD" type="Control" parent="SyndicateParityLayer" node_paths=PackedStringArray("precinct_path")]
 layout_mode = 3
@@ -20,3 +22,18 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_layout")
 precinct_path = NodePath("../../LivingPrecinct")
+
+[node name="RenderedDashboardLayer" type="CanvasLayer" parent="."]
+layer = 15
+
+[node name="RenderedDashboard" type="Control" parent="RenderedDashboardLayer" node_paths=PackedStringArray("precinct_path", "legacy_hud_path")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("3_rendered")
+precinct_path = NodePath("../../LivingPrecinct")
+legacy_hud_path = NodePath("../../SyndicateParityLayer/SyndicateParityHUD")
