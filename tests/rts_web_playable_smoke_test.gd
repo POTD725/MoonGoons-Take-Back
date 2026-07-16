@@ -26,7 +26,9 @@ func _validate_web_export_preset() -> void:
 		"custom_features=\"web,html5,playable,touch\"",
 		"html/custom_html_shell=\"res://web/shell.html\"",
 		"variant/thread_support=false",
-		"progressive_web_app/enabled=false"
+		"progressive_web_app/enabled=false",
+		"moongoons-rendered-dashboard-scale-v2",
+		"mode:'manual',scale:0.72"
 	]:
 		if not text.contains(required_text):
 			failures.append("Web export preset missing: %s" % required_text)
