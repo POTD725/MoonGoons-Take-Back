@@ -3,6 +3,24 @@ extends "res://scripts/rendered_dashboard_controller.gd"
 ## Keeps the hidden compatibility HUD available, but never depends on it for
 ## missions, officers, orbital maps, equipment, or the return control.
 
+func _ready() -> void:
+	super._ready()
+	_resolve_precinct()
+
+func _resolve_precinct() -> Node:
+	if precinct != null and is_instance_valid(precinct):
+		return precinct
+	precinct = get_node_or_null("../../LivingPrecinct")
+	if precinct == null:
+		var scene_root: Node = get_tree().current_scene
+		if scene_root != null:
+			precinct = scene_root.get_node_or_null("LivingPrecinct")
+	if precinct == null:
+		var deck_root: Node = get_parent().get_parent()
+		if deck_root != null:
+			precinct = deck_root.get_node_or_null("LivingPrecinct")
+	return precinct
+
 func _build_return_layer() -> void:
 	var root_node: Node = get_parent().get_parent()
 	return_layer = CanvasLayer.new()
@@ -24,6 +42,9 @@ func _build_return_layer() -> void:
 func _open_live_panel(command: String) -> void:
 	popup.visible = false
 	command_popup.visible = false
+	if _resolve_precinct() == null:
+		status_label.text = "Station systems are still linking."
+		return
 	_close_panels_directly()
 	var opened: Control = null
 	match command:
@@ -63,6 +84,7 @@ func _open_live_panel(command: String) -> void:
 	status_label.text = "%s opened." % command.replace("_", " ").capitalize()
 
 func _return_to_station() -> void:
+	_resolve_precinct()
 	_close_panels_directly()
 	var dashboard_layer: CanvasLayer = get_parent() as CanvasLayer
 	if dashboard_layer != null:
@@ -74,7 +96,7 @@ func _return_to_station() -> void:
 	status_label.text = "Rendered station online. Select a facility, mission, unit, or map panel."
 
 func _close_panels_directly() -> void:
-	if precinct == null:
+	if _resolve_precinct() == null:
 		return
 	for property_name: String in ["city_panel", "officer_panel", "patrol_panel", "custody_panel", "tasks_panel"]:
 		_core_panel(property_name, false)
@@ -93,7 +115,7 @@ func _close_panels_directly() -> void:
 			(value as Control).visible = false
 
 func _core_panel(property_name: String, show: bool) -> Control:
-	if precinct == null:
+	if _resolve_precinct() == null:
 		return null
 	var value: Variant = precinct.get(property_name)
 	if value is Control:
@@ -103,7 +125,7 @@ func _core_panel(property_name: String, show: bool) -> Control:
 	return null
 
 func _external_panel(controller_name: String, property_name: String, show: bool) -> Control:
-	if precinct == null:
+	if _resolve_precinct() == null:
 		return null
 	var controller: Node = precinct.get_node_or_null(controller_name)
 	if controller == null:
