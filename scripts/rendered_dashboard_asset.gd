@@ -12,7 +12,7 @@ const EXPECTED_BASE64_LENGTH: int = 41568
 static func load_image() -> Image:
 	var encoded: String = encoded_payload()
 	if encoded.length() != EXPECTED_BASE64_LENGTH:
-		push_error("Rendered dashboard payload length mismatch: %d" % encoded.length())
+		push_error("Rendered dashboard payload length mismatch after normalization: %d" % encoded.length())
 		return null
 	var bytes: PackedByteArray = Marshalls.base64_to_raw(encoded)
 	if bytes.is_empty():
@@ -42,5 +42,10 @@ static func encoded_payload() -> String:
 		if file == null:
 			push_error("Missing rendered dashboard chunk: %s" % path)
 			return ""
-		encoded += file.get_as_text().strip_edges()
+		encoded += file.get_as_text()
+	encoded = encoded.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", "")
+	# The first repository-safe transfer appended five trailing characters after
+	# the verified JPEG payload. Only the verified prefix is accepted.
+	if encoded.length() > EXPECTED_BASE64_LENGTH:
+		encoded = encoded.left(EXPECTED_BASE64_LENGTH)
 	return encoded
