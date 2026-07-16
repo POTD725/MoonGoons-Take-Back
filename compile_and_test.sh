@@ -8,6 +8,8 @@ IMPORT_LOG="${LOG_DIR}/godot_import.log"
 TEST_LOG="${LOG_DIR}/latest_simulation_run.log"
 GODOT_BIN="${GODOT_BIN:-godot}"
 FAILURES=0
+CHECK_TIMEOUT_SECONDS="${CHECK_TIMEOUT_SECONDS:-75}"
+IMPORT_TIMEOUT_SECONDS="${IMPORT_TIMEOUT_SECONDS:-150}"
 
 mkdir -p "${LOG_DIR}"
 : > "${IMPORT_LOG}"
@@ -23,10 +25,13 @@ run_check() {
   shift
   echo "${step_label}" | tee -a "${TEST_LOG}"
   set +e
-  "$@" 2>&1 | tee -a "${TEST_LOG}"
+  timeout --signal=TERM --kill-after=10s "${CHECK_TIMEOUT_SECONDS}s" "$@" 2>&1 | tee -a "${TEST_LOG}"
   local exit_code=${PIPESTATUS[0]}
   set -e
-  if [[ ${exit_code} -ne 0 ]]; then
+  if [[ ${exit_code} -eq 124 || ${exit_code} -eq 137 ]]; then
+    echo "CHECK TIMED OUT: ${step_label} after ${CHECK_TIMEOUT_SECONDS}s" | tee -a "${TEST_LOG}"
+    FAILURES=1
+  elif [[ ${exit_code} -ne 0 ]]; then
     echo "CHECK FAILED: ${step_label} (exit ${exit_code})" | tee -a "${TEST_LOG}"
     FAILURES=1
   fi
@@ -46,10 +51,13 @@ done
 
 echo "[1/30] Importing and parsing project scripts..." | tee "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
 set +e
-"${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
+timeout --signal=TERM --kill-after=10s "${IMPORT_TIMEOUT_SECONDS}s" "${GODOT_BIN}" --headless --path . --editor --quit 2>&1 | tee -a "${IMPORT_LOG}" | tee -a "${TEST_LOG}"
 IMPORT_EXIT=${PIPESTATUS[0]}
 set -e
-if [[ ${IMPORT_EXIT} -ne 0 ]]; then
+if [[ ${IMPORT_EXIT} -eq 124 || ${IMPORT_EXIT} -eq 137 ]]; then
+  echo "CHECK TIMED OUT: [1/30] Importing and parsing project scripts after ${IMPORT_TIMEOUT_SECONDS}s" | tee -a "${TEST_LOG}"
+  FAILURES=1
+elif [[ ${IMPORT_EXIT} -ne 0 ]]; then
   echo "CHECK FAILED: [1/30] Importing and parsing project scripts... (exit ${IMPORT_EXIT})" | tee -a "${TEST_LOG}"
   FAILURES=1
 fi
